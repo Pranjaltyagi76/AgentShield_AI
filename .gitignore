@@ -9,6 +9,7 @@ credentials.json
 
 # Python dependencies, caches, test outputs, and build artifacts
 .venv/
+.cache/
 venv/
 __pycache__/
 *.py[cod]
@@ -29,6 +30,7 @@ node_modules/
 coverage/
 playwright-report/
 test-results/
+*.tsbuildinfo
 
 # Local databases, logs, and private runtime artifacts
 *.sqlite
