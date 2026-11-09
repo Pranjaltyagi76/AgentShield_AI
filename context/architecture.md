@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: planned architecture, not implemented. Last reviewed: November 10, 2026.
+Status: Phase 0 foundation implemented; feature modules and runtime remain planned. Last reviewed: November 10, 2026.
 
 ## Decisions
 
@@ -69,6 +69,12 @@ AgentShield_AI/
   .env.example
   .gitignore
 ```
+
+## Implemented Phase 0 foundation
+
+Implemented modules are api/system.py, core/settings.py, core/logging.py, db/connection.py, and the application factory in main.py. The database probe uses synchronous SQLAlchemy/psycopg in FastAPI threadpool routes with a two-connection pool, connect/pool/statement timeouts, and no feature tables. Health is independent of the database; readiness returns 503 when unavailable. Production hides interactive docs, and Phase 0 configuration rejects enabling execution or inference.
+
+The frontend uses React Router, TanStack Query, Zod response contracts, Tailwind, lucide icons, and a local shadcn-style Radix-composed Button. There are three foundation routes and a not-found view. Source/lockfiles, tests, CI, Compose, Dockerfile, Render blueprint, and Vercel routing/headers are present. No guest session, agent, or evaluation implementation is included.
 
 ## Backend responsibilities
 

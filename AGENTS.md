@@ -39,4 +39,4 @@ The owner explicitly requires new commits to be attributed only to **Pranjal Tya
 
 ## Current scope
 
-At initial documentation creation, application implementation has not started. Use the roadmap and actual working tree for later status rather than treating this statement as permanent.
+Phase 0 local foundation has been implemented and verified. The initial hosted smoke-test gate remains pending owner hosting connections. Phase 1 and later features are not implemented. Use the roadmap, review log, and actual working tree for current status.

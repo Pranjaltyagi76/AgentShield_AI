@@ -1,6 +1,6 @@
 # AgentShield AI: Free Deployment Runbook
 
-Status: planned; no frontend, API, database, or live demo deployment has been verified. Last updated: November 10, 2026.
+Status: Phase 0 source/configuration and local API/PostgreSQL/frontend checks are implemented; no public frontend/API/Neon deployment has been verified. Last updated: November 10, 2026.
 
 ## Budget and topology
 
@@ -28,15 +28,21 @@ Do not add artificial keep-alive requests to defeat host sleep. Use small databa
 
 ## Phase 0 smoke deployment
 
-1. Confirm that generated frontend/backend code and CI exist. This document alone does not provide runnable services.
+1. Use the implemented frontend/backend source, committed npm/uv locks, and CI. Local setup and check commands are in the root readme. The initial hosted gate still requires owner service connections.
 2. Create a Neon Free project, select a suitable available region, and obtain its TLS-enabled pooled database URL in the provider dashboard. Configure a small application connection pool. Do not publish the URL.
-3. Create the Render Free web service from the repository. Use the `backend` root, a supported Python runtime, and build commands derived from the actual dependency manifest produced in Phase 0. Do not guess a missing lockfile or install command.
+3. Create the Render Free web service from the repository. Use root `backend`, Python 3.12.10, and `pip install uv==0.12.23 && uv sync --locked --no-dev`. Start with `sh scripts/start.sh`. The tracked `render.yaml` selects Free, has no Render database/disk, and keeps automatic deployment off.
 4. Configure only required settings; keep public runs and LLM inference disabled. Use one Uvicorn process bound to `0.0.0.0` and the host-assigned port.
 5. Implement `/api/v1/health` for process health and `/api/v1/ready` for a bounded database check and, once migrations exist, schema readiness. Neither endpoint invokes a model.
-6. Create a Vercel Hobby project with root `frontend`. Once scripts exist, use the Vite build script and its `dist` output. Configure SPA route fallback without intercepting assets; verify a direct visit to a nested route.
+6. Create a Vercel Hobby project with root `frontend`. Use `npm ci`, `npm run build`, and output `dist`. The tracked `frontend/vercel.json` rewrites the known `/system` and `/roadmap` routes without intercepting assets and sets production security headers. Add routing rules when future routes are implemented; verify direct visits after hosting. Narrow its CSP connection origin to the actual API once provisioned.
 7. Set the frontend API base URL to the actual backend origin plus the API prefix expected by the client. Document that convention in the implemented client so `/api/v1` is not duplicated.
 8. Restrict backend CORS to the deployed frontend and explicit development origins; do not wildcard preview origins. Add optional preview origins deliberately when needed.
 9. Verify shell loading, HTTPS health/readiness, browser-to-API requests, and a real database connection. Record dated results below. No public feature mutation endpoints are exposed in Phase 0.
+
+## Implemented Phase 0 startup
+
+The Render build installs from `backend/uv.lock` using the manifest command above. `backend/scripts/start.sh` runs one Uvicorn worker, binds the host-provided port, and disables default access logs to avoid logging arbitrary query strings. It performs no feature-schema migration because Phase 0 has no feature tables. The backend Dockerfile provides the same single-process entry point for container verification.
+
+Local smoke verification used actual PostgreSQL on loopback and the Vite proxy. Docker is missing on the implementation machine, so the local database connectivity check used an ignored temporary portable PostgreSQL binary; Compose/container execution is delegated to the CI checks and still needs a recorded hosted result. Neither a temporary local database nor a green local readiness response proves Neon connectivity.
 
 ## Full application startup after migrations exist
 
@@ -51,7 +57,7 @@ Do not rely on a paid pre-deploy hook, host shell, or separate migration job. Va
 | `DATABASE_URL` | Secret TLS-enabled pooled PostgreSQL URL |
 | `APP_ENV` | Deployment environment identifier |
 | `CORS_ORIGINS` | Explicit allowed frontend and local-development origins |
-| `SECRET_KEY` | Owner-provisioned high-entropy backend secret; never frontend-visible |
+| `SECRET_KEY` | Deferred until session/auth features require it; Phase 0 creates no guest credentials |
 | `LLM_PROVIDER` | `demo` by default |
 | `GEMINI_API_KEY` | Optional backend-only key; absent for required demo |
 | `PUBLIC_RUNS_ENABLED` | Off until guest isolation, bounds, and policy enforcement pass |
@@ -88,13 +94,16 @@ After restart, fail orphaned active runs as interrupted and preserve their parti
 
 | Item | Current evidence |
 |---|---|
-| Repository | [Pranjaltyagi76/AgentShield_AI](https://github.com/Pranjaltyagi76/AgentShield_AI); read connectivity previously checked |
+| Repository | [Pranjaltyagi76/AgentShield_AI](https://github.com/Pranjaltyagi76/AgentShield_AI); documentation publication previously verified |
 | Frontend URL | Not provisioned or verified |
 | Backend URL | Not provisioned or verified |
-| Database connection | Not provisioned or verified |
+| Local database connection | Verified against temporary PostgreSQL; not hosted Neon evidence |
+| Hosted database connection | Not provisioned or verified |
 | Free billing settings | Not inspected in owner accounts |
 | Live benchmark | Not run |
 | Cold-start duration | Not measured |
-| Last successful deployment revision | None recorded |
+| Last successful public deployment revision | None recorded |
+| Local browser smoke | API connected, PostgreSQL ready, navigation and 1440px/390px layouts inspected |
+| Source configuration | render.yaml, frontend/vercel.json, backend Dockerfile/start script, and CI authored |
 
 Replace these entries with dated observations as work progresses. Never infer a successful deployment from a CI badge, build log, or a saved sample alone.

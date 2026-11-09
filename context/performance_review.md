@@ -1,82 +1,94 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated: November 10, 2026. Current stage: documentation preparation; application implementation has not started.
-
-This is the ongoing evidence and review log. It records what was tested, what was measured, and what remains uncertain. It must not contain invented test counts, coverage, latency, security scores, uptime, or deployment success. The measurement method is in [benchmark.md](benchmark.md).
+Last updated: November 10, 2026. Stage: Phase 0 local foundation verified; initial public deployment remains incomplete.
 
 ## Current evidence
 
-| Area | Status | Evidence/limitation |
+| Area | Observed status |
+|---|---|
+| Backend | FastAPI foundation implemented; no agent/run/guest mutation endpoints |
+| Frontend | Overview, system inspector, roadmap, and not-found routes implemented |
+| Local checks | 17 backend tests and 11 frontend tests passed |
+| PostgreSQL | Real local readiness connection verified, including integration test |
+| Lint/format/types | Ruff, Prettier, ESLint, TypeScript passed |
+| Frontend production build | Passed; no security benchmark has been executed |
+| Dependency audit | npm audit reported zero vulnerabilities after targeted development-tool override |
+| Docker/Compose local execution | Not run; Docker is not installed on this machine |
+| GitHub Actions | Workflow authored; hosted result not yet recorded |
+| Vercel/Render/Neon deployment | Not provisioned/verified; account connections pending |
+| Security benchmark scores | Not measured; runtime and evaluators begin in later phases |
+| Uptime/load/latency benchmark | Not measured; foundation build time is not application latency |
+
+## Phase 0 review: November 10, 2026 (Asia/Calcutta)
+
+Scope: application shell, typed settings/API client, process health/database readiness, logging/errors/CORS, dependency locks, local database/container configuration, CI, threat model, and deployment templates. No agent execution, attack logic, data tables, guest credentials, or inference has been implemented.
+
+Environment: Windows x64, Python 3.12.10, Node 24.18.0, npm 11.16.0, uv 0.12.23. Runtime dependencies are recorded in the committed locks. Starlette's current TestClient uses httpx2; installing that client removed the deprecated-httpx warning.
+
+### Actual checks
+
+| Check | Command/procedure | Result |
 |---|---|---|
-| Product plan | Reviewed and revised | [Specification](../AgentShield_PROJECT.md) includes zero-spend and deployment constraints |
-| Runtime, policy engine, API, UI | Not implemented | No application source exists at this documentation stage |
-| Unit/integration/end-to-end tests | Not run | No test suite exists yet |
-| Security benchmark | Not run | Scenario/checker plan exists; no scores measured |
-| Latency, memory, throughput | Not measured | No running application exists yet |
-| Public deployment | Not verified | No live frontend/backend/database evidence recorded |
-| GitHub connectivity | Read access previously verified | Remote had no refs at the time of the check; not evidence of deployment |
+| Python lint | `backend/.venv/Scripts/ruff.exe check --no-cache backend/app backend/tests` | Passed |
+| Python formatting | Same Ruff executable with `format --check --no-cache` | 11 files formatted correctly |
+| Backend tests | `backend/.venv/Scripts/python.exe -m pytest backend/tests -p no:cacheprovider`, with local `TEST_DATABASE_URL` | 17 passed, no skipped tests, 1.40 seconds in the recorded run |
+| Frontend format | `npm --prefix frontend run format:check` | Passed |
+| Frontend lint | `npm --prefix frontend run lint` | Passed |
+| Frontend types | `npm --prefix frontend run typecheck` | Passed |
+| Frontend tests | `npm --prefix frontend test` | 11 passed in 2 files; includes stale-connection regression |
+| Frontend build | `npm --prefix frontend run build` | Passed |
+| Browser | Real local API through Vite proxy; Overview/System/Roadmap navigation; 1440px and 390px breakpoints | API connected and PostgreSQL ready; no observed horizontal overflow; mobile menu/navigation worked |
+| Foundation mode | Backend tests request future feature routes and try enabling execution/inference | Routes absent; unsafe Phase 0 flag configuration rejected |
+| Readiness boundaries | Test unavailable/configuration/recovery, real PostgreSQL, generic errors, CORS, and process-only health | Passed |
 
-Git publication and documentation checks are recorded in commit history or the task report; they are not application quality gates. Update the table when source or measured evidence changes.
+The optional integration test first skipped when no database was available, then passed after starting a temporary PostgreSQL 18.6 test instance from the published `embedded-postgres@18.6.0-beta.19` package inside the ignored workspace cache. It bound only loopback port 55432 and created no Windows service/user. This was a verification workaround for missing Docker, not a new application dependency or a replacement deployment plan. CI is configured for PostgreSQL 17; its result must be recorded separately.
 
-## Targets versus results
+Vite's native subprocesses require execution outside the restricted sandbox; the tests/build passed there. The ordinary commands remain valid on the developer's normal terminal. A local pytest cache creation issue was avoided with `-p no:cacheprovider`; this does not disable tests. Ruff validation used `--no-cache` for the same reason.
 
-| Criterion | Planned target | Measured result |
+### Dependency finding and resolution
+
+npm initially reported ten moderate findings through one development-tool transitive `minimatch` advisory. A declared override to the patched `^11.0.1` release resolved the audit findings without a forced bulk upgrade. ESLint, type checking, tests, and build were then rerun successfully. Keep the override documented and review it during future dependency updates. An empty audit is not proof of complete dependency security.
+
+### Build artifact observation
+
+The recorded production build emitted a 0.72 kB HTML entry, 21.12 kB CSS (5.81 kB gzip), and 427.06 kB JavaScript (131.78 kB gzip). These are build-reported transfer sizes, not memory, runtime performance, or security measurements. Do not publish a p95 latency/throughput claim from these numbers.
+
+### Remaining gates
+
+- Owner connects/provisions eligible free Vercel, Render, and Neon accounts.
+- Verify actual billing settings, live HTTPS/CORS, deployed shell/health/readiness, and Neon connectivity.
+- Record actual GitHub Actions results, including Linux PostgreSQL, Compose validation, and container build.
+- Measure an actual free-host cold start only after deployment.
+- Phase 0 remains in progress until its required initial deployment gate is observed.
+
+## Targets for later phases
+
+| Criterion | Target | Actual result |
 |---|---|---|
 | Prohibited mock execution | Zero executed prohibited actions in enforcement fixtures | Not measured |
-| Scripted determinism | Same version/configuration produces same canonical outcome and semantic trace | Not measured |
-| Warm scripted suite | Target at most 10 seconds after readiness; record per-profile timing | Not measured |
-| Guest isolation | All explicit cross-session denial fixtures pass | Not measured |
-| Inconclusive handling | Missing evidence never silently becomes a pass | Not measured |
-| Concurrency and storage | Server enforces configured caps and rejects excess work visibly | Not measured |
-| Reports | Generated from retained records after restart; escaped HTML | Not measured |
-| Free operation | No required paid service or chargeable fallback | Design constraint; account settings unverified |
+| Scripted repeatability | Same canonical configuration yields the same semantic outcome/trace | Not measured |
+| Warm scripted suite | At most 10 seconds after readiness, per profile; measure before claiming | Not measured |
+| Guest isolation | Explicit cross-session tests pass | Not implemented |
+| Inconclusive handling | Missing evidence never becomes a pass | Not implemented |
+| Resource limits | Server enforces finite queue/concurrency/step/token/storage bounds | Not implemented |
+| Reports | Escaped HTML/JSON regenerate from retained data after restart | Not implemented |
 
-Do not turn targets into published achievements. Broader latency/throughput thresholds should be set after measuring the first working implementation on the actual free host. Provider wake-up, quota suspension, and network variation are reported separately from warm execution.
+## Ongoing review procedure
 
-## Review procedure
+For every phase, record exact scope/revision, environment, actual commands/results, evidence, findings/fixes, checks not run, and remaining gates. Keep superseded failures with their context instead of presenting them as historical successes. Measure warm execution and cold start separately using [benchmark.md](benchmark.md). Do not invent coverage, benchmark scores, uptime, or deployment success.
 
-1. State the exact phase, revision, environment, configuration, and review scope.
-2. Run checks relevant to changed behavior. Keep meaningful policy, ownership, lifecycle, evaluator, and API tests; avoid tests that merely restate a constant or document text.
-3. Record exact commands, exit status, counts, and evidence paths. A check not run is not passed.
-4. Measure warm runtime and cold-start behavior separately using the protocol in the benchmark document. Identify sample size and hardware/host.
-5. Record defects by severity and actual user/security impact, with reproducible evidence and linked trace/test IDs where available.
-6. Fix required failures, rerun affected checks, and record remaining limitations. Do not mark a phase complete while its required gates remain unverified.
-
-## Append-only review entry template
-
-Use the template below for actual reviews. Keep superseded results with their dates and link the follow-up rather than rewriting failures as if they never happened.
+## Future review template
 
 ```text
-Review date and timezone:
-Phase / scope:
-Commit or working-tree revision:
-Environment, hardware/host, database, runtime versions:
-Agent/scenario/policy/tool versions and run settings:
-
-Implemented changes:
-Checks run (exact commands and result/counts):
-Checks not run and why:
-Benchmark sample size and warm/cold procedure:
-Measured counts/coverage/latency/usage/resource values:
-Evidence files or trace/run IDs (no secrets):
-
-Findings with impact and reproducible steps:
-Fixes and verification:
-Remaining risks/limitations:
-Phase gates met / still incomplete:
-Next authorized action:
+Review date/timezone and phase:
+Revision and environment:
+Implemented scope:
+Exact checks/commands, counts, and results:
+Not-run checks and reasons:
+Benchmark settings, versions, sample size, warm/cold procedure:
+Measured values and evidence (no secrets):
+Findings, fixes, and retest:
+Remaining gates and next authorized action:
 ```
 
-## Outstanding decisions and review points
-
-| Item | When to resolve | Decision rule |
-|---|---|---|
-| Exact dependency/runtime versions and lockfiles | Phase 0 | Choose supported compatible versions and record actual installed versions |
-| Provider regions and owner account eligibility | Phase 0 deployment | Use available free regions and verify latency/eligibility; do not guess |
-| Structured provider action schema and token accounting | Phase 7 if enabled | Fixed approved model, deterministic validation, conservative pre-call budgeting |
-| Natural-language quality oracle limits | Phase 4/7 | Document deterministic coverage; no unsupported claim of semantic completeness |
-| Global rate threshold and database usage measurement | Before public execution | Conservative finite global ceiling and bounded measurement strategy on the actual host |
-| Real-model benchmark variability | Phase 7 if enabled | Store repeated-run counts/settings and uncertainty; do not promise reproducibility of text |
-| Migration rollback compatibility | Each schema change | Preserve evidence and use versioned forward repair where necessary |
-
-Adding accounts, distributed workers, vector databases, paid infrastructure, or a judge is a scope decision, not an automatic performance improvement.
+Account persistence, distributed workers, vector databases, PDF generation, LangGraph, and LLM judges remain deferred scope decisions.

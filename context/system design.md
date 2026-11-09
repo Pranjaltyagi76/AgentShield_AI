@@ -1,6 +1,6 @@
 # AgentShield AI: System Design
 
-Status: planned design; no application implementation yet. Last reviewed: November 10, 2026.
+Status: target system design; Phase 0 health/readiness and shell implemented, feature runtime still planned. Last reviewed: November 10, 2026.
 
 Product scope and acceptance criteria come from [the project specification](../AgentShield_PROJECT.md) and [requirements](../requirement.md). Module boundaries are in [architecture](architecture.md); metric definitions are in [benchmark](benchmark.md).
 
