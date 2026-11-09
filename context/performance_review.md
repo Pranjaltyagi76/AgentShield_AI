@@ -14,7 +14,7 @@ Last updated: November 10, 2026. Stage: Phase 0 local foundation verified; initi
 | Frontend production build | Passed; no security benchmark has been executed |
 | Dependency audit | npm audit reported zero vulnerabilities after targeted development-tool override |
 | Docker/Compose local execution | Not run; Docker is not installed on this machine |
-| GitHub Actions | Workflow authored; hosted result not yet recorded |
+| GitHub Actions | Hosted frontend and backend container build passed in the initial run; backend setup correction described below. Follow the linked Actions history for the latest outcome. |
 | Vercel/Render/Neon deployment | Not provisioned/verified; account connections pending |
 | Security benchmark scores | Not measured; runtime and evaluators begin in later phases |
 | Uptime/load/latency benchmark | Not measured; foundation build time is not application latency |
@@ -57,9 +57,15 @@ The recorded production build emitted a 0.72 kB HTML entry, 21.12 kB CSS (5.81 k
 
 - Owner connects/provisions eligible free Vercel, Render, and Neon accounts.
 - Verify actual billing settings, live HTTPS/CORS, deployed shell/health/readiness, and Neon connectivity.
-- Record actual GitHub Actions results, including Linux PostgreSQL, Compose validation, and container build.
+- Check the latest [Phase 0 Actions run](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/workflows/ci.yml) for Linux PostgreSQL and Compose validation after the setup correction. The hosted frontend/container checks already passed in the initial run.
 - Measure an actual free-host cold start only after deployment.
 - Phase 0 remains in progress until its required initial deployment gate is observed.
+
+## Hosted CI verification record
+
+The [initial CI run](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/42687280344) verified the frontend checks/build and backend container build. The backend job failed before executing tests because `astral-sh/setup-uv@v10` could not be resolved. Direct Git tag inspection found v7 at `94527f2e458b27549849d47d273a16bec83a01e9`; the workflow now pins that verified revision. The correction also removes unused starter assets and ignores interrupted pytest cache folders.
+
+See the [Actions history](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/workflows/ci.yml) for the correction run and its current result. Local backend tests including actual PostgreSQL had already passed independently. A workflow setup failure is not a failed security benchmark and must not be represented as one.
 
 ## Targets for later phases
 

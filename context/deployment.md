@@ -42,7 +42,7 @@ Do not add artificial keep-alive requests to defeat host sleep. Use small databa
 
 The Render build installs from `backend/uv.lock` using the manifest command above. `backend/scripts/start.sh` runs one Uvicorn worker, binds the host-provided port, and disables default access logs to avoid logging arbitrary query strings. It performs no feature-schema migration because Phase 0 has no feature tables. The backend Dockerfile provides the same single-process entry point for container verification.
 
-Local smoke verification used actual PostgreSQL on loopback and the Vite proxy. Docker is missing on the implementation machine, so the local database connectivity check used an ignored temporary portable PostgreSQL binary; Compose/container execution is delegated to the CI checks and still needs a recorded hosted result. Neither a temporary local database nor a green local readiness response proves Neon connectivity.
+Local smoke verification used actual PostgreSQL on loopback and the Vite proxy. Docker is missing on the implementation machine, so the local database connectivity check used an ignored temporary portable PostgreSQL binary; The initial hosted CI run verified the backend container build and frontend checks. The backend test/Compose job required a corrected setup-uv reference; follow the linked Actions history in the performance review for the latest result. Neither a temporary local database nor a green local readiness response proves Neon connectivity.
 
 ## Full application startup after migrations exist
 
