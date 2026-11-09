@@ -1,0 +1,50 @@
+# Real credentials and local environment configuration
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+credentials.json
+
+# Python dependencies, caches, test outputs, and build artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.egg-info/
+build/
+dist/
+
+# JavaScript dependencies and generated output
+node_modules/
+.vite/
+coverage/
+playwright-report/
+test-results/
+
+# Local databases, logs, and private runtime artifacts
+*.sqlite
+*.sqlite3
+*.db
+*.log
+backend/.runtime/
+backend/artifacts/
+local-exports/
+
+# Local deployment clients and editor/OS files
+.vercel/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Keep dependency lockfiles, migrations, scenarios, and reviewed sample reports tracked.
