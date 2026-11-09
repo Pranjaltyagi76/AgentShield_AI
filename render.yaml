@@ -1,0 +1,29 @@
+# Owner must select/retain Free and provision Neon separately. No Render database or disk.
+services:
+  - type: web
+    name: agentshield-api
+    runtime: python
+    plan: free
+    branch: main
+    rootDir: backend
+    buildCommand: pip install uv==0.12.23 && uv sync --locked --no-dev
+    startCommand: sh scripts/start.sh
+    healthCheckPath: /api/v1/health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.10"
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: PUBLIC_RUNS_ENABLED
+        value: "false"
+      - key: PUBLIC_LLM_ENABLED
+        value: "false"
+      - key: LLM_PROVIDER
+        value: demo
+      - key: LOG_LEVEL
+        value: INFO
