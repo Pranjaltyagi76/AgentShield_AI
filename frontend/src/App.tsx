@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Button } from './components/ui/button'
+import { Agents, Scenarios } from './Registry'
 import { API_BASE } from './lib/api'
 import { cn } from './lib/utils'
 import { useSystemStatus } from './lib/use-system-status'
@@ -85,17 +86,17 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
             <ListChecks size={18} />
             Development roadmap
           </NavLink>
+          <NavLink to="/agents" onClick={close}>
+            <Layers3 size={18} />
+            Agents
+          </NavLink>
+          <NavLink to="/scenarios" onClick={close}>
+            <FlaskConical size={18} />
+            Scenarios
+          </NavLink>
         </nav>
         <p className="nav-heading nav-heading-later">EVALUATION · COMING LATER</p>
         <div className="future-nav">
-          <span>
-            <Layers3 size={18} />
-            Agents<small>01</small>
-          </span>
-          <span>
-            <FlaskConical size={18} />
-            Scenarios<small>01</small>
-          </span>
           <span>
             <Workflow size={18} />
             Benchmark runs<small>04</small>
@@ -192,7 +193,7 @@ function SystemCards({ system }: { system: System }) {
       <article className="surface system-card">
         <div className="card-top">
           <LockKeyhole size={19} />
-          <StatusLabel tone="muted">Disabled in Phase 0</StatusLabel>
+          <StatusLabel tone="muted">Disabled</StatusLabel>
         </div>
         <h3>Agent execution</h3>
         <p>Tests and model calls stay unavailable during foundation setup.</p>
@@ -329,7 +330,7 @@ function Overview({ system }: { system: System }) {
           </div>
         </section>
         <section className="surface next-panel">
-          <span className="small-eyebrow">UP NEXT · PHASE 1</span>
+          <span className="small-eyebrow">AVAILABLE · PHASE 1</span>
           <h2>
             Give every test
             <br />a place to belong.
@@ -410,8 +411,9 @@ function SystemPage({ system }: { system: System }) {
         <div>
           <h2>Execution is intentionally unavailable.</h2>
           <p>
-            Phase 0 exposes only system checks. Guest sessions, agent configuration, scenarios, and
-            benchmark execution arrive in later phases. No inference credentials are required.
+            Guest sessions, versioned agent profiles and the scenario catalog are available.
+            Simulation and benchmark execution arrive in later phases. No inference credentials are
+            required.
           </p>
         </div>
       </section>
@@ -430,7 +432,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="good">Phase 0 complete</StatusLabel>
+        <StatusLabel tone="good">Phase 1 complete</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -447,7 +449,7 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index === 0 ? (
+            {index <= 1 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
             ) : (
               <span className="planned-label">Planned</span>
@@ -485,7 +487,11 @@ export default function App() {
         ? 'System status'
         : location.pathname === '/roadmap'
           ? 'Development roadmap'
-          : 'Page not found'
+          : location.pathname === '/agents'
+            ? 'Agents'
+            : location.pathname === '/scenarios'
+              ? 'Scenarios'
+              : 'Page not found'
   useEffect(() => {
     document.title = routeName + ' · AgentShield AI'
     mainRef.current?.focus({ preventScroll: true })
@@ -526,6 +532,8 @@ export default function App() {
             <Route path="/" element={<Overview system={system} />} />
             <Route path="/system" element={<SystemPage system={system} />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/agents" element={<Agents />} />
+            <Route path="/scenarios" element={<Scenarios />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <footer className="workspace-footer">

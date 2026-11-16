@@ -1,4 +1,53 @@
 @import 'tailwindcss';
+.registry {
+  max-width: 52rem;
+}
+.registry h1,
+.registry h2,
+.registry h3 {
+  margin: 1.3rem 0 0.5rem;
+}
+.registry label {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.6rem 0;
+}
+.registry input,
+.registry select,
+.registry textarea,
+.registry button {
+  font: inherit;
+  border: 1px solid #b8c7bc;
+  border-radius: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  background: white;
+  color: #20392b;
+}
+.registry button,
+.registry summary {
+  cursor: pointer;
+}
+.registry button:disabled {
+  opacity: 0.55;
+}
+.registry ul {
+  padding: 0;
+  list-style: none;
+}
+.registry li,
+.registry details {
+  padding: 0.5rem 0;
+}
+.registry article {
+  padding: 1rem;
+  overflow-wrap: anywhere;
+}
+.registry form {
+  max-width: 36rem;
+}
+.registry [role='alert'] {
+  color: #813511;
+}
 :root {
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
   color: #202d28;
