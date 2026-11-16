@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: Phase 0 foundation implemented; feature modules and runtime remain planned. Last reviewed: November 16, 2026.
+Status: Phase 0 foundation and public deployment smoke complete; feature modules and runtime remain planned. Last reviewed: November 16, 2026.
 
 ## Decisions
 
@@ -73,7 +73,7 @@ AgentShield_AI/
 
 ## Hosted foundation status
 
-The Render Free Docker API and Neon Free PostgreSQL connection are live and verified. Vercel frontend provisioning remains blocked by its configured scope grant; the public browser flow is not yet verified. The live service was created directly with MCP, with no Blueprint attached. The matching Docker template remains versioned for reviewable reproduction. See deployment.md for exact evidence and resource IDs.
+The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreSQL connection are live and verified together in the browser. The frontend uses the public backend API base and its CSP permits only that API origin. Render CORS explicitly lists the two production aliases, without wildcard previews. Vercel releases upload reviewed frontend source through its API because the GitHub integration is not installed; automatic GitHub frontend deployment is not configured. Vercel's default deployment protection is retained; the canonical production domain is public. The Render service was created directly with MCP, with no Blueprint attached and automatic deploy off. See deployment.md for exact evidence and resource IDs.
 
 ## Implemented Phase 0 foundation
 

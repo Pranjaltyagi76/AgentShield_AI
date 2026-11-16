@@ -4,13 +4,13 @@ Last updated: November 16, 2026. Source: Section 16 of [AgentShield_PROJECT.md](
 
 ## Current position
 
-Phase 0 local foundation is implemented. Render Free and Neon Free are now provisioned, and live HTTPS health/readiness, database connectivity, production route restrictions, and CORS rejection were verified. The deployment fix passed CI for frontend, backend/PostgreSQL, Compose, and container checks. No phase is marked complete: Vercel still requires the owner to approve its configured scope before frontend deployment and the public browser smoke test. See performance_review.md for dated evidence.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phase 1 and later features have not started. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
 | Phase | Scope | Status |
 |---|---|---|
-| 0 | Foundation and initial free deployment smoke test | In progress; live backend/Neon verified, Vercel scope approval and frontend smoke pending |
+| 0 | Foundation and initial free deployment smoke test | Complete; local checks, CI, and public shell/API/Neon smoke verified November 16 |
 | 1 | Guest ownership, data model, agent/scenario catalog | Not started |
 | 2 | Scripted agents, bounded queue, simulation runtime | Not started |
 | 3 | Deterministic policy enforcement | Not started |
@@ -29,6 +29,8 @@ Create React/Vite/TypeScript frontend and Python/FastAPI backend, typed settings
 Deploy only the frontend shell and health/readiness API on free plans; verify a Neon connection without creating feature tables. Keep mutation and run endpoints unavailable. Record commands, free billing settings, origins, and cold-start behavior. Owner sign-ins/account setup may be needed.
 
 Exit evidence: local frontend/backend start, checks pass, and deployed shell/API/database connectivity is observed. If accounts prevent deployment, mark that gate incomplete and record the blocker; do not silently waive it.
+
+Completion record: started November 10 and completed November 16, 2026. The public shell at https://agentshield-ai-tau.vercel.app reaches the Render API and pooled Neon database. Direct /system and /roadmap visits, connection refresh, mobile navigation, disabled execution, and rejected unapproved CORS origins were observed. Frontend completion labels are in b5abaad3dde25d627aae0efb804e03e9f6c38df4; backend code is unchanged from the CI-tested 5b48b86. No Phase 0 exit gate remains. Post-idle cold-start timing and performance benchmarks remain unmeasured; the full no-key scenario workflow belongs to later phases.
 
 ## Phase 1: Core data and guest ownership
 

@@ -1,6 +1,6 @@
 # AgentShield AI: System Design
 
-Status: target system design; Phase 0 health/readiness are live on Render with Neon connectivity, while the shell remains local until Vercel access is approved. Feature runtime is still planned. Last reviewed: November 16, 2026.
+Status: target system design; Phase 0 public Vercel shell → Render health/readiness → Neon connectivity is verified. Feature runtime is still planned. Last reviewed: November 16, 2026.
 
 Product scope and acceptance criteria come from [the project specification](../AgentShield_PROJECT.md) and [requirements](../requirement.md). Module boundaries are in [architecture](architecture.md); metric definitions are in [benchmark](benchmark.md).
 
@@ -11,6 +11,8 @@ AgentShield evaluates agents inside an application-controlled simulation runtime
 The required product works without inference credentials. A scripted vulnerable profile and a scripted hardened profile exercise the actual runner, policy gateway, trace recorder, and evaluator. Optional real-model tests are separately labelled. Prompt edits do not change scripted behavior; profile and behavior versions must identify changes that do.
 
 ## Public system
+
+Only the visitor → static frontend → API → database path is implemented and verified in Phase 0. The queue, simulation runtime, tool gateway, evaluator, optional provider, and saved sample in the target diagram remain planned.
 
 ```mermaid
 flowchart LR
