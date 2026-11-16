@@ -1,6 +1,6 @@
 # AgentShield AI: Free Deployment Runbook
 
-Status: Render Free backend and Neon Free database verified over public HTTPS on November 16, 2026. Vercel scope authorization and public frontend smoke verification remain pending.
+Status: Phase 0 public Vercel Hobby → Render Free → Neon Free smoke verified on November 16, 2026. No feature execution or inference is enabled.
 
 Reuse the existing resources in the observed deployment record below. Do not provision duplicate AgentShield services or projects when continuing this task.
 
@@ -30,12 +30,12 @@ Do not add artificial keep-alive requests to defeat host sleep. Use small databa
 
 ## Phase 0 smoke deployment
 
-1. Use the implemented frontend/backend source, committed npm/uv locks, and CI. Local setup and check commands are in the root readme. The remaining hosted gate requires the owner to authorize the existing Vercel connection for the configured scope.
-2. Create a Neon Free project, select a suitable available region, and obtain its TLS-enabled pooled database URL in the provider dashboard. Configure a small application connection pool. Do not publish the URL.
+1. Reuse the implemented source, committed npm/uv locks, existing resources, and CI. Local setup and check commands are in the root readme. The owner has approved the configured Vercel scope.
+2. Reuse the recorded Neon Free project and its TLS-enabled pooled database URL in provider settings. Keep the small application connection pool. Do not publish the URL.
 3. Reuse the Render Free Docker web service. Its repository root is unchanged; `dockerContext` is `backend` and `dockerfilePath` is `backend/Dockerfile`. The Dockerfile installs from the locked Python dependencies and starts `sh scripts/start.sh`. The matching `render.yaml` template selects Free/Singapore, has no Render database/disk/worker, and keeps automatic deployment off.
 4. Configure only required settings; keep public runs and LLM inference disabled. Use one Uvicorn process bound to `0.0.0.0` and the host-assigned port.
 5. Implement `/api/v1/health` for process health and `/api/v1/ready` for a bounded database check and, once migrations exist, schema readiness. Neither endpoint invokes a model.
-6. Create a Vercel Hobby project with root `frontend`. Use `npm ci`, `npm run build`, and output `dist`. The tracked `frontend/vercel.json` rewrites the known `/system` and `/roadmap` routes without intercepting assets and sets production security headers. Add routing rules when future routes are implemented; verify direct visits after hosting. Its CSP now restricts connections to the provisioned API origin.
+6. Reuse the recorded Vercel Hobby project with root `frontend`. Use `npm ci`, `npm run build`, and output `dist`. The tracked `frontend/vercel.json` rewrites the known `/system` and `/roadmap` routes without intercepting assets and sets production security headers. Add routing rules when future routes are implemented; verify direct visits after hosting. Its CSP now restricts connections to the provisioned API origin.
 7. Set the frontend API base URL to the actual backend origin plus the API prefix expected by the client. Document that convention in the implemented client so `/api/v1` is not duplicated.
 8. Restrict backend CORS to the deployed frontend and explicit development origins; do not wildcard preview origins. Add optional preview origins deliberately when needed.
 9. Verify shell loading, HTTPS health/readiness, browser-to-API requests, and a real database connection. Record dated results below. No public feature mutation endpoints are exposed in Phase 0.
@@ -50,9 +50,17 @@ Local smoke verification used actual PostgreSQL on loopback and the Vite proxy. 
 
 The service was created directly with Render MCP in the workspace explicitly selected by the owner. It is not attached to a Blueprint. `render.yaml` is a schema-validated recreation/configuration template, not evidence of an applied Blueprint sync; do not adopt or replace the live service without reviewing that operation. The direct creation tool did not expose an HTTP health-check-path field, so the live platform probe is TCP. Both `/api/v1/health` and `/api/v1/ready` were independently verified over HTTPS. The template retains the intended HTTP health check for a future reviewed configuration application.
 
-The live `CORS_ORIGINS` is currently `[]` while the frontend is not provisioned. After Vercel authorization, verify the target scope is eligible for Hobby, reuse/create the AgentShield frontend with root `frontend`, set public `VITE_API_BASE_URL=https://agentshield-api-hn0q.onrender.com/api/v1`, and deploy the reviewed source revision. Then merge the exact frontend origin into Render CORS without retrieving/replacing the database secret; trigger one manual deploy because auto-deploy is off. Verify browser-to-API-to-Neon behavior and deep links before completing Phase 0. Do not enable wildcard origins.
+The live public frontend is https://agentshield-ai-tau.vercel.app. Vercel's Hobby badge was observed in the selected scope, and the owner completed access authorization. The project root is `frontend`, Node is `24.x`, and the public production/preview variable is `VITE_API_BASE_URL=https://agentshield-api-hn0q.onrender.com/api/v1`. Only public API configuration belongs in frontend variables.
 
-Vercel returned 403 for scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`). Use `authorize_team_access` to generate a fresh short-lived consent link when the owner is ready, then retry the original request after approval. Do not ask the owner to paste API tokens, do not switch scopes to evade the denial, and do not commit consent links.
+Render `CORS_ORIGINS` is the JSON list `["https://agentshield-ai-tau.vercel.app","https://agentshield-ai-pranjal-tyagi-ai.vercel.app"]`. Both are exact production aliases; the shorter canonical alias is publicly accessible. The scope-qualified alias and generated deployment URLs retain Vercel authentication under the default protection setting. Unapproved origins still receive no allow-origin header. The CORS merge did not retrieve or replace database credentials. The final Render deploy reached live with the updated settings.
+
+Vercel's GitHub integration is not installed: the initial attempt to create a Git-linked project returned 400 before creation. The existing project was then created without Git linking, and reviewed frontend source was deployed using `create_deployment` with inline files. This is a manual release path; pushing GitHub does not automatically deploy the frontend. Do not describe Git metadata attached to an uploaded release as a configured Git connection. Render automatic Git deployment remains off.
+
+For the next release, review/test the intended commit, construct a nonempty bundle containing only tracked `frontend/` source with repository-relative paths, and exclude real env files, dependencies, build output, and credentials. Verify the file list and completion label before submitting it to this existing project with target `production`. Keep project root `frontend`, build `npm run build`, install `npm ci`, and output `dist`. Wait for READY, verify the canonical public alias, direct routes, and API/database response in the browser. Prefer a fresh function-local bundle over stale persistent REPL variables.
+
+Environment-variable updates may schedule a Render deploy themselves; inspect `list_deploys` before triggering an additional deployment. Use manual `trigger_deploy` only when no relevant deploy is queued or running. Confirm the actual live revision and CORS response afterward.
+
+Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
 ## Full application startup after migrations exist
 
@@ -107,23 +115,30 @@ Verified November 16, 2026. No credentials or connection strings are recorded he
 | Item | Current evidence |
 |---|---|
 | Repository | [Pranjaltyagi76/AgentShield_AI](https://github.com/Pranjaltyagi76/AgentShield_AI) |
-| Frontend URL | Not provisioned; Vercel scope grant required |
+| Vercel project | agentshield-ai; prj_SQE3tk0g66cjq1qDqQ6NlJTET0Lb; scope pranjal-tyagi-ai; Hobby badge verified |
+| Final Vercel deploy | dpl_3wys5nTJ9Gywt3fAFXn4kK8fVfck; READY at 2026-11-16T12:08:30.656Z |
+| Frontend source revision | b5abaad3dde25d627aae0efb804e03e9f6c38df4; 23 reviewed source files uploaded directly; no Git integration installed |
+| Public browser evidence | Overview Connected/Ready; /system actual database-connected JSON; /roadmap Phase 0 complete; refresh and mobile navigation passed; inspected console had no errors/warnings |
+| Responsive inspection | 390×844 and 1440×1000 viewport checks; document scroll width equalled client width at both |
+| Frontend URL | [Live public foundation](https://agentshield-ai-tau.vercel.app); unsigned HTTP request returned the application, not a login page |
 | Backend health | [Live HTTPS health](https://agentshield-api-hn0q.onrender.com/api/v1/health): HTTP 200, status ok, phase 0 |
 | Backend database readiness | [Live HTTPS readiness](https://agentshield-api-hn0q.onrender.com/api/v1/ready): HTTP 200, database connected |
 | Render resource | agentshield-api; service ID srv-dbtefcmtlv9c73f4i2pg; Free plan; Singapore; one Docker instance; auto-deploy off |
-| Successful Render deploy | dep-dbteiqgn74is73bmec5g; live at 2026-11-16 11:31:25 UTC |
-| Deployed application revision | 5b48b865f45aef02044cc6e567302ff9c2779915 |
+| Successful Render deploy | dep-dbtf20jo00dc73d0nqe0; live at 2026-11-16 12:04:19 UTC; exact production CORS verified |
+| Backend source revision | d6561281701f86c160851b7d6c8661f4624a5866; backend source unchanged from CI-tested 5b48b865f45aef02044cc6e567302ff9c2779915 |
 | Neon resource | agentshield-ai; project nameless-paper-98324516; organization Pranjal on Free; Singapore; PostgreSQL 17 |
 | Neon compute | Fixed 0.25 CU minimum/maximum; Free idle policy left at its default |
 | Database verification | Standalone SELECT 1 passed; deployed FastAPI readiness also reached the pooled Neon connection |
 | Phase 0 execution/inference | Disabled; /api/v1/runs returned 404; /docs returned 404 in production |
-| CORS | Unapproved-origin response had no allow-origin header; current allowed-origin list is empty pending frontend creation |
-| Runtime error scan | No error-level app logs in the corrected deploy's scanned window |
+| CORS | Canonical frontend origin received its exact allow-origin header; untrusted.example received none; browser connectivity passed |
+| Runtime error scan | No error-level app logs from 12:04:19 to 12:06:05 UTC in the final CORS deploy window |
 | CI | [Deployment-fix CI](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43858216273): frontend, backend/PostgreSQL, and container build succeeded |
-| Billing verification | Render service plan Free and Neon organization plan Free confirmed; no paid upgrade requested; account payment-method settings not inspected |
+| Billing verification | Vercel Hobby badge, Render service Free, and Neon organization Free confirmed; no paid upgrade requested; account payment-method settings not inspected |
 | Live benchmark | Not run; scenario execution is outside Phase 0 |
 | Cold-start duration | Not measured; initial deploy duration is not a post-idle cold-start measurement |
 | Local browser smoke | November 10: API/database connected and 1440px/390px navigation inspected locally |
-| Remaining gate | Vercel scope approval, Hobby eligibility check, frontend deployment, exact CORS update, and public browser smoke |
+| Phase 0 gates | Complete; public browser shell/API/Neon path, direct routes, refresh, mobile navigation, disabled execution, and CORS rejection observed |
 
 The first Render deploy (dep-dbtefdetlv9c73f4i4r0) failed because Literal[False] settings rejected hosting environment strings. The corrected application normalizes explicit false spellings while rejecting true/unknown inputs, with 15 new regression cases. Preserve this failure and fix as historical evidence; never describe the first attempt as successful.
+
+The final frontend attempt dpl_9Hc63GtqSVrUuAveuExpyJHYBk1V failed before building because an empty source bundle omitted the frontend root. It did not replace the working deployment. The successful retry used a freshly constructed, checked 23-file bundle; see performance_review.md for the retained failure record.
