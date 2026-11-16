@@ -37,7 +37,7 @@ def test_health_does_not_touch_database_and_cleans_up():
         response = client.get("/api/v1/health")
         assert response.status_code == 200
         assert response.json()["status"] == "ok"
-        assert response.json()["phase"] == 0
+        assert response.json()["phase"] == 1
         assert probe.calls == 0
         UUID(response.headers["X-Request-ID"])
         assert response.headers["Cache-Control"] == "no-store"
@@ -82,12 +82,12 @@ def test_cors_allows_only_configured_origins():
             "/api/v1/health",
             headers={"Origin": "https://frontend.example", "Access-Control-Request-Method": "POST"},
         )
-        assert preflight.status_code == 400
+        assert preflight.status_code == 200
 
 
 def test_feature_mutations_are_not_available():
     with TestClient(create_app(config(), Probe())) as client:
-        for path in ("/api/v1/runs", "/api/v1/agents", "/api/v1/guest-sessions"):
+        for path in ("/api/v1/runs", "/api/v1/execute"):
             response = client.post(path, json={})
             assert response.status_code == 404
             assert response.json()["error"]["code"] == "not_found"

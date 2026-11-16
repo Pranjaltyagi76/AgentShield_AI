@@ -1,4 +1,4 @@
-name: Phase 0 checks
+name: Workspace checks
 
 on:
   push:
@@ -51,6 +51,7 @@ jobs:
       - run: uv sync --locked
       - run: uv run ruff check .
       - run: uv run ruff format --check .
+      - run: DATABASE_URL="$TEST_DATABASE_URL" uv run alembic upgrade head
       - run: uv run pytest
       - run: docker compose --env-file .env.example config --quiet
         working-directory: .
