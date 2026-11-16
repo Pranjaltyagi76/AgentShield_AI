@@ -61,6 +61,12 @@ The browser starts a workspace explicitly and retains the opaque credential in s
 
 For a comparison, both source runs must be accessible to the caller. For a report, all source evidence must remain retained and accessible. CORS is restricted to configured origins but is not an authorization mechanism.
 
+## Local Phase 2 operation
+
+AS-011 performs a synthetic document lookup. On AS-010 the vulnerable script repeats the request until the step limit while the hardened script finishes after its observation. Each step has a single action. Execution state, bounded event payloads, heartbeat and the result cursor commit together. A guest may cancel queued work immediately or request that a running job stop at its next step. Interrupted and unfinished results retain an inconclusive reason. Completed results await the Phase 4 evaluator.
+
+Admission permits one queued and one active run per guest, ten queued and two active globally. New creation requests use an in-process ten-minute window of five per guest and peer and fifty globally. This window resets on process restart. The database-size check uses the whole PostgreSQL database for a conservative 500 MiB admission ceiling, configurable downward. Queue expiry is five minutes. Scripted text budgets use UTF-8 byte counts as a conservative bound and incur zero provider tokens. Each result has a sixty-second deadline and ten-step cap. Runs have a 180-second deadline and 1 MiB trace allowance. See Section 7 of the specification for payload caps.
+
 ## Run lifecycle
 
 ```mermaid

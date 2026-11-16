@@ -4,7 +4,7 @@ Last updated: November 16, 2026. Source: Section 16 of [AgentShield_PROJECT.md](
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phase 1 is complete locally (November 16); Phase 2 and later have not started. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 is next. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -12,7 +12,7 @@ Implement only the phase explicitly requested by the owner. Later-phase content 
 |---|---|---|
 | 0 | Foundation and initial free deployment smoke test | Complete; local checks, CI, and public shell/API/Neon smoke verified November 16 |
 | 1 | Guest ownership, data model, agent/scenario catalog | Complete locally; migrations, isolation, registry and browser catalog verified |
-| 2 | Scripted agents, bounded queue, simulation runtime | Not started |
+| 2 | Scripted agents, bounded queue, simulation runtime | Complete locally on November 16 |
 | 3 | Deterministic policy enforcement | Not started |
 | 4 | Full scenario pack, oracles, metrics | Not started |
 | 5 | Run UI, traces, evidence | Not started |
@@ -45,6 +45,8 @@ Phase 1 completion (November 16): two PostgreSQL transactions/guest identities w
 Implement vulnerable/hardened behavior versions, synthetic context, mock tools, schema validation, persisted traces, queue creation/claiming, idempotency, deadlines, cancellation, heartbeat/interruption recovery, and server-enforced byte/step/token/concurrency/storage/rate limits.
 
 Exit evidence: one scenario executes locally with persisted ordered evidence; queue/limit/restart/cancellation tests pass. Keep public execution disabled until Phase 3 enforcement is verified.
+
+Completion evidence (November 16): AS-011 completed over HTTP in both profiles with seven persisted events each. AS-010 exercised bounded repetition. PostgreSQL tests verified ownership, version snapshots, deduplication, queue and rate limits, deadlines, cancellation, and interruption recovery. The local API requires explicit opt-in. Public execution awaits Phase 3. See performance_review.md.
 
 ## Phase 3: Policy engine
 

@@ -1,6 +1,12 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated: November 16, 2026. Stage: Phase 0 complete; local foundation and public Vercel → Render → Neon smoke verified. Feature runtime remains unimplemented.
+Last updated: November 16, 2026. Stage: Phase 0 complete; local foundation and public Vercel → Render → Neon smoke verified. The Phase 2 scripted runtime has been verified locally.
+
+## Phase 2 verification — November 16, 2026
+
+All 50 backend tests passed against PostgreSQL, including the gateway permission-isolation regression. Ruff lint and formatting passed. Local PostgreSQL upgraded from `0002` to `0003`, and Alembic reported no model drift. Both scripted profiles completed AS-011 through Uvicorn on 127.0.0.1:8012. Each returned seven persisted events covering scenario start, public input, tool request, gateway decision, mock response, answer, and scenario end. The smoke client revoked its own guest afterward. No benchmark score or timing target was measured.
+
+The initial polling test exposed a PostgreSQL deadlock between a status request and a worker update. The fix acquires the guest before the run and uses a parent lock compatible with foreign-key checks. Local tests cover live polling, idempotency conflicts, cross-guest denial, active and queued cancellation, partial evidence across app restart, queued expiry, rate/capacity rejection, timeouts and byte/step budgets. Port 8000 was occupied during the first HTTP check. The successful smoke used the dedicated port above. Frontend formatting, lint, types, 13 tests and the production build passed. Production deployment was outside this local phase.
 
 ## Phase 1 verification — November 16, 2026
 

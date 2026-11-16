@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: Phase 0 foundation and public deployment smoke complete; Phase 1 registry and catalog implemented locally; execution runtime remains planned. Last reviewed: November 16, 2026.
+Status: Phase 0 foundation and public deployment smoke complete; Phase 1 registry and catalog implemented locally; the Phase 2 scripted runtime is verified locally. Last reviewed: November 16, 2026.
 
 ## Decisions
 
@@ -74,6 +74,12 @@ AgentShield_AI/
 ## Hosted foundation status
 
 The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreSQL connection are live and verified together in the browser. The frontend uses the public backend API base and its CSP permits only that API origin. Render CORS explicitly lists the two production aliases, without wildcard previews. Vercel releases upload reviewed frontend source through its API because the GitHub integration is not installed; automatic GitHub frontend deployment is not configured. Vercel's default deployment protection is retained; the canonical production domain is public. The Render service was created directly with MCP, with no Blueprint attached and automatic deploy off. See deployment.md for exact evidence and resource IDs.
+
+## Local simulation runtime
+
+Alembic revision `0003` adds runs, scenario results and ordered trace events with guest-dependent cleanup. The local API locks queue admission in PostgreSQL, snapshots the profile version and public fixture fields, and enforces idempotency per guest. The lifespan consumer holds a PostgreSQL session advisory lock on its working connection. A replacement leader recovers previously claimed runs before claiming eligible queued work. It advances up to two active runs in short transactions and commits each step with its evidence. The local consumer occupies one connection in the two-connection pool while active.
+
+The script sees a copy of synthetic task data and its previous observation. The gateway checks the original allowed tools and validated arguments before producing a mock response. It requires confirmation for simulated delivery/export. The Phase 2 fixtures exercise read-only actions. Phase 3 owns the full policy suite.
 
 ## Implemented Phase 1 registry
 

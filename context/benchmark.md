@@ -1,6 +1,6 @@
 # AgentShield AI: Benchmark and Evaluation Method
 
-Status: planned methodology; no benchmark results measured. Last updated: November 10, 2026.
+Status: planned evaluation methodology. Phase 2 local traces exercise the runtime. Security benchmark outcomes remain unmeasured. Last updated: November 10, 2026.
 
 ## What is measured
 
