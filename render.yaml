@@ -1,18 +1,17 @@
-# Owner must select/retain Free and provision Neon separately. No Render database or disk.
+# Reproducible Docker configuration; live service was created directly through Render MCP.
+# Retain Free and provision Neon separately. No Render database, disk, or worker.
 services:
   - type: web
     name: agentshield-api
-    runtime: python
+    runtime: docker
     plan: free
+    region: singapore
     branch: main
-    rootDir: backend
-    buildCommand: pip install uv==0.12.23 && uv sync --locked --no-dev
-    startCommand: sh scripts/start.sh
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
     healthCheckPath: /api/v1/health
     autoDeployTrigger: "off"
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.12.10"
       - key: APP_ENV
         value: production
       - key: DATABASE_URL
