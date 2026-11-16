@@ -195,10 +195,10 @@ function SystemCards({ system }: { system: System }) {
           <LockKeyhole size={19} />
           <StatusLabel tone="muted">Disabled</StatusLabel>
         </div>
-        <h3>Agent execution</h3>
-        <p>Tests and model calls stay unavailable during foundation setup.</p>
+        <h3>Public execution</h3>
+        <p>Scripted runs are available through the local development API.</p>
         <div className="card-footer">
-          <code>No execution endpoints</code>
+          <code>Local API only</code>
           <span>Phase 2–4</span>
         </div>
       </article>
@@ -235,7 +235,7 @@ function ArchitectureStrip() {
           <Database size={21} />
         </span>
         <strong>PostgreSQL</strong>
-        <small>Evidence storage in later phases</small>
+        <small>Run and trace storage</small>
       </div>
     </div>
   )
@@ -296,7 +296,7 @@ function Overview({ system }: { system: System }) {
         </span>
         <div>
           <strong>Phase 0 · Foundation verified</strong>
-          <p>This workspace is under development. No security tests have been executed.</p>
+          <p>Browse profiles and scenario definitions. Scoring arrives in a later phase.</p>
         </div>
         <Link to="/roadmap">
           View plan
@@ -409,11 +409,10 @@ function SystemPage({ system }: { system: System }) {
       <section className="surface boundary-panel">
         <ShieldCheck size={23} />
         <div>
-          <h2>Execution is intentionally unavailable.</h2>
+          <h2>Scripted runs are local.</h2>
           <p>
-            Guest sessions, versioned agent profiles and the scenario catalog are available.
-            Simulation and benchmark execution arrive in later phases. No inference credentials are
-            required.
+            Guest sessions, versioned agent profiles and the scenario catalog are available. Local
+            simulations use synthetic data and mock tools. No inference credentials are required.
           </p>
         </div>
       </section>
@@ -432,7 +431,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="good">Phase 1 complete</StatusLabel>
+        <StatusLabel tone="good">Phase 2 complete locally</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -449,7 +448,7 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index <= 1 ? (
+            {index <= 2 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
             ) : (
               <span className="planned-label">Planned</span>
