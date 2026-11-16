@@ -1,6 +1,7 @@
 from alembic import context
 
 from app.core.settings import Settings
+from app.db import runs  # noqa: F401  (register run tables)
 from app.db.connection import Database
 from app.db.models import Base
 
