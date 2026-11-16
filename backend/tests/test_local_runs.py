@@ -1,0 +1,304 @@
+import os
+from datetime import timedelta
+from time import monotonic, sleep
+from uuid import UUID, uuid4
+
+import pytest
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
+from pydantic import ValidationError
+from sqlalchemy.orm import Session
+
+from app import main, run_queue
+from app.api import runs
+from app.core.settings import Settings
+from app.db.runs import Result, Run
+from app.simulation import decide, gateway
+
+
+def test_production_and_remote_database_reject_execution():
+    for env, host in [("production", "localhost"), ("development", "db.example")]:
+        with pytest.raises(ValidationError):
+            Settings(
+                _env_file=None,
+                app_env=env,
+                local_runs_enabled=True,
+                database_url=f"postgresql://user@{host}/test",
+            )
+
+
+def test_gateway_authority_and_profile_decisions():
+    for tool, args, allowed, expected in [
+        ("unknown", {}, ["unknown"], "invalid"),
+        ("search_docs", {"query": "guide", "owner": "admin"}, ["search_docs"], "invalid"),
+        ("search_docs", {"query": "x" * 17000}, ["search_docs"], "invalid"),
+        ("get_customer_record", {"record": "sample"}, [], "blocked"),
+        (
+            "export_file_simulated",
+            {"destination": "mock-inbox"},
+            ["export_file_simulated"],
+            "requires_confirmation",
+        ),
+        (
+            "send_message_simulated",
+            {"destination": "mock-inbox"},
+            ["send_message_simulated"],
+            "requires_confirmation",
+        ),
+    ]:
+        assert gateway(tool, args, allowed) == (expected, None)
+    context = {"available_tools": [], "repeat": False}
+    assert "answer" in decide("hardened", context, None, 0)
+    assert "tool" in decide("vulnerable", context, None, 0)
+
+
+@pytest.fixture
+def harness(request, monkeypatch):
+    url = os.getenv("TEST_DATABASE_URL")
+    if not url:
+        pytest.skip("requires migrated local PostgreSQL")
+    live = getattr(request, "param", False)
+    if not live:
+        monkeypatch.setattr(main, "consume", lambda engine, stop: None)
+    app = main.create_app(
+        Settings(_env_file=None, app_env="test", local_runs_enabled=True, database_url=url)
+    )
+    headers = []
+    with TestClient(
+        app, base_url="http://127.0.0.1/api/v1/", client=("127.0.0.1", 52100)
+    ) as client:
+
+        def workspace(profile="hardened", prompt="Use the synthetic guide"):
+            issued = client.post("guest-sessions")
+            assert issued.status_code == 201
+            h = {"Authorization": "Bearer " + issued.json()["credential"]}
+            headers.append(h)
+            agent = client.post(
+                "agents",
+                headers=h,
+                json={
+                    "name": "Fixture",
+                    "configuration": {
+                        "allowed_tools": ["search_docs"],
+                        "demo_profile": profile,
+                        "system_prompt": prompt,
+                    },
+                },
+            )
+            return h, agent.json()["versions"][0]["id"]
+
+        try:
+            yield client, workspace, app.state.database.engine, app.state.settings
+        finally:
+            for h in headers:
+                client.delete("guest-session", headers=h)
+
+
+def submit(client, h, version, scenarios=("AS-011",), key="one"):
+    return client.post(
+        "runs",
+        headers={**h, "Idempotency-Key": key},
+        json={"agent_version_id": version, "scenarios": list(scenarios)},
+    )
+
+
+@pytest.mark.parametrize("harness", [True], indirect=True)
+def test_live_consumer_and_ordered_trace(harness):
+    c, workspace, _, _ = harness
+    for profile in ("hardened", "vulnerable"):
+        h, version = workspace(profile)
+        response = submit(c, h, version)
+        assert response.status_code == 202, response.text
+        path = "runs/" + response.json()["id"]
+        until = monotonic() + 8
+        while monotonic() < until and c.get(path, headers=h).json()["status"] in (
+            "queued",
+            "running",
+        ):
+            sleep(0.05)
+        assert c.get(path, headers=h).json()["status"] == "completed"
+        events = c.get(path + "/traces", headers=h).json()
+        assert [e["sequence"] for e in events] == list(range(1, 8))
+        assert [e["kind"] for e in events] == [
+            "scenario_start",
+            "agent_input",
+            "tool_requested",
+            "policy_decision",
+            "mock_tool_result",
+            "agent_output",
+            "scenario_end",
+        ]
+        assert events[4]["payload"]["document"] == events[5]["payload"]["answer"]
+        assert c.get(path + "/results", headers=h).json()[0]["outcome"] is None
+        assert submit(c, h, version).json()["id"] == response.json()["id"]
+
+
+def test_queue_admission_ownership_and_cancellation(harness, monkeypatch):
+    c, workspace, engine, settings = harness
+    a, va = workspace()
+    b, vb = workspace()
+    worker = uuid4()
+    first = submit(c, a, va).json()
+    path = "runs/" + first["id"]
+    assert submit(c, a, va).json()["id"] == first["id"]
+    assert submit(c, a, va, ["AS-010"]).status_code == 409
+    assert submit(c, a, va, key="another").status_code == 503
+    assert submit(c, b, va).status_code == 404
+    for route in (path, path + "/traces", path + "/results"):
+        assert c.get(route, headers=b).status_code == 404
+    assert c.post(path + "/cancel", headers=b).status_code == 404
+    monkeypatch.setattr(runs, "MAX_QUEUED", 1)
+    assert submit(c, b, vb).status_code == 503
+    assert c.get("runs", headers={"Host": "remote.example", **a}).status_code == 404
+    with Session(engine) as s, s.begin():
+        assert run_queue.claim(s, worker) == UUID(first["id"])
+    run_queue.tick(engine, worker)
+    assert c.post(path + "/cancel", headers=a).json()["cancel_requested"]
+    run_queue.tick(engine, worker)
+    assert c.get(path, headers=a).json()["status"] == "cancelled"
+    evidence = c.get(path + "/traces", headers=a).json()
+    assert evidence[-1]["kind"] == "mock_tool_result"
+    run_queue.tick(engine, worker)
+    assert c.get(path + "/traces", headers=a).json() == evidence
+    second = submit(c, b, vb, key="second").json()
+    assert c.post("runs/" + second["id"] + "/cancel", headers=b).json()["status"] == "cancelled"
+    settings.max_database_bytes = 1
+    assert submit(c, b, vb, key="third").status_code == 503
+
+
+def test_crash_recovery_preserves_evidence_and_expires_queue(harness):
+    c, workspace, engine, _ = harness
+    a, va = workspace()
+    b, vb = workspace()
+    first = submit(c, a, va).json()
+    old = uuid4()
+    run_queue.tick(engine, old)
+    queued = submit(c, b, vb).json()
+    with Session(engine) as s, s.begin():
+        s.get(Run, UUID(queued["id"])).queue_expires_at = run_queue.now() - timedelta(seconds=1)
+    path = "runs/" + first["id"]
+    events = c.get(path + "/traces", headers=a).json()
+    with Session(engine) as s, s.begin():
+        run_queue.recover(s)
+    run_queue.tick(engine, uuid4())
+    assert c.get(path, headers=a).json()["reason"] == "interrupted"
+    assert c.get(path + "/results", headers=a).json()[0]["outcome"] == "inconclusive"
+    assert c.get(path + "/traces", headers=a).json() == events and events
+    assert c.get("runs/" + queued["id"], headers=b).json()["reason"] == "expired"
+
+
+@pytest.mark.parametrize(
+    ("bound", "reason"),
+    [
+        ("steps", "step_limit"),
+        ("trace", "trace_limit"),
+        ("input", "input_budget"),
+        ("output", "output_budget"),
+        ("total", "input_budget"),
+        ("run", "run_timeout"),
+        ("scenario", "scenario_timeout"),
+    ],
+)
+def test_budget_stop_retains_inconclusive_result(harness, monkeypatch, bound, reason):
+    c, workspace, engine, _ = harness
+    h, v = workspace("vulnerable")
+    obj = submit(c, h, v, ["AS-010"]).json()
+    worker = uuid4()
+    run_queue.tick(engine, worker)
+    if bound in ("trace", "input", "total", "output"):
+        monkeypatch.setattr(
+            run_queue,
+            {
+                "trace": "MAX_TRACE",
+                "input": "MAX_INPUT",
+                "total": "MAX_TOTAL",
+                "output": "MAX_OUTPUT",
+            }[bound],
+            1,
+        )
+    if bound in ("run", "scenario"):
+        with Session(engine) as s, s.begin():
+            target = (
+                s.get(Run, UUID(obj["id"]))
+                if bound == "run"
+                else s.query(Result).filter_by(run_id=UUID(obj["id"])).one()
+            )
+            target.started_at = run_queue.now() - timedelta(seconds=181)
+    for _ in range(11):
+        run_queue.tick(engine, worker)
+    path = "runs/" + obj["id"]
+    row = c.get(path, headers=h).json()
+    assert (row["status"], row["reason"]) == ("failed", reason)
+    assert c.get(path + "/results", headers=h).json()[0]["outcome"] == "inconclusive"
+
+
+def test_new_app_recovers_orphan_and_resumes_unclaimed_work(harness, monkeypatch):
+    client, workspace, engine, settings = harness
+    auth, version = workspace()
+    partial = submit(client, auth, version).json()["id"]
+    run_queue.tick(engine, uuid4())
+    pending = submit(client, auth, version, ["AS-011", "AS-010"], key="next").json()["id"]
+    evidence = client.get("runs/" + partial + "/traces", headers=auth).json()
+    monkeypatch.setattr(main, "consume", run_queue.consume)
+    with TestClient(
+        main.create_app(settings), base_url="http://localhost/api/v1/", client=("127.0.0.1", 52101)
+    ) as restarted:
+        deadline = monotonic() + 8
+        while monotonic() < deadline:
+            row = restarted.get("runs/" + pending, headers=auth).json()
+            if row["status"] == "completed":
+                break
+            sleep(0.05)
+        assert row["status"] == "completed"
+        assert restarted.get("runs/" + partial, headers=auth).json()["reason"] == "interrupted"
+        assert restarted.get("runs/" + partial + "/traces", headers=auth).json() == evidence
+        rows = restarted.get("runs/" + pending + "/results", headers=auth).json()
+        assert [r["scenario_id"] for r in rows] == ["AS-011", "AS-010"]
+        assert all(r["status"] == "completed" for r in rows)
+
+
+def test_agent_cannot_expand_gateway_permissions(harness, monkeypatch):
+    client, workspace, engine, _ = harness
+    auth, version = workspace()
+
+    def request_record(profile, context, observation, step):
+        context["available_tools"].append("get_customer_record")
+        return {"tool": "get_customer_record", "arguments": {"record": "sample"}}
+
+    monkeypatch.setattr(run_queue, "decide", request_record)
+    run = submit(client, auth, version).json()
+    run_queue.tick(engine, uuid4())
+    events = client.get("runs/" + run["id"] + "/traces", headers=auth).json()
+    assert events[-1]["payload"] == {"decision": "blocked"}
+    assert "mock_tool_result" not in [event["kind"] for event in events]
+    assert events[1]["payload"]["available_tools"] == ["search_docs"]
+
+
+def test_active_caps_and_rate_limits(harness):
+    c, workspace, engine, _ = harness
+    a, va = workspace()
+    b, vb = workspace()
+    d, vd = workspace()
+    worker = uuid4()
+    first = submit(c, a, va).json()["id"]
+    with Session(engine) as s, s.begin():
+        assert run_queue.claim(s, worker) == UUID(first)
+    assert submit(c, a, va, key="next").status_code == 202
+    second = submit(c, b, vb).json()["id"]
+    with Session(engine) as s, s.begin():
+        assert run_queue.claim(s, worker) == UUID(second)
+    assert submit(c, d, vd).status_code == 202
+    with Session(engine) as s, s.begin():
+        assert run_queue.claim(s, worker) is None
+    assert submit(c, d, vd, key="retry1").status_code == 503
+    limited = submit(c, d, vd, key="retry2")
+    assert limited.status_code == 429 and limited.headers["Retry-After"] == "600"
+    limiter = runs.RunLimiter()
+    for i in range(5):
+        limiter.admit("same", str(i))
+    with pytest.raises(HTTPException):
+        limiter.admit("same", "new-peer")
+    for i in range(45):
+        limiter.admit(str(i), "peer" + str(i))
+    with pytest.raises(HTTPException):
+        limiter.admit("new-owner", "new-peer")
