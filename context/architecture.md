@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: Phase 0 foundation implemented; feature modules and runtime remain planned. Last reviewed: November 10, 2026.
+Status: Phase 0 foundation implemented; feature modules and runtime remain planned. Last reviewed: November 16, 2026.
 
 ## Decisions
 
@@ -8,6 +8,7 @@ Status: Phase 0 foundation implemented; feature modules and runtime remain plann
 |---|---|
 | React + Vite + TypeScript | Static frontend deployment; no Node.js backend |
 | Python 3.12+ + FastAPI | Typed HTTP API and a maintainable Python evaluation runtime |
+| CI-tested Python Docker container on Render Free | Live backend uses backend/Dockerfile with one process; no change to the Python/FastAPI backend |
 | PostgreSQL + SQLAlchemy 2 + Alembic | Durable relational state, version references, and explicit migrations |
 | Modular monolith, one API process | Fits a single free web service and simple bounded execution |
 | PostgreSQL queue + in-process consumer | Persists state without a mandatory broker or paid worker |
@@ -69,6 +70,10 @@ AgentShield_AI/
   .env.example
   .gitignore
 ```
+
+## Hosted foundation status
+
+The Render Free Docker API and Neon Free PostgreSQL connection are live and verified. Vercel frontend provisioning remains blocked by its configured scope grant; the public browser flow is not yet verified. The live service was created directly with MCP, with no Blueprint attached. The matching Docker template remains versioned for reviewable reproduction. See deployment.md for exact evidence and resource IDs.
 
 ## Implemented Phase 0 foundation
 

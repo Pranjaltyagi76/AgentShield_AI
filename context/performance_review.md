@@ -1,6 +1,6 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated: November 10, 2026. Stage: Phase 0 local foundation verified; initial public deployment remains incomplete.
+Last updated: November 16, 2026. Stage: local foundation and hosted backend/Neon verified; public frontend verification still awaits Vercel scope approval.
 
 ## Current evidence
 
@@ -8,16 +8,31 @@ Last updated: November 10, 2026. Stage: Phase 0 local foundation verified; initi
 |---|---|
 | Backend | FastAPI foundation implemented; no agent/run/guest mutation endpoints |
 | Frontend | Overview, system inspector, roadmap, and not-found routes implemented |
-| Local checks | 17 backend tests and 11 frontend tests passed |
-| PostgreSQL | Real local readiness connection verified, including integration test |
+| Local checks | November 16: 31 backend tests passed, 1 database integration case skipped locally; November 10 browser evidence retained |
+| PostgreSQL | Live Render-to-Neon readiness returned connected; standalone Neon SELECT 1 also passed |
 | Lint/format/types | Ruff, Prettier, ESLint, TypeScript passed |
 | Frontend production build | Passed; no security benchmark has been executed |
 | Dependency audit | npm audit reported zero vulnerabilities after targeted development-tool override |
 | Docker/Compose local execution | Not run; Docker is not installed on this machine |
-| GitHub Actions | Hosted frontend and backend container build passed in the initial run; backend setup correction described below. Follow the linked Actions history for the latest outcome. |
-| Vercel/Render/Neon deployment | Not provisioned/verified; account connections pending |
+| GitHub Actions | Deployment-fix CI passed frontend, backend/PostgreSQL, and container jobs; workflow includes the real database integration case |
+| Vercel/Render/Neon deployment | Render Free and Neon Free verified; Vercel scope permission still denied |
 | Security benchmark scores | Not measured; runtime and evaluators begin in later phases |
 | Uptime/load/latency benchmark | Not measured; foundation build time is not application latency |
+
+## Hosted foundation review: November 16, 2026 (Asia/Calcutta)
+
+- Source revision verified by CI and deployed on Render: 5b48b865f45aef02044cc6e567302ff9c2779915.
+- [CI run 43858216273](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43858216273) completed successfully for frontend checks/build, backend tests with PostgreSQL 17, Compose validation, and the backend container build.
+- The final frontend-CSP revision a7f5a720b0a898486bede64bd39ffca8042c2b07 also passed [CI run 43859035364](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43859035364). The live backend remains on 5b48b86; the subsequent revision changes only frontend security-header configuration.
+- Local backend command: backend/.venv/Scripts/python.exe -m pytest backend/tests -p no:cacheprovider -o faulthandler_timeout=20. Result: 31 passed and 1 database integration case skipped, in 1.12 seconds. TEST_DATABASE_URL was not configured for this local rerun; do not claim it tested hosted connectivity.
+- Ruff lint/format checks passed. Render Docker manifest passed current JSON schema validation using check-jsonschema. Frontend formatting also passed after restricting the CSP to the actual API origin.
+- The backend suite now has 32 collected cases, including 15 environment-string regressions. The first deployment's false-string parsing failure is preserved in the deployment record. Explicit false values are accepted; true and unknown values remain rejected.
+- A sandboxed pytest run stalled and was interrupted. The same suite passed outside the restricted sandbox; no assertions were removed or skipped to work around the stall.
+- Live HTTPS health and readiness both returned 200. Readiness reported database connected. Production /docs and the unimplemented run route returned 404; an unapproved origin received no CORS allow-origin header.
+- Corrected Render deploy dep-dbteiqgn74is73bmec5g reached live on the Free plan in Singapore. Its error-level runtime-log query returned no logs in the scanned window.
+- Neon project agentshield-ai was created in the confirmed Free organization, in Singapore on PostgreSQL 17 with fixed 0.25 CU limits. An explicit idle-timeout override was rejected, so the successful project retained the Free plan default. No app feature schema or data was created.
+- Frontend deployment remains incomplete: Vercel returned 403 for its configured scope and requires the owner's team-access approval. No paid plan or alternative scope was selected.
+- Warm API latency, post-idle cold starts, uptime, security benchmark scores, and load capacity were not measured.
 
 ## Phase 0 review: November 10, 2026 (Asia/Calcutta)
 
@@ -55,9 +70,9 @@ The recorded production build emitted a 0.72 kB HTML entry, 21.12 kB CSS (5.81 k
 
 ### Remaining gates
 
-- Owner connects/provisions eligible free Vercel, Render, and Neon accounts.
-- Verify actual billing settings, live HTTPS/CORS, deployed shell/health/readiness, and Neon connectivity.
-- Check the latest [Phase 0 Actions run](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/workflows/ci.yml) for Linux PostgreSQL and Compose validation after the setup correction. The hosted frontend/container checks already passed in the initial run.
+- Owner approves the configured Vercel scope; Render and Neon are now provisioned on Free.
+- Verify Vercel Hobby eligibility, actual account billing boundaries, the deployed frontend, exact CORS, and the public browser flow; backend health/readiness and Neon connectivity passed.
+- The [November 16 CI run](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43858216273) passed the PostgreSQL, Compose, frontend, and container checks. Retain the earlier failed setup-action run as history.
 - Measure an actual free-host cold start only after deployment.
 - Phase 0 remains in progress until its required initial deployment gate is observed.
 

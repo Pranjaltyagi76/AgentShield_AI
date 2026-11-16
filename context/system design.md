@@ -1,6 +1,6 @@
 # AgentShield AI: System Design
 
-Status: target system design; Phase 0 health/readiness and shell implemented, feature runtime still planned. Last reviewed: November 10, 2026.
+Status: target system design; Phase 0 health/readiness are live on Render with Neon connectivity, while the shell remains local until Vercel access is approved. Feature runtime is still planned. Last reviewed: November 16, 2026.
 
 Product scope and acceptance criteria come from [the project specification](../AgentShield_PROJECT.md) and [requirements](../requirement.md). Module boundaries are in [architecture](architecture.md); metric definitions are in [benchmark](benchmark.md).
 
