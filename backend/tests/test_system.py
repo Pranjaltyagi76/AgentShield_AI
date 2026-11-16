@@ -122,6 +122,23 @@ def test_phase_zero_rejects_execution_flags(flag):
         config(**{flag: True})
 
 
+@pytest.mark.parametrize("value", ["false", "False", "0", "off", "no"])
+def test_phase_zero_accepts_disabled_environment_flags(monkeypatch, value):
+    monkeypatch.setenv("PUBLIC_RUNS_ENABLED", value)
+    monkeypatch.setenv("PUBLIC_LLM_ENABLED", value)
+    settings = Settings(_env_file=None, app_env="test", database_url=None)
+    assert settings.public_runs_enabled is False
+    assert settings.public_llm_enabled is False
+
+
+@pytest.mark.parametrize("flag", ["PUBLIC_RUNS_ENABLED", "PUBLIC_LLM_ENABLED"])
+@pytest.mark.parametrize("value", ["true", "1", "on", "yes", "unknown"])
+def test_phase_zero_rejects_enabled_or_unknown_environment_flags(monkeypatch, flag, value):
+    monkeypatch.setenv(flag, value)
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, app_env="test", database_url=None)
+
+
 @pytest.mark.parametrize(
     "origin", ["*", "https://*.example", "https://example/path", "file://host"]
 )

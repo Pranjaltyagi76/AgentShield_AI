@@ -30,6 +30,16 @@ class Settings(BaseSettings):
     public_llm_enabled: Literal[False] = False
     llm_provider: Literal["demo"] = "demo"
 
+    @field_validator("public_runs_enabled", "public_llm_enabled", mode="before")
+    @classmethod
+    def parse_disabled_environment_flag(cls, value: object) -> object:
+        # Environment values are strings; Literal[False] does not coerce them.
+        # Only explicit false spellings are normalized. True/unknown values
+        # still fail the Literal validation and cannot enable Phase 0 execution.
+        if isinstance(value, str) and value.strip().lower() in {"false", "0", "off", "no"}:
+            return False
+        return value
+
     @field_validator("database_url")
     @classmethod
     def validate_database_url(cls, value: SecretStr | None) -> SecretStr | None:
