@@ -1,6 +1,6 @@
 # AgentShield AI: Requirements
 
-Status: acceptance baseline; Phase 0 local foundation implemented, initial hosted gate pending. Last updated: November 10, 2026.
+Status: acceptance baseline; Phase 0 local foundation and live backend/Neon verified; Vercel frontend gate pending. Last updated: November 16, 2026.
 
 The full product specification is [AgentShield_PROJECT.md](AgentShield_PROJECT.md). This file is its concise acceptance checklist. Runtime decisions are in [context/system design.md](context/system%20design.md); implementation status is in [context/phasewise_roadmap.md](context/phasewise_roadmap.md). Changes to scope must update these references together.
 

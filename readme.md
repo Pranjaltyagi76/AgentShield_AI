@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Current status: Phase 0 foundation implemented and verified locally. The initial public deployment gate is still pending hosting-account connections.** Agent profiles, scenario execution, policy evaluation, and reports are planned for later phases.
+**Current status: Phase 0 local foundation and the Render Free backend/Neon Free database are verified. The Vercel frontend deployment still requires scope authorization, so Phase 0 remains in progress.** Agent profiles, scenario execution, policy evaluation, and reports are planned for later phases.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -16,7 +16,7 @@ The required product will work without an AI API key, using synthetic data and m
 - Local PostgreSQL Compose configuration, backend Dockerfile, committed npm/uv dependency locks, and CI.
 - Free Render/Vercel deployment configuration and an initial threat model.
 
-Local verification: **17 backend tests and 11 frontend tests passed**, including real PostgreSQL connectivity. Lint, formatting, TypeScript, and the production frontend build passed. These are foundation tests, not security benchmark results. See [performance review](context/performance_review.md) for environment and limitations.
+Latest verification (November 16): the backend suite contains **32 cases**; **31 passed locally and one database integration case skipped** without TEST_DATABASE_URL. [CI with PostgreSQL](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43859035364) passed all jobs, including the database integration check, frontend checks/build, and container build. The frontend suite contains **11 tests**. Live Render readiness also reached Neon successfully. These are foundation tests, not security benchmark results. See [performance review](context/performance_review.md) for environment and limitations.
 
 ## Prerequisites
 
@@ -90,13 +90,13 @@ The CI workflow also validates Compose configuration and builds the backend cont
 Use Vercel Hobby for the frontend, Render Free for one backend process, and Neon Free for PostgreSQL, subject to current eligibility. Provider subdomains provide HTTPS. Free services may sleep, restart, hit quotas, or become unavailable; this is a low-traffic portfolio deployment without guaranteed uptime.
 
 - Vercel root: `frontend`; tracked configuration: `frontend/vercel.json`.
-- Render configuration: `render.yaml`; root: `backend`; locked build and `sh scripts/start.sh`.
+- Render configuration: `render.yaml`; Docker context `backend`, Dockerfile `backend/Dockerfile`, locked Python build, and `sh scripts/start.sh`.
 - Set the real backend-only `DATABASE_URL`, explicit JSON `CORS_ORIGINS`, and frontend `VITE_API_BASE_URL`.
 - Render's process health path is `/api/v1/health`; separately verify database readiness.
 - Keep execution/inference disabled. No model keys, paid disk, worker, or Render database are provisioned.
 - Complete owner sign-ins and confirm free-plan/billing settings before provisioning.
 
-Follow [context/deployment.md](context/deployment.md). No live frontend/backend URL or Neon connection has been verified yet.
+Follow [context/deployment.md](context/deployment.md). The backend is live: [health](https://agentshield-api-hn0q.onrender.com/api/v1/health) and [database readiness](https://agentshield-api-hn0q.onrender.com/api/v1/ready) both returned HTTP 200 on November 16. The public frontend is not deployed yet: the owner must approve Vercel access to the configured scope. Phase 0 stays incomplete until that frontend and its browser-to-API-to-Neon flow are verified.
 
 ## Planned product
 

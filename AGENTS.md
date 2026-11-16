@@ -39,4 +39,4 @@ The owner explicitly requires new commits to be attributed only to **Pranjal Tya
 
 ## Current scope
 
-Phase 0 local foundation has been implemented and verified. The initial hosted smoke-test gate remains pending owner hosting connections. Phase 1 and later features are not implemented. Use the roadmap, review log, and actual working tree for current status.
+Phase 0 local foundation, Render Free backend, and Neon Free connectivity have been implemented and verified. The remaining initial hosted gate is Vercel scope approval, frontend deployment, and public browser verification. Reuse the existing resources recorded in context/deployment.md. Phase 1 and later features are not implemented. Use the roadmap, review log, and actual working tree for current status.
