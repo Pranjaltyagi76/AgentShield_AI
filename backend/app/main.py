@@ -4,6 +4,7 @@ import asyncio
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
+from threading import Event as StopSignal
 from time import perf_counter
 from uuid import uuid4
 
@@ -14,6 +15,8 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
 from app import __version__
+from app.api.runs import RunLimiter
+from app.api.runs import router as run_router
 from app.api.system import router
 from app.api.workspaces import IssueLimiter, cleanup
 from app.api.workspaces import router as workspace_router
@@ -21,6 +24,7 @@ from app.core.body_limit import BodyLimit
 from app.core.logging import configure_logging
 from app.core.settings import Settings
 from app.db.connection import Database, DatabaseProbe
+from app.run_queue import consume
 
 logger = logging.getLogger("agentshield")
 
@@ -48,10 +52,19 @@ def create_app(settings: Settings | None = None, database: DatabaseProbe | None 
                 await asyncio.sleep(300)
 
         worker = asyncio.create_task(reap()) if getattr(probe, "engine", None) is not None else None
+        stop = StopSignal()
+        runner = (
+            asyncio.create_task(asyncio.to_thread(consume, probe.engine, stop))
+            if config.local_runs_enabled
+            else None
+        )
         logger.info("application_started")
         try:
             yield
         finally:
+            if runner:
+                stop.set()
+                await runner
             if worker:
                 worker.cancel()
                 with suppress(asyncio.CancelledError):
@@ -111,6 +124,9 @@ def create_app(settings: Settings | None = None, database: DatabaseProbe | None 
 
     application.state.issue_limiter = IssueLimiter()
     application.include_router(workspace_router)
+    if config.local_runs_enabled:
+        application.state.run_limiter = RunLimiter()
+        application.include_router(run_router)
     application.include_router(router)
     application.add_middleware(BodyLimit)
     application.add_middleware(
@@ -118,7 +134,7 @@ def create_app(settings: Settings | None = None, database: DatabaseProbe | None 
         allow_origins=config.cors_origins,
         allow_credentials=False,
         allow_methods=["GET", "POST", "PATCH", "DELETE"],
-        allow_headers=["Content-Type", "Authorization"],
+        allow_headers=["Content-Type", "Authorization", "Idempotency-Key"],
         expose_headers=["X-Request-ID"],
     )
     return application

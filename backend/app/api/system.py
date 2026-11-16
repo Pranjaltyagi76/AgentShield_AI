@@ -17,14 +17,14 @@ class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: str = "agentshield-api"
     version: str = __version__
-    phase: Literal[1] = 1
+    phase: Literal[2] = 2
 
 
 class ReadinessResponse(BaseModel):
     status: Literal["ready", "not_ready"]
     database: DatabaseStatus
     service: str = "agentshield-api"
-    phase: Literal[1] = 1
+    phase: Literal[2] = 2
 
 
 @router.get("/health", response_model=HealthResponse)

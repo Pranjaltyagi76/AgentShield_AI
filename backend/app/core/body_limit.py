@@ -10,15 +10,21 @@ class BodyLimit:
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http" or scope["method"] not in {"POST", "PATCH"}:
             return await self.app(scope, receive, send)
+        limit = 262144 if scope["path"] == "/api/v1/runs" else 65536
         body = bytearray()
         while True:
             event = await receive()
             if event["type"] == "http.disconnect":
                 return
             chunk = event.get("body", b"")
-            if len(body) + len(chunk) > 65536:
+            if len(body) + len(chunk) > limit:
                 return await JSONResponse(
-                    {"error": {"code": "payload_too_large", "message": "Maximum body is 64 KiB."}},
+                    {
+                        "error": {
+                            "code": "payload_too_large",
+                            "message": f"Maximum body is {limit // 1024} KiB.",
+                        }
+                    },
                     status_code=413,
                 )(scope, receive, send)
             body.extend(chunk)

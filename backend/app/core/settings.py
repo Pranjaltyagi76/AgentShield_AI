@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import urlsplit
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
@@ -28,6 +28,20 @@ class Settings(BaseSettings):
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     public_runs_enabled: Literal[False] = False
     public_llm_enabled: Literal[False] = False
+    local_runs_enabled: bool = False
+    max_database_bytes: int = Field(default=524288000, gt=0, le=524288000)
+
+    @model_validator(mode="after")
+    def local_runtime(self):
+        if self.local_runs_enabled and (
+            self.app_env == "production"
+            or not self.database_url
+            or make_url(self.database_url.get_secret_value()).host
+            not in {"localhost", "127.0.0.1", "::1"}
+        ):
+            raise ValueError("Local execution requires development/test and loopback PostgreSQL")
+        return self
+
     llm_provider: Literal["demo"] = "demo"
 
     @field_validator("public_runs_enabled", "public_llm_enabled", mode="before")

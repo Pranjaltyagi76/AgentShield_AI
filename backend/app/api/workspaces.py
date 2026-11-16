@@ -64,7 +64,7 @@ def guest(request, session, required=True):
     row = session.scalar(
         select(Guest)
         .where(Guest.credential_hash == digest(token), Guest.expires_at > func.clock_timestamp())
-        .with_for_update()
+        .with_for_update(key_share=True)
     )
     if not row:
         raise HTTPException(401)
