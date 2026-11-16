@@ -39,7 +39,9 @@ class Database:
             return "not_configured"
         with self.engine.connect() as connection:
             connection.execute(text("SET LOCAL statement_timeout = '3000ms'"))
-            connection.execute(text("SELECT 1"))
+            revision = connection.scalar(text("SELECT version_num FROM alembic_version"))
+            if revision != "0002":
+                return "unavailable"
         return "connected"
 
     def close(self) -> None:

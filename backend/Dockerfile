@@ -6,6 +6,8 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-dev --no-install-project
 COPY app ./app
 COPY scripts ./scripts
+COPY alembic.ini ./
+COPY migrations ./migrations
 RUN useradd --create-home --uid 10001 appuser
 USER appuser
 EXPOSE 8000
