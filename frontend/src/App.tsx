@@ -294,7 +294,7 @@ function Overview({ system }: { system: System }) {
           <Layers3 size={19} />
         </span>
         <div>
-          <strong>Phase 0 · Building the foundation</strong>
+          <strong>Phase 0 · Foundation verified</strong>
           <p>This workspace is under development. No security tests have been executed.</p>
         </div>
         <Link to="/roadmap">
@@ -430,7 +430,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="warn">Phase 0 in progress</StatusLabel>
+        <StatusLabel tone="good">Phase 0 complete</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -448,7 +448,7 @@ function RoadmapPage() {
               <p>{description}</p>
             </div>
             {index === 0 ? (
-              <StatusLabel tone="warn">In progress</StatusLabel>
+              <StatusLabel tone="good">Complete</StatusLabel>
             ) : (
               <span className="planned-label">Planned</span>
             )}
