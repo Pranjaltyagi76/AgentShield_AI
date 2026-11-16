@@ -39,4 +39,4 @@ The owner explicitly requires new commits to be attributed only to **Pranjal Tya
 
 ## Current scope
 
-Phase 0 local foundation, Render Free backend, and Neon Free connectivity have been implemented and verified. The remaining initial hosted gate is Vercel scope approval, frontend deployment, and public browser verification. Reuse the existing resources recorded in context/deployment.md. Phase 1 and later features are not implemented. Use the roadmap, review log, and actual working tree for current status.
+Phase 0 is complete: local foundation, CI, and the public Vercel Hobby → Render Free → Neon Free smoke have been verified. Reuse the existing resources recorded in context/deployment.md. Vercel deployment uses reviewed source uploads because its GitHub integration is not installed; Render automatic deploy is off. Phase 1 and later features are not implemented or authorized. Use the roadmap, review log, and actual working tree for current status.

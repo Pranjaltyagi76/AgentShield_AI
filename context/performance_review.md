@@ -1,6 +1,6 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated: November 16, 2026. Stage: local foundation and hosted backend/Neon verified; public frontend verification still awaits Vercel scope approval.
+Last updated: November 16, 2026. Stage: Phase 0 complete; local foundation and public Vercel → Render → Neon smoke verified. Feature runtime remains unimplemented.
 
 ## Current evidence
 
@@ -15,11 +15,29 @@ Last updated: November 16, 2026. Stage: local foundation and hosted backend/Neon
 | Dependency audit | npm audit reported zero vulnerabilities after targeted development-tool override |
 | Docker/Compose local execution | Not run; Docker is not installed on this machine |
 | GitHub Actions | Deployment-fix CI passed frontend, backend/PostgreSQL, and container jobs; workflow includes the real database integration case |
-| Vercel/Render/Neon deployment | Render Free and Neon Free verified; Vercel scope permission still denied |
+| Vercel/Render/Neon deployment | Vercel Hobby, Render Free, and Neon Free verified together through the public frontend |
 | Security benchmark scores | Not measured; runtime and evaluators begin in later phases |
 | Uptime/load/latency benchmark | Not measured; foundation build time is not application latency |
 
-## Hosted foundation review: November 16, 2026 (Asia/Calcutta)
+## Phase 0 completion review: November 16, 2026 (Asia/Calcutta)
+
+- Public URL: https://agentshield-ai-tau.vercel.app. An unsigned HTTPS request returned HTTP 200 with the AgentShield application title. No model key, developer credential, or Vercel sign-in was required for the public production alias.
+- The owner completed Vercel scope approval. The selected scope's Hobby badge was observed; Render service plan and Neon organization plan were already confirmed Free. No upgrade was requested. Payment-method settings were not inspected.
+- Final frontend release: b5abaad3dde25d627aae0efb804e03e9f6c38df4; Vercel deployment dpl_3wys5nTJ9Gywt3fAFXn4kK8fVfck reached READY. Uploaded source contained 23 files, excluding real environment files, dependency folders, and generated build output. Node 24, npm ci, npm run build, and dist output were used.
+- Final frontend checks: Prettier, ESLint, TypeScript, all 11 Vitest cases, and production build passed. The local build reported HTML 0.72 kB, CSS 19.25 kB, and JavaScript 427.05 kB; these are artifact sizes, not application latency.
+- Render deploy dep-dbtf20jo00dc73d0nqe0 reached live at 12:04:19 UTC on d6561281701f86c160851b7d6c8661f4624a5866. Backend source is unchanged from CI-tested 5b48b86. Error-level app logs from 12:04:19 through 12:06:05 UTC were empty.
+- Browser evidence: Overview showed Connected and Ready; /system rendered actual health and database-connected JSON; direct /system and /roadmap visits worked; the final roadmap showed Phase 0 complete and ten later phases Planned. Connection refresh worked. No console errors or warnings were returned in the inspected window.
+- Mobile check at a requested 390×844 viewport: navigation opened, selecting System status closed it and showed the actual database response. Document client/scroll widths both measured 375 px. Desktop check at 1440×1000 measured both widths 1425 px; no horizontal overflow. Temporary viewport overrides were reset.
+- Final HTTPS health/readiness both returned 200; production /docs and /api/v1/runs returned 404. The canonical frontend origin received the exact allow-origin header; untrusted.example received none. CSP allows the actual API origin; DENY framing and nosniff headers were observed.
+- Local proof screenshot: .cache/phase0-live-preview.png (ignored workspace evidence, not a generated private trace). Deployment IDs, configuration, and manual release procedure are recorded in deployment.md.
+- Vercel Git linking initially returned 400 because the account's GitHub integration was not installed. The project was created without Git linking and successfully deployed using source uploads. Automatic frontend Git deployment is not configured.
+- Final-release attempt dpl_9Hc63GtqSVrUuAveuExpyJHYBk1V failed with NOW_SANDBOX_WORKER_ROOTDIR_NOT_EXIST because an empty source bundle was submitted from a stale REPL binding. The existing public deployment stayed available. A fresh function-local bundle was counted and inspected before the successful retry; this was an upload packaging failure, not a code/build assertion failure.
+- Automatic approval review rejected removing project-wide Vercel protection. It was not applied; the canonical production alias works while default protection remains enabled. No bypass was added.
+- All Phase 0 exit gates are complete. Feature execution, no-key scenario profiles, isolation, benchmarks, and reports remain for later requested phases. Post-idle cold-start duration, warm API latency, uptime, load capacity, and security scores were not measured.
+
+## Initial hosted backend review: November 16, 2026 (Asia/Calcutta)
+
+Historical state before Vercel authorization and frontend completion; the completion record above supersedes its pending frontend gate.
 
 - Source revision verified by CI and deployed on Render: 5b48b865f45aef02044cc6e567302ff9c2779915.
 - [CI run 43858216273](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43858216273) completed successfully for frontend checks/build, backend tests with PostgreSQL 17, Compose validation, and the backend container build.
@@ -68,13 +86,9 @@ npm initially reported ten moderate findings through one development-tool transi
 
 The recorded production build emitted a 0.72 kB HTML entry, 21.12 kB CSS (5.81 kB gzip), and 427.06 kB JavaScript (131.78 kB gzip). These are build-reported transfer sizes, not memory, runtime performance, or security measurements. Do not publish a p95 latency/throughput claim from these numbers.
 
-### Remaining gates
+### Gates remaining at the November 10 review
 
-- Owner approves the configured Vercel scope; Render and Neon are now provisioned on Free.
-- Verify Vercel Hobby eligibility, actual account billing boundaries, the deployed frontend, exact CORS, and the public browser flow; backend health/readiness and Neon connectivity passed.
-- The [November 16 CI run](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43858216273) passed the PostgreSQL, Compose, frontend, and container checks. Retain the earlier failed setup-action run as history.
-- Measure an actual free-host cold start only after deployment.
-- Phase 0 remains in progress until its required initial deployment gate is observed.
+Vercel approval, free-plan checks, public frontend deployment, exact CORS, and the initial browser/API/database smoke were outstanding at that review. They were completed on November 16 as recorded above. The [November 16 CI run](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43858216273) passed PostgreSQL, Compose, frontend, and container checks. Actual post-idle cold-start timing remains unmeasured; no measured duration is claimed.
 
 ## Hosted CI verification record
 

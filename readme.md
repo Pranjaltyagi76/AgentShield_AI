@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Current status: Phase 0 local foundation and the Render Free backend/Neon Free database are verified. The Vercel frontend deployment still requires scope authorization, so Phase 0 remains in progress.** Agent profiles, scenario execution, policy evaluation, and reports are planned for later phases.
+**Current status: Phase 0 is complete. Local checks, CI, and the public Vercel Hobby → Render Free → Neon Free connection are verified.** Agent profiles, scenario execution, policy evaluation, and reports are planned for later phases.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -96,7 +96,9 @@ Use Vercel Hobby for the frontend, Render Free for one backend process, and Neon
 - Keep execution/inference disabled. No model keys, paid disk, worker, or Render database are provisioned.
 - Complete owner sign-ins and confirm free-plan/billing settings before provisioning.
 
-Follow [context/deployment.md](context/deployment.md). The backend is live: [health](https://agentshield-api-hn0q.onrender.com/api/v1/health) and [database readiness](https://agentshield-api-hn0q.onrender.com/api/v1/ready) both returned HTTP 200 on November 16. The public frontend is not deployed yet: the owner must approve Vercel access to the configured scope. Phase 0 stays incomplete until that frontend and its browser-to-API-to-Neon flow are verified.
+Open the [live AgentShield foundation](https://agentshield-ai-tau.vercel.app) or its [system status](https://agentshield-ai-tau.vercel.app/system). The browser reaches the [backend health](https://agentshield-api-hn0q.onrender.com/api/v1/health) and [database readiness](https://agentshield-api-hn0q.onrender.com/api/v1/ready) endpoints; both returned HTTP 200 on November 16. No sign-in or model key is required for this foundation smoke test. Scenario execution is not implemented yet.
+
+Follow [context/deployment.md](context/deployment.md) for the exact configuration and release procedure. Vercel GitHub integration is not installed, so frontend releases currently upload reviewed source through the API. Render automatic deploy is off. Free services may sleep or suspend at quota limits; no uptime or measured cold-start claim is made.
 
 ## Planned product
 
