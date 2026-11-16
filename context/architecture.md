@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: Phase 0 foundation and public deployment smoke complete; feature modules and runtime remain planned. Last reviewed: November 16, 2026.
+Status: Phase 0 foundation and public deployment smoke complete; Phase 1 registry and catalog implemented locally; execution runtime remains planned. Last reviewed: November 16, 2026.
 
 ## Decisions
 
@@ -75,7 +75,11 @@ AgentShield_AI/
 
 The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreSQL connection are live and verified together in the browser. The frontend uses the public backend API base and its CSP permits only that API origin. Render CORS explicitly lists the two production aliases, without wildcard previews. Vercel releases upload reviewed frontend source through its API because the GitHub integration is not installed; automatic GitHub frontend deployment is not configured. Vercel's default deployment protection is retained; the canonical production domain is public. The Render service was created directly with MCP, with no Blueprint attached and automatic deploy off. See deployment.md for exact evidence and resource IDs.
 
-## Implemented Phase 0 foundation
+## Implemented Phase 1 registry
+
+SQLAlchemy models and Alembic revisions `0001`/`0002` define guest sessions, agents, immutable agent versions, scenarios and scenario versions. The seed migration creates two shared profiles and AS-001 through AS-012. Catalog serialization selects public columns explicitly. Runtime descriptors and evaluator rules are distinct; no checker executes in this phase. A bounded query provides the Core v1 suite membership. The Docker entrypoint migrates once before startup; readiness rejects missing/outdated schema. `app/api/workspaces.py` owns the API transactions; React routes `/agents` and `/scenarios` use the versioned API.
+
+## Implemented Phase 0 foundation (historical)
 
 Implemented modules are api/system.py, core/settings.py, core/logging.py, db/connection.py, and the application factory in main.py. The database probe uses synchronous SQLAlchemy/psycopg in FastAPI threadpool routes with a two-connection pool, connect/pool/statement timeouts, and no feature tables. Health is independent of the database; readiness returns 503 when unavailable. Production hides interactive docs, and Phase 0 configuration rejects enabling execution or inference.
 

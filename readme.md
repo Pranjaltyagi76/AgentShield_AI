@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Current status: Phase 0 is complete. Local checks, CI, and the public Vercel Hobby → Render Free → Neon Free connection are verified.** Agent profiles, scenario execution, policy evaluation, and reports are planned for later phases.
+**Phase 1 is implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -11,12 +11,14 @@ The required product will work without an AI API key, using synthetic data and m
 - Responsive React/Vite/TypeScript workspace with Overview, System status, roadmap, and not-found routes.
 - FastAPI process health and real PostgreSQL readiness endpoints.
 - Validated environment settings, restricted CORS, safe JSON errors, request IDs, and structured logs.
-- Phase 0 execution/inference flags locked off; no feature mutation endpoints.
+- Guest-only profile mutations; shared examples are read-only. Execution and inference stay disabled.
 - Small SQLAlchemy/psycopg connection pool and bounded connection/query timeouts.
 - Local PostgreSQL Compose configuration, backend Dockerfile, committed npm/uv dependency locks, and CI.
 - Free Render/Vercel deployment configuration and an initial threat model.
 
-Latest verification (November 16): the backend suite contains **32 cases**; **31 passed locally and one database integration case skipped** without TEST_DATABASE_URL. [CI with PostgreSQL](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43859035364) passed all jobs, including the database integration check, frontend checks/build, and container build. The frontend suite contains **11 tests**. Live Render readiness also reached Neon successfully. These are foundation tests, not security benchmark results. See [performance review](context/performance_review.md) for environment and limitations.
+Phase 1 local verification (November 16): 35 backend tests passed with PostgreSQL and 13 frontend tests passed. The catalog and private profile creation were also checked in the browser.
+
+Historical Phase 0 verification (November 16): the backend suite contains **32 cases**; **31 passed locally and one database integration case skipped** without TEST_DATABASE_URL. [CI with PostgreSQL](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43859035364) passed all jobs, including the database integration check, frontend checks/build, and container build. The frontend suite contains **11 tests**. Live Render readiness also reached Neon successfully. These are foundation tests, not security benchmark results. See [performance review](context/performance_review.md) for environment and limitations.
 
 ## Prerequisites
 
@@ -45,6 +47,7 @@ In a backend terminal:
 
 ```powershell
 uv sync --project backend --locked
+uv --directory backend run alembic upgrade head
 uv --directory backend run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
@@ -57,7 +60,7 @@ npm --prefix frontend run dev
 
 Open [the local workspace](http://127.0.0.1:5173). The frontend proxies `/api` to port 8000; `VITE_API_BASE_URL` includes `/api/v1` exactly once. Development API docs are at [localhost:8000/docs](http://127.0.0.1:8000/docs). Production disables the interactive docs.
 
-`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. No feature tables or migrations are created in Phase 0; schema migrations begin in Phase 1.
+`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 1 readiness also requires Alembic revision `0002`.
 
 Stop the database with `docker compose down`. This preserves the named data volume. Removing the volume deletes local database data, so do not do that as an ordinary shutdown step.
 
@@ -74,14 +77,14 @@ npm --prefix frontend test
 npm --prefix frontend run build
 ```
 
-The database integration test intentionally skips unless `TEST_DATABASE_URL` is set. To include it against the local Compose database in PowerShell:
+Database integration tests skip unless `TEST_DATABASE_URL` is set. To include it against the local Compose database in PowerShell:
 
 ```powershell
 $env:TEST_DATABASE_URL = "postgresql://agentshield:local-development-only@127.0.0.1:5432/agentshield"
 uv --directory backend run pytest
 ```
 
-This example matches the local Compose defaults. Update it if you changed your local database values. Copying a dotenv file does not populate PowerShell environment variables. CI provides a disposable PostgreSQL 17 service and runs the integration test.
+Use a dedicated migrated local test database when running these tests. This example matches the local Compose defaults. Update it if you changed your local database values. Copying a dotenv file does not populate PowerShell environment variables. CI provides a disposable PostgreSQL 17 service and runs the integration test.
 
 The CI workflow also validates Compose configuration and builds the backend container. Docker/Compose were not available on the local implementation machine; their execution must be verified in CI or an equipped environment.
 
@@ -102,7 +105,7 @@ Follow [context/deployment.md](context/deployment.md) for the exact configuratio
 
 ## Planned product
 
-Later phases add isolated guest sessions, versioned agent configurations, 12 curated scenarios, vulnerable/hardened scripted profiles, independently enforced tool policies, redacted evidence traces, deterministic metrics, regression comparisons, and HTML/JSON reports. Optional eligible Gemini free-tier testing stays separate from scripted results.
+Later phases add executable scenarios and vulnerable/hardened scripted behavior, independently enforced tool policies, redacted evidence traces, deterministic metrics, regression comparisons, and HTML/JSON reports. Optional eligible Gemini free-tier testing stays separate from scripted results.
 
 This is an application-controlled simulation harness. It does not execute untrusted code or test arbitrary external systems. A passing finite benchmark does not prove complete security.
 

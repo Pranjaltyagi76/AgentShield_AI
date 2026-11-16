@@ -46,6 +46,10 @@ One backend process owns a bounded consumer, request handling, and cleanup tasks
 
 Authorization uses trusted runtime principal and policy metadata. The model cannot supply an owner ID, redefine permissions, approve its own action, or select an executable checker. Guest-configurable policy settings remain within server-defined constraints; tests cannot disable mandatory gateway enforcement.
 
+## Implemented Phase 1 flow (local)
+
+The browser starts a workspace explicitly and retains the opaque credential in session storage. The API hashes it, resolves the unexpired guest inside the database transaction, and locks the guest row for consistency with changes and revocation. Private reads include ownership in the query; version reads also match the parent ID. Revocation deletes the guest and cascades to its profiles and versions. A five-minute in-process task removes up to 16 expired guests per transaction using skip-locked selection. Expiry denies new requests independently of this task.
+
 ## Guest session lifecycle
 
 1. A rate-limited session endpoint issues a high-entropy opaque credential and expiry.

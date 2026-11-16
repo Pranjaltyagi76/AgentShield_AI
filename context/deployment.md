@@ -62,6 +62,10 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Phase 1 release preparation (not deployed)
+
+The public URLs and release IDs below are the observed Phase 0 deployment. Phase 1 was tested against local PostgreSQL only. The new Docker startup script runs `.venv/bin/python -m alembic upgrade head` before starting Uvicorn; a failed migration prevents startup. A future release must deploy the migrated API before publishing the Phase 1 frontend and verify `/api/v1/ready`, CORS preflight with Authorization, two-session isolation, catalog browsing and revocation on the hosted stack. No additional service or API key is required.
+
 ## Full application startup after migrations exist
 
 Run the checked-in Alembic migration command once before the API starts, then start the single process. The intended sequence is `alembic upgrade head` followed by `uvicorn app.main:app --host 0.0.0.0 --port <host PORT>` from the backend root. Convert this into an actual host-compatible checked-in startup script during implementation; `<host PORT>` is a placeholder, not a runnable command. Propagate any migration failure and do not report readiness after failure.

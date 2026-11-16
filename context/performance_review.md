@@ -2,7 +2,11 @@
 
 Last updated: November 16, 2026. Stage: Phase 0 complete; local foundation and public Vercel → Render → Neon smoke verified. Feature runtime remains unimplemented.
 
-## Current evidence
+## Phase 1 verification — November 16, 2026
+
+On a dedicated local PostgreSQL database, Alembic upgraded from empty to `0002`; `alembic check` found no model/schema drift. Ruff lint and formatting passed. `pytest -q -p no:cacheprovider` with TEST_DATABASE_URL passed **35/35**. Checks cover anonymous and foreign reads, cross-parent version lookup, shared immutability, revocation, expiry before cleanup, cascading deletion, byte and row quotas, issuance limits and the catalog allowlist. Frontend formatting, lint, types, build and **13/13** Vitest cases passed. A local browser created a guest and private profile, observed version 1, filtered AS-011 and opened its detail against FastAPI/PostgreSQL. No model calls, benchmark scores, hosted Phase 1 checks or cold-start measurements.
+
+## Phase 0 evidence (historical)
 
 | Area | Observed status |
 |---|---|

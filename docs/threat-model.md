@@ -6,7 +6,9 @@ Status: Phase 0 foundation. November 10, 2026. The later agent runtime is a plan
 
 Assets include environment secrets/database credentials, service availability/free quotas, future guest credentials/private records, versioned test definitions, evaluator-only ground truth, and evidence integrity.
 
-Phase 0 entry points are the static frontend, the process-only health endpoint, database readiness, development-only OpenAPI/docs, dependency installation, CI, and deployment configuration. No guest, agent, scenario, run, tool, or inference endpoints exist yet.
+Phase 1 adds guest issuance, private CRUD for profile metadata, append-only versions, and public catalog reads. Guest tokens are random 32-byte values, stored only by SHA-256 digest on the server. Guest row locks serialize ownership and quota checks with writes. The single-process issuance window allows eight requests per peer and sixty globally per ten minutes (resets on restart); a database-backed cap of 128 sessions persists across restarts. Behind a proxy the peer cap can be shared. Each guest has at most eight profiles and four versions per profile. Write bodies are bounded to 64 KiB, prompts to 16 KiB UTF-8. The API permits no owner/shared flags or arbitrary tool endpoints in client input. Browser session storage remains vulnerable to a successful same-origin script injection.
+
+Historical Phase 0 entry points were the static frontend, the process-only health endpoint, database readiness, development-only OpenAPI/docs, dependency installation, CI, and deployment configuration. No guest, agent, scenario, run, tool, or inference endpoints exist yet.
 
 ## Threats and controls
 
