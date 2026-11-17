@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Phase 3 policy enforcement passed locally and in CI. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
+**Phase 4 scripted evaluation is implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -60,7 +60,7 @@ npm --prefix frontend run dev
 
 Open [the local workspace](http://127.0.0.1:5173). The frontend proxies `/api` to port 8000; `VITE_API_BASE_URL` includes `/api/v1` exactly once. Development API docs are at [localhost:8000/docs](http://127.0.0.1:8000/docs). Production disables the interactive docs.
 
-`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 3 readiness requires Alembic revision `0004`.
+`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 4 readiness requires Alembic revision `0005`.
 
 Stop the database with `docker compose down`. This preserves the named data volume. Removing the volume deletes local database data, so do not do that as an ordinary shutdown step.
 
@@ -76,7 +76,7 @@ uv --directory backend run uvicorn app.main:app --host 127.0.0.1 --port 8012 --n
 
 In another terminal, run `uv --directory backend run python scripts/smoke_local_runs.py`. The script creates a temporary guest, runs AS-011 with each profile, reads back the ordered events, then revokes its guest. To retain evidence for inspection, use the local API with your own guest. Send its bearer credential in the Authorization header. POST to `/api/v1/runs` with an `Idempotency-Key` header and JSON containing `agent_version_id` and `scenarios` (an ordered list). GET the returned run ID at `/api/v1/runs/{id}`, `/{id}/results` or `/{id}/traces` under the same prefix. POST to `/{id}/cancel` to request cancellation.
 
-AS-011 exercises a routine document lookup. Enable `search_docs` on the profile version to see a mock read. AS-010 exercises repeated requests and the six-call budget. Behavior version 1 uses the scripted profile, the fixture, the version's tool list and the previous mock observation. Prompt edits change the recorded hash and input size. Scripted decisions follow the checked-in program. Security scores and the benchmark UI belong to later phases.
+AS-011 exercises a routine document lookup. Enable `search_docs` on the profile version to see a mock read. AS-010 exercises repeated requests and the six-call budget. Behavior version 1 uses the scripted profile, the fixture, the version's tool list and the previous mock observation. Prompt edits change the recorded hash and input size. Scripted decisions follow the checked-in program. The API returns evidence-derived scores. The run and trace UI is scheduled for Phase 5.
 
 ### Verify a policy decision
 
@@ -93,7 +93,13 @@ For AS-006 revision 2, select a version that allows `send_message_simulated`. Su
 }
 ```
 
-Read the owner-only trace to see the request and decision reason. An approved action returns an in-memory simulated receipt. All three fixtures use the same gateway and run limits.
+Read the owner-only trace to see the request and decision reason. An approved action returns an in-memory simulated receipt. All twelve fixtures use the same gateway and run limits.
+
+### Run the full benchmark
+
+With the loopback API on port 8012, run `uv --directory backend run python scripts/smoke_suite.py`. It runs both read-only shared profiles against PostgreSQL, prints counts and revokes its temporary guest.
+
+For a retained run, get a guest credential, select the latest shared agent version and POST `{"agent_version_id":"<version UUID>","suite_id":"core-v2"}` to `/api/v1/runs` with the bearer credential and a fresh `Idempotency-Key`. Poll the returned run ID. Read its `/results`, `/metrics`, `/findings` and `/traces` using the same credential. Each finding’s `evidence_id` identifies a specific trace event. A null percentage denotes an empty denominator.
 
 ## Checks
 

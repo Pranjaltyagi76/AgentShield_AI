@@ -1,6 +1,6 @@
 # AgentShield AI: System Design
 
-Status: target system design; Phase 0 public Vercel shell → Render health/readiness → Neon connectivity is verified. Guest workspaces, the scripted worker and the policy gateway are verified locally. Last reviewed November 17, 2026.
+Status: target system design; Phase 0 public Vercel shell → Render health/readiness → Neon connectivity is verified. Guest workspaces, the scripted worker, policy gateway and deterministic evaluator are verified locally. Last reviewed November 17, 2026.
 
 Product scope and acceptance criteria come from [the project specification](../AgentShield_PROJECT.md) and [requirements](../requirement.md). Module boundaries are in [architecture](architecture.md); metric definitions are in [benchmark](benchmark.md).
 
@@ -12,7 +12,7 @@ The required product works without inference credentials. A scripted vulnerable 
 
 ## Public system
 
-Only the visitor → static frontend → API → database path is implemented and verified in Phase 0. The queue, simulation runtime and gateway are implemented through Phase 3. Evaluation, optional inference and the saved sample are planned.
+Only the visitor → static frontend → API → database path is implemented and verified in Phase 0. The queue, simulation runtime and gateway are implemented through Phase 3. Phase 4 adds local evaluation. Optional inference and the saved sample are planned.
 
 ```mermaid
 flowchart LR
@@ -63,7 +63,7 @@ For a comparison, both source runs must be accessible to the caller. For a repor
 
 ## Local Phase 2 operation
 
-AS-011 performs a synthetic document lookup. On AS-010 the vulnerable script repeats the request until the six-call policy limit while the hardened script finishes after its observation. Each step has a single action. Execution state, bounded event payloads, heartbeat and the result cursor commit together. A guest may cancel queued work immediately or request that a running job stop at its next step. Interrupted and unfinished results retain an inconclusive reason. Completed results await the Phase 4 evaluator. AS-006 revision 2 exercises message delivery. An authenticated submitter can approve the exact first proposal to `mock-inbox`. Without this approval the policy records `requires_confirmation`. A disallowed destination is blocked even with approval. The immutable run snapshot separates the approval from the agent input. Trace events retain the attempted tool, safe fixture arguments and a decision reason. Only an allowed call adds a mock result.
+AS-011 performs a synthetic document lookup. On AS-010 the vulnerable script repeats the request until the six-call policy limit while the hardened script finishes after its observation. Each step has a single action. Execution state, bounded event payloads, heartbeat and the result cursor commit together. A guest may cancel queued work immediately or request that a running job stop at its next step. Interrupted and unfinished results retain an inconclusive reason. The evaluator consumes ordered events within the terminal transaction. A recorded AS-010 call-budget stop completes that scenario so the remaining suite members can run. Other unexpected limits leave affected results inconclusive. AS-006 revision 2 exercises message delivery. An authenticated submitter can approve the exact first proposal to `mock-inbox`. Without this approval the policy records `requires_confirmation`. A disallowed destination is blocked even with approval. The immutable run snapshot separates the approval from the agent input. Trace events retain the attempted tool, safe fixture arguments and a decision reason. Only an allowed call adds a mock result.
 
 Admission permits one queued and one active run per guest, ten queued and two active globally. New creation requests use an in-process ten-minute window of five per guest and peer and fifty globally. This window resets on process restart. The database-size check uses the whole PostgreSQL database for a conservative 500 MiB admission ceiling, configurable downward. Queue expiry is five minutes. Scripted text budgets use UTF-8 byte counts as a conservative bound and incur zero provider tokens. Each result has a sixty-second deadline and ten-step cap. Runs have a 180-second deadline and 1 MiB trace allowance. See Section 7 of the specification for payload caps.
 

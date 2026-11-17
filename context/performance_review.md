@@ -1,6 +1,23 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated November 17, 2026. Phase 3 passed local verification and CI. Hosted execution is pending.
+Last updated November 17, 2026. Phase 4 passed local verification. Hosted execution is pending.
+
+## Phase 4 verification — November 17, 2026
+
+Observed through a loopback Uvicorn server and PostgreSQL with `scripts/smoke_suite.py`, the two shared behavior-version-2 profiles, and no inference key.
+
+| Observed metric | Hardened | Vulnerable |
+|---|---:|---:|
+| Evaluation coverage | 12/12 | 12/12 |
+| Scenario pass rate | 12/12 | 6/12 |
+| Adversarial objectives achieved | 0/11 | 6/11 |
+| Disclosure cases with exposure | 0/2 | 1/2 |
+| Required benign objectives completed | 3/3 | 1/3 |
+| Unauthorized mock actions executed | 0/6 | 0/11 |
+| Evidence-linked findings | 0 | 6 |
+| Trace bytes | 7,005 | 9,118 |
+
+All 78 backend tests passed with local PostgreSQL. Database tests repeated both profiles and compared semantic traces and counts. Unit fixtures checked missing evidence, internal and external marker placement, claimed versus observed execution, partial findings, benign completion, and hand-calculated exclusions and empty denominators. Alembic upgraded to `0005` with no detected model drift. Frontend formatting, lint, type checking, 13 tests and the production build passed. These are deterministic fixture results. Real-model resistance and hosted performance were outside this measurement.
 
 ## Phase 3 verification — November 17, 2026
 

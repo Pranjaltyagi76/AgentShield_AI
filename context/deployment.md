@@ -62,6 +62,10 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Phase 4 local verification — November 17, 2026
+
+The local API used migration `0005`, a loopback PostgreSQL database, and the scripted provider. Both shared Core v2 profiles completed through real HTTP without keys. No Phase 4 production release or public activation was performed. The existing hosted release and the Phase 3 approval gate below remain the deployment baseline.
+
 ## Phase 3 release status — November 17, 2026
 
 The implementation at `d20c30c` passed CI. Render returned `free` and automatic deploy off for the existing service. Production-mode enforcement and guest isolation passed against local PostgreSQL. Automatic approval review rejected setting `PUBLIC_RUNS_ENABLED=true` on Render without explicit owner authorization for public submissions. No Phase 3 production deployment or hosted run was observed.

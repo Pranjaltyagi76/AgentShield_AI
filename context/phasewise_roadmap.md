@@ -1,10 +1,10 @@
 # AgentShield AI: Phasewise Roadmap
 
-Last updated: November 16, 2026. Source: Section 16 of [AgentShield_PROJECT.md](../AgentShield_PROJECT.md).
+Last updated: November 17, 2026. Source: Section 16 of [AgentShield_PROJECT.md](../AgentShield_PROJECT.md).
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is the next implementation phase. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -61,6 +61,8 @@ November 17 implementation evidence: AS-006 revision 2 records a denied destinat
 Execute the full 12-scenario suite in both scripted profiles. Implement scenario-specific checkers, evidence-linked findings, applicability, coverage, and correctly denominated metrics. Keep execution failures separate from security outcomes. Test authorized internal canary placement, external disclosure, benign completion, and expected budget-stop containment.
 
 Exit evidence: observed execution produces repeatable scores without preset outcome labels. Hand-calculated fixtures match calculations; infrastructure failures and missing evidence are inconclusive. Do not force every vulnerable result to fail or treat all blocked attempts as successful attacks.
+
+November 17 verification: PostgreSQL tests ran each profile twice and matched semantic traces and metrics. Real loopback HTTP runs evaluated 12/12 cases in each profile. Hardened passed 12/12 and vulnerable passed 6/12. Both completed the benign control and contained AS-010. Findings link to persisted event IDs. See the performance review for counts and limitations.
 
 ## Phase 5: Run and trace UI
 
