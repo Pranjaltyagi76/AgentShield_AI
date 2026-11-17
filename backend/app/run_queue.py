@@ -12,7 +12,8 @@ from sqlalchemy.orm import Session
 
 from app.db.models import Guest
 from app.db.runs import Event, Result, Run
-from app.simulation import decide, encoded, gateway
+from app.policy import MAX_ARGUMENT_BYTES, encoded, gateway, request_evidence
+from app.simulation import decide
 
 MAX_ACTIVE = 2
 MAX_QUEUED = 10
@@ -60,11 +61,18 @@ def lock_run(session, run_id):
     return session.scalar(select(Run).where(Run.id == run_id).with_for_update())
 
 
-def recover(session):
+def recover(session, stale_before=None):
     queue_lock(session)
-    for run_id in session.scalars(select(Run.id).where(Run.status == "running")):
+    candidates = select(Run.id).where(Run.status == "running")
+    if stale_before is not None:
+        candidates = candidates.where(Run.heartbeat_at < stale_before)
+    for run_id in session.scalars(candidates):
         run = lock_run(session, run_id)
-        if run and run.status == "running":
+        if (
+            run
+            and run.status == "running"
+            and (stale_before is None or run.heartbeat_at < stale_before)
+        ):
             finish(session, run, "failed", "interrupted")
 
 
@@ -138,14 +146,38 @@ def execute_step(session, run, result):
     )
     output_size = len(encoded(action))
     if output_size > MAX_OUTPUT or run.budget_used + input_size + output_size > MAX_TOTAL:
+        if isinstance(action, dict) and "tool" in action:
+            oversized = len(encoded(action.get("arguments"))) > MAX_ARGUMENT_BYTES
+            reason = "arguments_too_large" if oversized else "output_budget"
+            record(
+                session,
+                run,
+                result,
+                [
+                    ("tool_requested", request_evidence(action)),
+                    ("policy_decision", {"decision": "invalid", "reason": reason}),
+                ],
+            )
         raise BudgetStop("output_budget")
-    if "tool" in action:
-        decision, response = gateway(action["tool"], action["arguments"], permitted_tools)
-        events = [("tool_requested", action), ("policy_decision", {"decision": decision})]
-        if response is not None:
-            events.append(("mock_tool_result", response))
+    if isinstance(action, dict) and ("tool" in action or "arguments" in action):
+        approval = config.get("confirmation")
+        confirmed_action = None
+        if (
+            approval
+            and approval["scenario"] == result.scenario_id
+            and approval["step"] == result.steps + 1
+        ):
+            confirmed_action = {"tool": approval["tool"], "arguments": approval["arguments"]}
+        # Each previous nonterminal step is exactly one attempted tool call.
+        verdict = gateway(action, permitted_tools, result.steps, confirmed_action)
+        decision = {"decision": verdict.decision, "reason": verdict.reason}
+        events = [("tool_requested", request_evidence(action)), ("policy_decision", decision)]
+        if verdict.result is not None:
+            events.append(("mock_tool_result", verdict.result))
         record(session, run, result, events)
-        result.last_observation = response or {"decision": decision}
+        result.last_observation = verdict.result or decision
+        if verdict.reason == "tool_call_limit":
+            raise BudgetStop("tool_call_limit")
     else:
         record(
             session,
@@ -191,10 +223,16 @@ def advance(session, run_id, worker):
 
 def tick(engine, worker):
     with Session(engine) as session, session.begin():
+        recover(session, stale_before=now() - timedelta(seconds=5))
         claim(session, worker)
         active = session.scalars(
             select(Run.id).where(Run.worker_id == worker, Run.status == "running")
         ).all()
+        busy = (
+            bool(active)
+            or session.scalar(select(Run.id).where(Run.status.in_(("queued", "running"))).limit(1))
+            is not None
+        )
     for run_id in active:
         try:
             with Session(engine) as session, session.begin():
@@ -207,27 +245,19 @@ def tick(engine, worker):
                 run = lock_run(session, run_id)
                 if run and run.worker_id == worker and run.status == "running":
                     finish(session, run, "failed", "runtime_error")
+    return busy
 
 
-def consume(engine, stop: StopSignal):
-    """Run all worker transactions on the connection holding the leadership lock."""
+def consume(engine, stop: StopSignal, wake: StopSignal):
+    """Use short transactions and fenced run ownership on pooled PostgreSQL."""
     worker = uuid4()
     while not stop.is_set():
+        wake.clear()
         try:
-            with engine.connect() as leader:
-                elected = leader.scalar(text("SELECT pg_try_advisory_lock(19485123)"))
-                leader.commit()
-                if elected:
-                    try:
-                        with Session(leader) as session, session.begin():
-                            recover(session)
-                        while not stop.is_set():
-                            tick(leader, worker)
-                            stop.wait(0.15)
-                    finally:
-                        if not leader.invalidated:
-                            leader.execute(text("SELECT pg_advisory_unlock(19485123)"))
-                            leader.commit()
+            busy = tick(engine, worker)
         except SQLAlchemyError:
-            logging.getLogger("agentshield").warning("local_queue_unavailable")
-        stop.wait(1)
+            logging.getLogger("agentshield").warning("queue_unavailable")
+            stop.wait(1)
+            continue
+        if not stop.is_set():
+            wake.wait(0.15 if busy else 300)
