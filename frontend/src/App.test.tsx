@@ -27,7 +27,7 @@ function renderApp(path = '/') {
 it('shows honest foundation status and actual connection results', async () => {
   renderApp()
   expect(screen.getByRole('heading', { name: /Test the boundaries/ })).toBeInTheDocument()
-  expect(screen.getByText('Local API only')).toBeInTheDocument()
+  expect(screen.getByText('POST /api/v1/runs')).toBeInTheDocument()
   expect(await screen.findByText('Connected')).toBeInTheDocument()
   expect(await screen.findByText('Not configured')).toBeInTheDocument()
 })
@@ -40,8 +40,8 @@ it('navigates to system setup and renders typed response evidence', async () => 
 it('shows the planned roadmap without marking future phases complete', () => {
   renderApp('/roadmap')
   expect(screen.getByRole('heading', { name: /A deliberate path/ })).toBeInTheDocument()
-  expect(screen.getByText('Phase 2 complete locally')).toBeInTheDocument()
-  expect(screen.getAllByText('Planned')).toHaveLength(8)
+  expect(screen.getByText('Phase 3 implemented')).toBeInTheDocument()
+  expect(screen.getAllByText('Planned')).toHaveLength(7)
 })
 it('handles an unknown deep link with a working return link', () => {
   renderApp('/missing')

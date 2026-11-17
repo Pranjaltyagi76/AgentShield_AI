@@ -4,13 +4,14 @@ const healthSchema = z.object({
   status: z.literal('ok'),
   service: z.string(),
   version: z.string(),
-  phase: z.union([z.literal(0), z.literal(1), z.literal(2)]),
+  public_runs_enabled: z.boolean().optional(),
+  phase: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
 })
 const readinessSchema = z.object({
   status: z.enum(['ready', 'not_ready']),
   database: z.enum(['connected', 'unavailable', 'not_configured']),
   service: z.string(),
-  phase: z.union([z.literal(0), z.literal(1), z.literal(2)]),
+  phase: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
 })
 export type Health = z.infer<typeof healthSchema>
 export type Readiness = z.infer<typeof readinessSchema>

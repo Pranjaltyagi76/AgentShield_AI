@@ -133,6 +133,8 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
 }
 function SystemCards({ system }: { system: System }) {
   const { health, readiness } = system
+  const publicRuns =
+    health.error || !health.data ? undefined : Boolean(health.data.public_runs_enabled)
   const db = readiness.error ? undefined : readiness.data?.database
   return (
     <div className="system-cards" aria-live="polite">
@@ -193,13 +195,15 @@ function SystemCards({ system }: { system: System }) {
       <article className="surface system-card">
         <div className="card-top">
           <LockKeyhole size={19} />
-          <StatusLabel tone="muted">Disabled</StatusLabel>
+          <StatusLabel tone={publicRuns ? 'good' : 'muted'}>
+            {publicRuns === undefined ? 'Unknown' : publicRuns ? 'Enabled' : 'Disabled'}
+          </StatusLabel>
         </div>
         <h3>Public execution</h3>
-        <p>Scripted runs are available through the local development API.</p>
+        <p>Guest-owned scripted runs use synthetic records and mock tools.</p>
         <div className="card-footer">
-          <code>Local API only</code>
-          <span>Phase 2–4</span>
+          <code>POST /api/v1/runs</code>
+          <span>Scripted demo</span>
         </div>
       </article>
     </div>
@@ -295,7 +299,7 @@ function Overview({ system }: { system: System }) {
           <Layers3 size={19} />
         </span>
         <div>
-          <strong>Phase 0 · Foundation verified</strong>
+          <strong>Phase 3 · Policy gateway</strong>
           <p>Browse profiles and scenario definitions. Scoring arrives in a later phase.</p>
         </div>
         <Link to="/roadmap">
@@ -409,10 +413,10 @@ function SystemPage({ system }: { system: System }) {
       <section className="surface boundary-panel">
         <ShieldCheck size={23} />
         <div>
-          <h2>Scripted runs are local.</h2>
+          <h2>Scripted simulation</h2>
           <p>
-            Guest sessions, versioned agent profiles and the scenario catalog are available. Local
-            simulations use synthetic data and mock tools. No inference credentials are required.
+            Guest sessions, versioned agent profiles and the scenario catalog are available.
+            Simulations use synthetic data and mock tools. No inference credentials are required.
           </p>
         </div>
       </section>
@@ -431,7 +435,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="good">Phase 2 complete locally</StatusLabel>
+        <StatusLabel tone="good">Phase 3 implemented</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -448,7 +452,7 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index <= 2 ? (
+            {index <= 3 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
             ) : (
               <span className="planned-label">Planned</span>
