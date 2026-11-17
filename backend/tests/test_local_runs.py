@@ -13,7 +13,8 @@ from app import main, run_queue
 from app.api import runs
 from app.core.settings import Settings
 from app.db.runs import Result, Run
-from app.simulation import decide, gateway
+from app.policy import PRIVATE_MARKER, gateway
+from app.simulation import decide
 
 
 def test_production_and_remote_database_reject_execution():
@@ -46,7 +47,8 @@ def test_gateway_authority_and_profile_decisions():
             "requires_confirmation",
         ),
     ]:
-        assert gateway(tool, args, allowed) == (expected, None)
+        verdict = gateway({"tool": tool, "arguments": args}, allowed, 0)
+        assert (verdict.decision, verdict.result) == (expected, None)
     context = {"available_tools": [], "repeat": False}
     assert "answer" in decide("hardened", context, None, 0)
     assert "tool" in decide("vulnerable", context, None, 0)
@@ -59,7 +61,7 @@ def harness(request, monkeypatch):
         pytest.skip("requires migrated local PostgreSQL")
     live = getattr(request, "param", False)
     if not live:
-        monkeypatch.setattr(main, "consume", lambda engine, stop: None)
+        monkeypatch.setattr(main, "consume", lambda engine, stop, wake: None)
     app = main.create_app(
         Settings(_env_file=None, app_env="test", local_runs_enabled=True, database_url=url)
     )
@@ -68,7 +70,7 @@ def harness(request, monkeypatch):
         app, base_url="http://127.0.0.1/api/v1/", client=("127.0.0.1", 52100)
     ) as client:
 
-        def workspace(profile="hardened", prompt="Use the synthetic guide"):
+        def workspace(profile="hardened", prompt="Use the synthetic guide", allowed_tools=None):
             issued = client.post("guest-sessions")
             assert issued.status_code == 201
             h = {"Authorization": "Bearer " + issued.json()["credential"]}
@@ -79,7 +81,9 @@ def harness(request, monkeypatch):
                 json={
                     "name": "Fixture",
                     "configuration": {
-                        "allowed_tools": ["search_docs"],
+                        "allowed_tools": ["search_docs"]
+                        if allowed_tools is None
+                        else allowed_tools,
                         "demo_profile": profile,
                         "system_prompt": prompt,
                     },
@@ -205,6 +209,8 @@ def test_budget_stop_retains_inconclusive_result(harness, monkeypatch, bound, re
     obj = submit(c, h, v, ["AS-010"]).json()
     worker = uuid4()
     run_queue.tick(engine, worker)
+    if bound == "steps":
+        monkeypatch.setattr(run_queue, "MAX_STEPS", 2)
     if bound in ("trace", "input", "total", "output"):
         monkeypatch.setattr(
             run_queue,
@@ -269,7 +275,7 @@ def test_agent_cannot_expand_gateway_permissions(harness, monkeypatch):
     run = submit(client, auth, version).json()
     run_queue.tick(engine, uuid4())
     events = client.get("runs/" + run["id"] + "/traces", headers=auth).json()
-    assert events[-1]["payload"] == {"decision": "blocked"}
+    assert events[-1]["payload"] == {"decision": "blocked", "reason": "tool_not_allowed"}
     assert "mock_tool_result" not in [event["kind"] for event in events]
     assert events[1]["payload"]["available_tools"] == ["search_docs"]
 
@@ -302,3 +308,50 @@ def test_active_caps_and_rate_limits(harness):
         limiter.admit(str(i), "peer" + str(i))
     with pytest.raises(HTTPException):
         limiter.admit("new-owner", "new-peer")
+
+
+@pytest.mark.parametrize(
+    "case,reason", [("repeat", "tool_call_limit"), ("oversize", "arguments_too_large")]
+)
+def test_runtime_retains_denied_attempt(harness, monkeypatch, case, reason):
+    client, workspace, engine, _ = harness
+    auth, version = workspace("vulnerable")
+    if case == "oversize":
+        monkeypatch.setattr(
+            run_queue,
+            "decide",
+            lambda *args: {"tool": "search_docs", "arguments": {"query": "x" * 17000}},
+        )
+    run = submit(client, auth, version, ["AS-010"]).json()
+    worker = uuid4()
+    for _ in range(8):
+        run_queue.tick(engine, worker)
+    path = "runs/" + run["id"]
+    assert client.get(path, headers=auth).json()["status"] == "failed"
+    trace = client.get(path + "/traces", headers=auth).json()
+    assert trace[-2]["kind"] == "tool_requested"
+    assert trace[-1]["kind"] == "policy_decision"
+    assert trace[-1]["payload"]["reason"] == reason
+    assert sum(event["kind"] == "mock_tool_result" for event in trace) == (
+        6 if case == "repeat" else 0
+    )
+    assert client.get(path + "/results", headers=auth).json()[0]["outcome"] == "inconclusive"
+
+
+def test_secret_in_a_delivery_request_never_reaches_guest_trace(harness, monkeypatch):
+    client, workspace, engine, _ = harness
+    auth, version = workspace(allowed_tools=["send_message_simulated"])
+    monkeypatch.setattr(
+        run_queue,
+        "decide",
+        lambda *args: {
+            "tool": "send_message_simulated",
+            "arguments": {"content": PRIVATE_MARKER, "destination": "mock-inbox"},
+        },
+    )
+    row = submit(client, auth, version, ["AS-006"]).json()
+    run_queue.tick(engine, uuid4())
+    trace = client.get("runs/" + row["id"] + "/traces", headers=auth)
+    assert trace.json()[-1]["payload"] == {"decision": "blocked", "reason": "synthetic_secret"}
+    assert PRIVATE_MARKER not in trace.text
+    assert "mock_tool_result" not in [e["kind"] for e in trace.json()]
