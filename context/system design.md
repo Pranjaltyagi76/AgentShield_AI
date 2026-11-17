@@ -12,7 +12,7 @@ The required product works without inference credentials. A scripted vulnerable 
 
 ## Public system
 
-Only the visitor → static frontend → API → database path is implemented and verified in Phase 0. The queue, simulation runtime and gateway are implemented through Phase 3. Phase 4 adds local evaluation. Phase 5 connects it to the browser launcher, guest history and trace viewer. Phase 6 compares terminal runs within the same guest workspace. Optional inference and the saved sample are planned.
+Phase 0 first verified the visitor → static frontend → API → database path. Phase 9 now verifies the deployed scripted workflow. The queue, simulation runtime and gateway are implemented through Phase 3. Phase 4 adds local evaluation. Phase 5 connects it to the browser launcher, guest history and trace viewer. Phase 6 compares terminal runs within the same guest workspace. Reports and the historical saved sample are implemented. Optional inference is explicitly disabled.
 
 ```mermaid
 flowchart LR
@@ -64,6 +64,12 @@ For a comparison, both source runs must be accessible to the caller. For a repor
 ## Browser run inspection
 
 The health endpoint advertises local, public or disabled scripted execution. A guest selects an immutable agent version and a manifest or explicit scenario list. The API owns the run ID, policy decisions and scores. The UI reads the selected scenario’s ordered events and shows an executed action only when a mock result exists. The event ID in a finding is stable across reloads and every evidence read requires the current guest credential. An expired workspace loses access to its detail view.
+
+## Hosted operation
+
+Public scripted execution is explicitly enabled on the existing Render service. Exact HTTPS origins and guest ownership protect browser mutations and retained evidence. Run creation remains bounded by the existing queue, per-guest/IP/global limits, runtime budgets and database ceiling. Rate rejection supplies `Retry-After`. The platform may sleep or restart.
+
+A real same-revision redeploy preserved report source data and regenerated identical JSON. A separately approved orphan fixture was recovered as interrupted with its one partial event retained. Startup cleanup removed an intentionally expired verification guest. Credentials used by the HTTP verifier remained in process memory and the surviving verification guest was revoked afterward.
 
 ## Report lifecycle
 

@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: Phase 0 foundation and public deployment smoke complete; Phase 1 registry and catalog implemented locally; the scripted evaluator, run UI and Phase 6 comparisons are verified locally. Last reviewed November 17, 2026.
+Status: the scripted runtime, evaluation, comparisons and retained reports are deployed on the existing free resources. Phase 9 cold-start validation is in progress. Last reviewed November 17, 2026.
 
 ## Decisions
 
@@ -71,13 +71,19 @@ AgentShield_AI/
   .gitignore
 ```
 
-## Hosted foundation status
+## Hosted foundation status (Phase 0 historical record)
 
 The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreSQL connection are live and verified together in the browser. The frontend uses the public backend API base and its CSP permits only that API origin. Render CORS explicitly lists the two production aliases, without wildcard previews. Vercel releases upload reviewed frontend source through its API because the GitHub integration is not installed; automatic GitHub frontend deployment is not configured. Vercel's default deployment protection is retained; the canonical production domain is public. The Render service was created directly with MCP, with no Blueprint attached and automatic deploy off. See deployment.md for exact evidence and resource IDs.
 
 ## Run and trace frontend
 
 The React routes `/runs` and `/runs/:runId` share the registry’s tab-scoped guest session. The launcher records a pending idempotency key and its request configuration for ambiguous retries. The status query polls active runs every 2.5 seconds in the foreground, stopping on a terminal response, error or 100 updates. Evidence reloads on status transitions, selection or manual refresh. Each query is scoped to the mounted guest workspace. A finding links to the run, scenario and event ID. The owned trace API filters by scenario and redacts values before the browser receives them.
+
+## Public runtime activation
+
+The owner approved public scripted activation on November 17. The existing Render service now uses `PUBLIC_RUNS_ENABLED=true` in production with exact HTTPS CORS origins and local execution disabled. Optional inference remains disabled. The API capability number is 8 because Phase 9 validates hosting of the existing features. The existing startup migration applies schema `0007` on Neon.
+
+Vercel receives only reviewed tracked frontend source through the existing manual upload release path. Render’s branch auto-deploy stays off. The canonical alias is public while default deployment authentication remains configured for generated deployment URLs. Readiness, guest workflows and exports were observed across HTTPS, with deployment IDs and actual test evidence in deployment.md.
 
 ## Retained reports and saved workspace
 

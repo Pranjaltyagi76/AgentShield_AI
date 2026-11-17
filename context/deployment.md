@@ -1,6 +1,6 @@
 # AgentShield AI: Free Deployment Runbook
 
-Status: Phase 0 public Vercel Hobby → Render Free → Neon Free smoke verified on November 16, 2026. No feature execution or inference is enabled.
+Status: public scripted execution was explicitly approved and enabled on November 17, 2026. The Vercel → Render → Neon feature workflow and recovery passed. Phase 9 cold-start validation is in progress. Optional inference remains disabled.
 
 Reuse the existing resources in the observed deployment record below. Do not provision duplicate AgentShield services or projects when continuing this task.
 
@@ -62,6 +62,37 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Phase 9 hosted release — November 17, 2026
+
+The owner explicitly approved `PUBLIC_RUNS_ENABLED=true` on the existing Render Free service. Initial automatic approval review rejected activation until that exact approval was received. The owner separately approved the temporary orphaned-run fixture, verification-guest expiry and dependent recovery redeploy. Account settings were confirmed by the owner as free with no chargeable overages.
+
+| Item | Observed release evidence |
+|---|---|
+| Frontend | Existing `agentshield-ai` Vercel project and canonical [public site](https://agentshield-ai-tau.vercel.app) |
+| Initial feature release | `dpl_61caTPxaktqk5CZXhzUUi7yQo6JP`, READY November 17 at 15:34:47 UTC |
+| Reviewed source | `6478fc228b60eeb729fab4a47945f043e7a3419e`; 40 tracked frontend files uploaded with repository-relative paths |
+| API | Existing `srv-dbtefcmtlv9c73f4i2pg`, Render Free, one Docker instance, Singapore |
+| Activation deployment | `dep-dbu77tfpq7jc739qr880`, live at 15:35:11 UTC |
+| Recovery deployment | `dep-dbu7ga8ae00c73eiuqdg`, same source revision, live at 15:52:55 UTC |
+| Database | Existing Neon project `nameless-paper-98324516`, PostgreSQL 17, schema `0007` observed through SQL |
+| Startup | Existing container entrypoint migrated the empty feature database before starting FastAPI |
+| Runtime | `APP_ENV=production`, `PUBLIC_RUNS_ENABLED=true`, `LOCAL_RUNS_ENABLED=false`, `LLM_PROVIDER=demo`, `PUBLIC_LLM_ENABLED=false` |
+| Limits | Existing rate, queue, concurrency, guest retention and 500 MiB application-storage bounds remain in code |
+| Publication | Vercel reviewed source upload; Render manual deploy; automatic Git deployment remains off |
+| Protection | Existing Vercel deployment authentication retained, canonical public alias accessible without sign-in |
+
+Render and Neon Free were verified from resource/account records. The Vercel authenticated-user response reported active Hobby with no trial and excess data-cache billing disabled. The owner confirmed the hosting dashboards’ free plans and absence of chargeable overages. The billing-charges endpoint returned `costs_not_found`, which supplies no charge measurement.
+
+Both suites ran from a clean browser guest. Hardened passed 12/12 in 3.8 seconds and vulnerable 6/12 in 5.1 seconds, each with full coverage. The comparison showed six improvements, six unchanged cases and +50 percentage points in pass rate. The AS-003 finding opened an explicitly redacted answer. Hosted HTML and JSON comparison downloads contained retained evidence, and report history reopened successfully. The 390-pixel mobile layout and navigation were inspected.
+
+A separate HTTPS verifier exercised foreign guest denial, shared immutability, exact-origin CORS, duplicate run creation, cancellation, inconclusive comparison and report ownership. Its recovery mode held temporary credentials only in an interactive process. After the approved same-revision redeploy, JSON regeneration was byte-identical, the staged orphan became `failed / interrupted` with one retained event and inconclusive assessment, and the expired verification guest was deleted. HTTP 429 with `Retry-After` was observed. Revocation removed the remaining verifier records. Database size afterward was 8,478,720 bytes with no queued/running jobs. Error-level app log query for 15:34–15:55 UTC returned no records.
+
+The recovery case used an operator-staged fixture under a newly created verification guest. It models an orphaned job at process startup. The live test did not deliberately fill the database to its storage ceiling or exhaust the shared queue. Those bounds remain covered by PostgreSQL integration tests.
+
+For repeatable ordinary HTTP validation, run `python -m scripts.verify_hosted` from the backend directory. The optional `--recovery-check` pauses for the explicitly approved fixture and service redeploy described above, and requires an interactive terminal. Expiry and fixture changes must stay scoped to that verifier’s newly created records.
+
+Cold-start timing is pending a real idle interval. Initial windows were interrupted by observed request pairs at 15:59:47, 16:11:42 and 16:14:00 UTC. The verification tab was navigated away from the app, and a process check found no old AgentShield verification Chrome processes. A later incoming pair showed that traffic was still arriving. An uninterrupted idle window remains necessary. No artificial keep-alive requests are configured.
+
 ## Phase 8 local release preparation — November 17, 2026
 
 Local readiness now requires revision `0007`. The startup migration mechanism remains the existing Docker entrypoint. Report files are generated from retained PostgreSQL evidence per request, so Render persistent disks and object storage are unnecessary.
@@ -86,7 +117,7 @@ Chrome reached Vite at `127.0.0.1:5173`, FastAPI at `127.0.0.1:8000` and local P
 
 The local API used migration `0005`, a loopback PostgreSQL database, and the scripted provider. Both shared Core v2 profiles completed through real HTTP without keys. No Phase 4 production release or public activation was performed. The existing hosted release and the Phase 3 approval gate below remain the deployment baseline.
 
-## Phase 3 release status — November 17, 2026
+## Phase 3 release status — historical pre-activation record, November 17, 2026
 
 The implementation at `d20c30c` passed CI. Render returned `free` and automatic deploy off for the existing service. Production-mode enforcement and guest isolation passed against local PostgreSQL. Automatic approval review rejected setting `PUBLIC_RUNS_ENABLED=true` on Render without explicit owner authorization for public submissions. No Phase 3 production deployment or hosted run was observed.
 
