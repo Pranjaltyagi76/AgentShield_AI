@@ -7,25 +7,43 @@ import { Button } from './components/ui/button'
 import type { Health } from './lib/api'
 import { api, guestState, subscribeGuest, startGuest, problem } from './lib/workspace'
 import { useRunRead, type Profile, type Scenario, type Version, type Run } from './lib/runs'
+import { Compare } from './Compare'
 import { RunDetail } from './RunDetail'
 
 export function Runs({
   health,
   healthError,
+  comparison = false,
   refresh,
 }: {
+  comparison?: boolean
   health?: Health
   healthError: boolean
   refresh: () => void
 }) {
   const session = useSyncExternalStore(subscribeGuest, guestState)
-  const { runId } = useParams()
+  const { runId, comparisonId } = useParams()
+  const title = comparison ? 'Benchmark comparison' : 'Benchmark runs'
   const navigate = useNavigate()
   const issue = useMutation({ mutationFn: startGuest, retry: false })
+  if (
+    comparison &&
+    health &&
+    !healthError &&
+    health.run_mode &&
+    health.run_mode !== 'disabled' &&
+    health.phase < 6
+  )
+    return (
+      <section className="run-page">
+        <h1>{title}</h1>
+        <p>Open this workspace with a Phase 6 API to compare runs.</p>
+      </section>
+    )
   if (!health || healthError || !health.run_mode || health.run_mode === 'disabled')
     return (
       <section className="run-page">
-        <h1>Benchmark runs</h1>
+        <h1>{title}</h1>
         <div className="surface run-panel" role="status">
           {healthError
             ? 'Cannot reach the API.'
@@ -43,7 +61,7 @@ export function Runs({
   if (session !== 'active')
     return (
       <section className="run-page">
-        <h1>Benchmark runs</h1>
+        <h1>{title}</h1>
         <div className="surface run-panel">
           <h2>Guest workspace</h2>
           <p>
@@ -54,7 +72,9 @@ export function Runs({
           <Button
             disabled={issue.isPending}
             onClick={() =>
-              issue.mutate(undefined, { onSuccess: () => navigate('/runs', { replace: true }) })
+              issue.mutate(undefined, {
+                onSuccess: () => navigate(comparison ? '/compare' : '/runs', { replace: true }),
+              })
             }
           >
             {issue.isPending ? 'Starting…' : 'Start guest workspace'}
@@ -63,6 +83,7 @@ export function Runs({
         </div>
       </section>
     )
+  if (comparison) return <Compare key={comparisonId ?? 'select'} id={comparisonId} />
   return <Workspace key={runId ?? 'history'} runId={runId} />
 }
 
@@ -77,6 +98,7 @@ function Workspace({ runId }: { runId?: string }) {
       </header>
       <Launcher scope={scope} />
       <RunHistory scope={scope} />
+      <Link to="/compare">Compare benchmark runs</Link>
     </section>
   )
 }

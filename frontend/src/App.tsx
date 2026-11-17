@@ -99,6 +99,10 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
             <Workflow size={18} />
             Benchmark runs
           </NavLink>
+          <NavLink to="/compare" onClick={close}>
+            <ListChecks size={18} />
+            Compare runs
+          </NavLink>
         </nav>
         <p className="nav-heading nav-heading-later">EVALUATION · COMING LATER</p>
         <div className="future-nav">
@@ -300,11 +304,11 @@ function Overview({ system }: { system: System }) {
           <Layers3 size={19} />
         </span>
         <div>
-          <strong>Phase 5 · Run workspace</strong>
-          <p>Launch benchmarks and inspect findings in the run workspace.</p>
+          <strong>Phase 6 · Benchmark comparison</strong>
+          <p>Compare two runs and inspect the scenarios that changed.</p>
         </div>
-        <Link to="/runs">
-          Open runs
+        <Link to="/compare">
+          Compare runs
           <ArrowRight size={15} />
         </Link>
       </div>
@@ -436,7 +440,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="good">Phase 5 implemented</StatusLabel>
+        <StatusLabel tone="good">Phase 6 implemented</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -453,7 +457,7 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index <= 5 ? (
+            {index <= 6 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
             ) : (
               <span className="planned-label">Planned</span>
@@ -495,9 +499,11 @@ export default function App() {
             ? 'Agents'
             : location.pathname === '/scenarios'
               ? 'Scenarios'
-              : location.pathname === '/runs' || location.pathname.startsWith('/runs/')
-                ? 'Benchmark runs'
-                : 'Page not found'
+              : location.pathname === '/compare' || location.pathname.startsWith('/compare/')
+                ? 'Benchmark comparison'
+                : location.pathname === '/runs' || location.pathname.startsWith('/runs/')
+                  ? 'Benchmark runs'
+                  : 'Page not found'
   useEffect(() => {
     document.title = routeName + ' · AgentShield AI'
     mainRef.current?.focus({ preventScroll: true })
@@ -554,6 +560,17 @@ export default function App() {
               path="/runs/:runId"
               element={
                 <Runs
+                  health={system.health.data}
+                  healthError={system.health.isError}
+                  refresh={system.refresh}
+                />
+              }
+            />
+            <Route
+              path="/compare/:comparisonId?"
+              element={
+                <Runs
+                  comparison
                   health={system.health.data}
                   healthError={system.health.isError}
                   refresh={system.refresh}

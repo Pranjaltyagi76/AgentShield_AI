@@ -49,6 +49,7 @@ export async function api<T>(
     changeGuest(null, true)
   if (!response.ok) {
     const runs = path.startsWith('/runs')
+    const comparison = path.startsWith('/benchmarks')
     const retry = response.headers.get('Retry-After')
     const delay = retry && /^\d+$/.test(retry) ? ' Retry after ' + retry + ' seconds.' : ''
     const messages: Record<number, string> = {
@@ -57,14 +58,22 @@ export async function api<T>(
       404: runs
         ? 'Run unavailable in this workspace or execution is disabled.'
         : 'Record unavailable.',
-      409: runs ? 'Run request conflicts with an earlier submission.' : 'Workspace limit reached.',
-      422: runs
-        ? 'Check the scenario and agent version selections.'
-        : 'Check the form values and prompt length.',
+      409: comparison
+        ? 'Both source runs must finish before comparison.'
+        : runs
+          ? 'Run request conflicts with an earlier submission.'
+          : 'Workspace limit reached.',
+      422: comparison
+        ? 'Choose two distinct runs.'
+        : runs
+          ? 'Check the scenario and agent version selections.'
+          : 'Check the form values and prompt length.',
       429: 'Request limit reached.' + delay,
-      503: runs
-        ? 'Run capacity or storage is unavailable.' + delay
-        : 'Workspace storage is unavailable.',
+      503: comparison
+        ? 'Comparison storage or workspace capacity is unavailable.'
+        : runs
+          ? 'Run capacity or storage is unavailable.' + delay
+          : 'Workspace storage is unavailable.',
     }
     throw new ApiError(messages[response.status] ?? 'Request failed.', response.status)
   }

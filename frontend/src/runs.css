@@ -331,3 +331,44 @@
 .call-details p {
   font-size: 14px;
 }
+.compare-fields,
+.compare-sources {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.compare-sources > div {
+  border: 1px solid #dbe4dc;
+  background: #f6f8f4;
+  border-radius: 8px;
+  padding: 14px;
+  overflow-wrap: anywhere;
+}
+.compare-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+.compare-counts span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  color: #4a5e50;
+}
+.compare-counts strong {
+  font-variant-numeric: tabular-nums;
+  color: #223e2a;
+}
+.run-panel meter {
+  display: block;
+  min-width: 70px;
+  width: 95%;
+  height: 10px;
+  accent-color: #417650;
+}
+@media (max-width: 700px) {
+  .compare-fields,
+  .compare-sources {
+    grid-template-columns: 1fr;
+  }
+}

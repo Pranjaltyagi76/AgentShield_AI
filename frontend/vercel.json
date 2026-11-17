@@ -8,6 +8,7 @@
     { "source": "/system", "destination": "/index.html" },
     { "source": "/agents", "destination": "/index.html" },
     { "source": "/scenarios", "destination": "/index.html" },
+    { "source": "/compare/:path*", "destination": "/index.html" },
     { "source": "/runs/:path*", "destination": "/index.html" },
     { "source": "/roadmap", "destination": "/index.html" }
   ],

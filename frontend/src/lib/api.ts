@@ -13,6 +13,7 @@ const healthSchema = z.object({
     z.literal(3),
     z.literal(4),
     z.literal(5),
+    z.literal(6),
   ]),
 })
 const readinessSchema = z.object({
@@ -26,6 +27,7 @@ const readinessSchema = z.object({
     z.literal(3),
     z.literal(4),
     z.literal(5),
+    z.literal(6),
   ]),
 })
 export type Health = z.infer<typeof healthSchema>
