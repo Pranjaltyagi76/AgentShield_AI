@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Button } from './components/ui/button'
+import { Runs } from './Runs'
 import { Agents, Scenarios } from './Registry'
 import { API_BASE } from './lib/api'
 import { cn } from './lib/utils'
@@ -94,13 +95,13 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
             <FlaskConical size={18} />
             Scenarios
           </NavLink>
+          <NavLink to="/runs" onClick={close}>
+            <Workflow size={18} />
+            Benchmark runs
+          </NavLink>
         </nav>
         <p className="nav-heading nav-heading-later">EVALUATION · COMING LATER</p>
         <div className="future-nav">
-          <span>
-            <Workflow size={18} />
-            Benchmark runs<small>04</small>
-          </span>
           <span>
             <BookOpen size={18} />
             Reports<small>08</small>
@@ -299,14 +300,11 @@ function Overview({ system }: { system: System }) {
           <Layers3 size={19} />
         </span>
         <div>
-          <strong>Phase 4 · Scenario evaluation</strong>
-          <p>
-            Browse profiles and scenario definitions. Scored runs are available through the scripted
-            API when enabled.
-          </p>
+          <strong>Phase 5 · Run workspace</strong>
+          <p>Launch benchmarks and inspect findings in the run workspace.</p>
         </div>
-        <Link to="/roadmap">
-          View plan
+        <Link to="/runs">
+          Open runs
           <ArrowRight size={15} />
         </Link>
       </div>
@@ -438,7 +436,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="good">Phase 4 implemented</StatusLabel>
+        <StatusLabel tone="good">Phase 5 implemented</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -455,7 +453,7 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index <= 4 ? (
+            {index <= 5 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
             ) : (
               <span className="planned-label">Planned</span>
@@ -497,7 +495,9 @@ export default function App() {
             ? 'Agents'
             : location.pathname === '/scenarios'
               ? 'Scenarios'
-              : 'Page not found'
+              : location.pathname === '/runs' || location.pathname.startsWith('/runs/')
+                ? 'Benchmark runs'
+                : 'Page not found'
   useEffect(() => {
     document.title = routeName + ' · AgentShield AI'
     mainRef.current?.focus({ preventScroll: true })
@@ -540,6 +540,26 @@ export default function App() {
             <Route path="/roadmap" element={<RoadmapPage />} />
             <Route path="/agents" element={<Agents />} />
             <Route path="/scenarios" element={<Scenarios />} />
+            <Route
+              path="/runs"
+              element={
+                <Runs
+                  health={system.health.data}
+                  healthError={system.health.isError}
+                  refresh={system.refresh}
+                />
+              }
+            />
+            <Route
+              path="/runs/:runId"
+              element={
+                <Runs
+                  health={system.health.data}
+                  healthError={system.health.isError}
+                  refresh={system.refresh}
+                />
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <footer className="workspace-footer">
