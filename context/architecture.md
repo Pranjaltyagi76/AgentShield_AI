@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: Phase 0 foundation and public deployment smoke complete; Phase 1 registry and catalog implemented locally; the Phase 4 scripted evaluator is verified locally. Last reviewed November 17, 2026.
+Status: Phase 0 foundation and public deployment smoke complete; Phase 1 registry and catalog implemented locally; the scripted evaluator, run UI and Phase 6 comparisons are verified locally. Last reviewed November 17, 2026.
 
 ## Decisions
 
@@ -78,6 +78,12 @@ The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreS
 ## Run and trace frontend
 
 The React routes `/runs` and `/runs/:runId` share the registry’s tab-scoped guest session. The launcher records a pending idempotency key and its request configuration for ambiguous retries. The status query polls active runs every 2.5 seconds in the foreground, stopping on a terminal response, error or 100 updates. Evidence reloads on status transitions, selection or manual refresh. Each query is scoped to the mounted guest workspace. A finding links to the run, scenario and event ID. The owned trace API filters by scenario and redacts values before the browser receives them.
+
+## Benchmark comparisons
+
+Migration `0006` stores an immutable JSONB summary with a unique ordered baseline/candidate pair. Both foreign keys cascade on source deletion. An authenticated POST to `/api/v1/benchmarks/compare` checks both terminal runs belong to the guest. A per-guest transaction lock serializes admissions and retries. A guest can retain 64 comparisons within the configured database limit. Retrying an existing pair returns its saved summary even at capacity. GET `/api/v1/benchmarks/{id}` checks access through both runs.
+
+The pure comparator consumes pinned run configurations and persisted scenario assessments. The React page displays full-run coverage alongside paired metrics, signed changes and per-scenario links back to each source trace.
 
 ## Local evaluation
 

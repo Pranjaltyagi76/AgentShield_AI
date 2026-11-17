@@ -1,6 +1,14 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated November 17, 2026. Phase 5 passed local verification. Hosted execution is pending.
+Last updated November 17, 2026. Phase 6 passed local verification. Hosted execution is pending.
+
+## Phase 6 verification — November 17, 2026
+
+A Chrome guest launched both scripted Core v2 profiles against local FastAPI and PostgreSQL without an inference key. In the vulnerable-baseline and hardened-candidate comparison, 12/12 cases were evaluable in both runs. Six improved and six were unchanged. The pass rate rose from 6/12 to 12/12 (+50 percentage points). Reversing the pair produced six regressions. Chrome reopened the saved comparison after reload, navigated to the AS-001 source evidence and back, and showed no document overflow at 390 CSS pixels.
+
+The backend suite passed all 92 tests with local PostgreSQL. Two simultaneous requests for the same ordered pair returned HTTP 201 and 200 with identical snapshots. Tests also covered both input ownership checks, guest revocation and cascading deletion, quota handling, incompatible settings and fixture revisions, unmatched cases, missing evidence, and undefined rate changes. Alembic reported no schema drift at `0006`. Ruff lint and formatting passed.
+
+The frontend suite passed all 20 tests. Frontend formatting, lint, TypeScript and the production build passed. Hosted comparison, load and latency measurements remain outstanding.
 
 ## Phase 5 verification — November 17, 2026
 

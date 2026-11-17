@@ -4,7 +4,7 @@ Last updated: November 17, 2026. Source: Section 16 of [AgentShield_PROJECT.md](
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is next. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is the optional free model adapter. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -13,10 +13,10 @@ Implement only the phase explicitly requested by the owner. Later-phase content 
 | 0 | Foundation and initial free deployment smoke test | Complete; local checks, CI, and public shell/API/Neon smoke verified November 16 |
 | 1 | Guest ownership, data model, agent/scenario catalog | Complete locally; migrations, isolation, registry and browser catalog verified |
 | 2 | Scripted agents, bounded queue, simulation runtime | Complete locally on November 16 |
-| 3 | Deterministic policy enforcement | Not started |
-| 4 | Full scenario pack, oracles, metrics | Not started |
-| 5 | Run UI, traces, evidence | Not started |
-| 6 | Compatible benchmark comparisons | Not started |
+| 3 | Deterministic policy enforcement | Verified locally and in CI. Hosted execution gate pending |
+| 4 | Full scenario pack, oracles, metrics | Verified locally |
+| 5 | Run UI, traces, evidence | Verified locally |
+| 6 | Compatible benchmark comparisons | Verified locally on November 17 |
 | 7 | Optional free real-model adapter | Not started; optional |
 | 8 | HTML/JSON reports, saved sample, UX polish | Not started |
 | 9 | Complete public deployment validation | Not started |
@@ -77,6 +77,8 @@ November 17 completion evidence: a guest ran the full suite in Chrome, followed 
 Add baseline/candidate matching by scenario version and compatible settings, improved/regressed/unchanged outcomes, explicit incompatible/inconclusive cases, metric deltas with counts, and a comparison page.
 
 Exit evidence: known fixtures identify regressions correctly; scripted behavior changes are distinguished from real-model prompt changes; access to both source runs is enforced.
+
+November 17 verification: a Chrome guest compared two full Core v2 runs, reopened the saved comparison and followed a source evidence link. Vulnerable to hardened classified six improvements and six unchanged scenarios. Reversing the pair classified six regressions. Hand-calculated fixtures verify incompatible, unmatched and inconclusive cases, coverage and rate denominators. See [performance review](performance_review.md).
 
 ## Phase 7: Optional free LLM adapter
 

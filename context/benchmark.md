@@ -76,6 +76,10 @@ Compare scripted semantic traces after excluding volatile IDs/timestamps/latency
 
 Match by scenario ID and version; require compatible oracle, tool, policy, and execution settings or display incompatibility. Explicitly label intentional policy/configuration experiments. Classify matched evaluable results as improved, regressed, or unchanged. Keep unmatched and inconclusive pairs separate. Show numerator/denominator changes beside percentage deltas so reduced coverage cannot masquerade as an improvement.
 
+Phase 6 checks oracle and runtime versions, tool schema and enabled tools, policy, execution limits, provider and model. For each shared scenario ID it also checks the pinned revision, fixture context and applicable owner confirmation. Missing compatibility metadata excludes the affected pair. Ordering of an equivalent tool list does not change compatibility. Scripted profile and behavior version are experimental variables. Prompt hash changes are recorded for provenance. The scripted agent does not interpret edited prompt text.
+
+Full-run coverage uses each run’s own manifest. Paired coverage uses all compatible pairs, including those with incomplete evidence. Outcome and action metrics use the cases evaluated on both sides, retaining the Phase 4 applicability denominators. An empty denominator yields an unavailable delta. Rate changes are candidate minus baseline in percentage points, calculated before rounding. Blocked attempts, invalid requests and confirmation requests also have absolute count changes.
+
 For real-model tests, begin with a small repeated synthetic sample allowed by free quotas. Record repetition count and variability; avoid claiming a statistically reliable model ranking from one 12-case run. Scripted baseline/candidate tests remain deterministic harness checks.
 
 ## Performance measurement protocol

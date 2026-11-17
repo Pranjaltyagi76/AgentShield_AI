@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Phase 5 run and trace UI is implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
+**Phase 6 benchmark comparisons are implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -60,7 +60,7 @@ npm --prefix frontend run dev
 
 Open [the local workspace](http://127.0.0.1:5173). The frontend proxies `/api` to port 8000; `VITE_API_BASE_URL` includes `/api/v1` exactly once. Development API docs are at [localhost:8000/docs](http://127.0.0.1:8000/docs). Production disables the interactive docs.
 
-`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 5 readiness requires Alembic revision `0005`.
+`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 6 readiness requires Alembic revision `0006`.
 
 Stop the database with `docker compose down`. This preserves the named data volume. Removing the volume deletes local database data, so do not do that as an ordinary shutdown step.
 
@@ -75,6 +75,12 @@ uv --directory backend run uvicorn app.main:app --host 127.0.0.1 --port 8000 --n
 ```
 
 Run `npm --prefix frontend run dev` in another terminal and open [Benchmark runs](http://127.0.0.1:5173/runs). Start a guest workspace, select an agent version and launch Core v2 or selected scenarios. Open a finding’s evidence link to inspect its highlighted event. Expand a tool request to see its arguments, policy decision and recorded mock result. The same tab can reopen a run from history. Guest access expires after seven days or revocation.
+
+## Compare two runs
+
+In the same guest workspace, run Core v2 once with the vulnerable profile and once with the hardened profile. Open [Compare benchmarks](http://127.0.0.1:5173/compare), choose vulnerable as the baseline and hardened as the candidate, then select **Compare runs**. Open a scenario outcome to inspect the corresponding source trace. The comparison link can be reopened while the guest has access to both retained runs.
+
+Each rate shows its numerator, denominator and change in percentage points. Full-run coverage includes every selected case. Outcome rates use only compatible cases with evidence on both sides. Switching the baseline and candidate reverses the direction of change.
 
 ## Try a local scripted run from the command line
 
@@ -154,7 +160,7 @@ Follow [context/deployment.md](context/deployment.md) for the exact configuratio
 
 ## Planned product
 
-Later phases add executable scenarios and vulnerable/hardened scripted behavior, independently enforced tool policies, redacted evidence traces, deterministic metrics, regression comparisons, and HTML/JSON reports. Optional eligible Gemini free-tier testing stays separate from scripted results.
+Later phases add HTML/JSON reports, a saved example, and hosted validation of the scripted workflow. Optional eligible Gemini free-tier testing stays separate from scripted results.
 
 This is an application-controlled simulation harness. It does not execute untrusted code or test arbitrary external systems. A passing finite benchmark does not prove complete security.
 

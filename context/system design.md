@@ -12,7 +12,7 @@ The required product works without inference credentials. A scripted vulnerable 
 
 ## Public system
 
-Only the visitor → static frontend → API → database path is implemented and verified in Phase 0. The queue, simulation runtime and gateway are implemented through Phase 3. Phase 4 adds local evaluation. Phase 5 connects it to the browser launcher, guest history and trace viewer. Optional inference and the saved sample are planned.
+Only the visitor → static frontend → API → database path is implemented and verified in Phase 0. The queue, simulation runtime and gateway are implemented through Phase 3. Phase 4 adds local evaluation. Phase 5 connects it to the browser launcher, guest history and trace viewer. Phase 6 compares terminal runs within the same guest workspace. Optional inference and the saved sample are planned.
 
 ```mermaid
 flowchart LR
@@ -64,6 +64,10 @@ For a comparison, both source runs must be accessible to the caller. For a repor
 ## Browser run inspection
 
 The health endpoint advertises local, public or disabled scripted execution. A guest selects an immutable agent version and a manifest or explicit scenario list. The API owns the run ID, policy decisions and scores. The UI reads the selected scenario’s ordered events and shows an executed action only when a mock result exists. The event ID in a finding is stable across reloads and every evidence read requires the current guest credential. An expired workspace loses access to its detail view.
+
+## Comparing retained runs
+
+The guest chooses a baseline and candidate independently from their history. FastAPI checks ownership and terminal status, loads the pinned manifests and saved assessments, and stores the comparison in PostgreSQL. A repeated request for the same ordered pair opens the same comparison. Reversing the pair creates a different comparison. Expiry denies access immediately. Deleting either source through retention cleanup also removes the comparison. The browser links each scenario directly to the underlying run evidence.
 
 ## Local Phase 2 operation
 
