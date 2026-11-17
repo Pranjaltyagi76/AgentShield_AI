@@ -133,7 +133,7 @@ def test_live_consumer_and_ordered_trace(harness):
             "scenario_end",
         ]
         assert events[4]["payload"]["document"] == events[5]["payload"]["answer"]
-        assert c.get(path + "/results", headers=h).json()[0]["outcome"] is None
+        assert c.get(path + "/results", headers=h).json()[0]["outcome"] == "pass"
         assert submit(c, h, version).json()["id"] == response.json()["id"]
 
 
@@ -327,15 +327,21 @@ def test_runtime_retains_denied_attempt(harness, monkeypatch, case, reason):
     for _ in range(8):
         run_queue.tick(engine, worker)
     path = "runs/" + run["id"]
-    assert client.get(path, headers=auth).json()["status"] == "failed"
+    assert client.get(path, headers=auth).json()["status"] == (
+        "completed" if case == "repeat" else "failed"
+    )
     trace = client.get(path + "/traces", headers=auth).json()
+    if case == "repeat":
+        assert trace.pop()["kind"] == "scenario_end"
     assert trace[-2]["kind"] == "tool_requested"
     assert trace[-1]["kind"] == "policy_decision"
     assert trace[-1]["payload"]["reason"] == reason
     assert sum(event["kind"] == "mock_tool_result" for event in trace) == (
         6 if case == "repeat" else 0
     )
-    assert client.get(path + "/results", headers=auth).json()[0]["outcome"] == "inconclusive"
+    assert client.get(path + "/results", headers=auth).json()[0]["outcome"] == (
+        "pass" if case == "repeat" else "inconclusive"
+    )
 
 
 def test_secret_in_a_delivery_request_never_reaches_guest_trace(harness, monkeypatch):
@@ -355,3 +361,65 @@ def test_secret_in_a_delivery_request_never_reaches_guest_trace(harness, monkeyp
     assert trace.json()[-1]["payload"] == {"decision": "blocked", "reason": "synthetic_secret"}
     assert PRIVATE_MARKER not in trace.text
     assert "mock_tool_result" not in [e["kind"] for e in trace.json()]
+
+
+def test_full_suite_repeatability_and_owned_evidence(harness):
+    client, workspace, engine, _ = harness
+    auth, _ = workspace()
+    other, _ = workspace()
+    suite = client.get("scenario-suites").json()[1]
+    assert suite["id"] == "core-v2" and len(suite["members"]) == 12
+    for agent in client.get("agents").json():
+        detail = client.get("agents/" + agent["id"]).json()
+        version = detail["versions"][0]
+        summaries = []
+        for _ in range(2):
+            run = client.post(
+                "runs",
+                headers={**auth, "Idempotency-Key": str(uuid4())},
+                json={"agent_version_id": version["id"], "suite_id": "core-v2"},
+            )
+            assert run.status_code == 202, run.text
+            path = "runs/" + run.json()["id"]
+            worker = uuid4()
+            for _ in range(45):
+                if not run_queue.tick(engine, worker):
+                    break
+            results = client.get(path + "/results", headers=auth).json()
+            assert [(r["scenario_id"], r["version"]) for r in results] == [
+                (m["scenario_id"], m["version"]) for m in suite["members"]
+            ]
+            report = client.get(path + "/metrics", headers=auth).json()
+            assert report["status"] == "completed" and report["coverage"]["numerator"] == 12
+            assert report["pass_rate"]["numerator"] == (
+                12 if version["demo_profile"] == "hardened" else 6
+            )
+            assert report["attack_success"]["denominator"] == 11
+            assert report["unauthorized_execution"]["numerator"] == 0
+            assert results[9]["outcome"] == "pass" and results[10]["outcome"] == "pass"
+            findings = client.get(path + "/findings", headers=auth).json()
+            events = []
+            for offset in (0, 100):
+                page = client.get(
+                    path + "/traces", headers=auth, params={"limit": 100, "offset": offset}
+                )
+                assert PRIVATE_MARKER not in page.text
+                events.extend(page.json())
+            by_id = {e["id"]: e for e in events}
+            assert all(by_id[f["evidence_id"]]["scenario_id"] == f["scenario_id"] for f in findings)
+            assert all(
+                "evaluator_rule" not in e["payload"] and "outcome" not in e["payload"]
+                for e in events
+                if e["kind"] == "agent_input"
+            )
+            assert all(
+                client.get(path + suffix, headers=other).status_code == 404
+                for suffix in ("/metrics", "/findings")
+            )
+            summaries.append(
+                (
+                    report,
+                    [(e["scenario_id"], e["sequence"], e["kind"], e["payload"]) for e in events],
+                )
+            )
+        assert summaries[0] == summaries[1]

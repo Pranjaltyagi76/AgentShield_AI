@@ -37,7 +37,7 @@ def test_health_does_not_touch_database_and_cleans_up():
         response = client.get("/api/v1/health")
         assert response.status_code == 200
         assert response.json()["status"] == "ok"
-        assert response.json()["phase"] == 3
+        assert response.json()["phase"] == 4
         assert probe.calls == 0
         UUID(response.headers["X-Request-ID"])
         assert response.headers["Cache-Control"] == "no-store"
