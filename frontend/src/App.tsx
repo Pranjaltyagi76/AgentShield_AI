@@ -40,7 +40,7 @@ const phases = [
   ['Scenario evaluation', 'Twelve scenarios, deterministic oracles and evidence-based metrics.'],
   ['Run workspace', 'Launcher, run history, trace timeline and findings.'],
   ['Regression comparison', 'Compatible baselines, improvements and regressions.'],
-  ['Optional model adapter', 'Free-tier real-model testing; never required for the demo.'],
+  ['Optional model adapter', 'Gemini disabled while free account access is unverified.'],
   ['Reports & polish', 'HTML/JSON reports, saved sample, accessibility and responsive UX.'],
   ['Deployment validation', 'Verify the complete public workflow and free-service limits.'],
   ['Portfolio readiness', 'Measured evidence, documentation and walkthrough.'],
@@ -422,6 +422,7 @@ function SystemPage({ system }: { system: System }) {
           <p>
             Guest sessions, versioned agent profiles and the scenario catalog are available.
             Simulations use synthetic data and mock tools. No inference credentials are required.
+            Gemini testing is disabled while free account access is unverified.
           </p>
         </div>
       </section>
@@ -440,7 +441,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="good">Phase 6 implemented</StatusLabel>
+        <StatusLabel tone="muted">Phase 7 · inference disabled</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -459,6 +460,8 @@ function RoadmapPage() {
             </div>
             {index <= 6 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
+            ) : index === 7 ? (
+              <StatusLabel tone="muted">Disabled</StatusLabel>
             ) : (
               <span className="planned-label">Planned</span>
             )}
