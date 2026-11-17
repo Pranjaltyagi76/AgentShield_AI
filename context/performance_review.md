@@ -1,6 +1,14 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated: November 16, 2026. Stage: Phase 0 complete; local foundation and public Vercel → Render → Neon smoke verified. The Phase 2 scripted runtime has been verified locally.
+Last updated November 17, 2026. Phase 3 passed local verification and CI. Hosted execution is pending.
+
+## Phase 3 verification — November 17, 2026
+
+- All 66 backend tests passed against local PostgreSQL after upgrading from `0003` to `0004`. Alembic detected no model drift. Ruff checks passed.
+- The production-mode API test used a non-loopback client address, an explicit HTTPS origin and two guest credentials. A foreign guest could neither submit with the owner's version nor read or cancel the run. The unconfirmed and disallowed-destination cases produced no mock receipt. A matching owner confirmation produced exactly one receipt.
+- Tests covered protected and foreign records, canary text in outgoing mock messages and exports, malformed and oversized arguments, attempts to supply confirmation from the agent, and guest trace redaction. After six allowed reads the next proposal was traced and blocked. Its result remained inconclusive.
+- Both no-key profiles completed AS-011 through local Uvicorn and PostgreSQL with seven persisted events each. The smoke client revoked its guest. Frontend formatting, lint, type checking, all 13 tests and the production build passed. [Implementation CI including the container build](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/44005420354).
+- Public-mode tests ran locally. The hosted service still runs Phase 0. Scenario scoring and hosted performance measurements belong to later verification.
 
 ## Phase 2 verification — November 16, 2026
 

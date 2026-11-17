@@ -4,7 +4,7 @@ Last updated: November 16, 2026. Source: Section 16 of [AgentShield_PROJECT.md](
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 is next. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -53,6 +53,8 @@ Completion evidence (November 16): AS-011 completed over HTTP in both profiles w
 Implement allowlists, protected-record access rules, destination restrictions, secret-export checks, confirmation gating for simulated actions, maximum calls, and invalid-argument handling. The gateway alone may execute registered mock tools.
 
 Exit evidence: prohibited and unconfirmed actions never execute, even when the agent claims authorization; decisions and attempted actions appear in traces. Enable bounded public demo execution only after ownership/enforcement tests pass.
+
+November 17 implementation evidence: AS-006 revision 2 records a denied destination, missing confirmation, or an exact owner-confirmed synthetic receipt. PostgreSQL tests cover the call cap, redaction, and isolation between two guests. The hosted exit gate remains open. See deployment.md.
 
 ## Phase 4: Scenario runner and evaluation
 

@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: Phase 0 foundation and public deployment smoke complete; Phase 1 registry and catalog implemented locally; the Phase 2 scripted runtime is verified locally. Last reviewed: November 16, 2026.
+Status: Phase 0 foundation and public deployment smoke complete; Phase 1 registry and catalog implemented locally; the Phase 3 policy engine passed local and CI checks. Last reviewed November 17, 2026.
 
 ## Decisions
 
@@ -77,9 +77,9 @@ The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreS
 
 ## Local simulation runtime
 
-Alembic revision `0003` adds runs, scenario results and ordered trace events with guest-dependent cleanup. The local API locks queue admission in PostgreSQL, snapshots the profile version and public fixture fields, and enforces idempotency per guest. The lifespan consumer holds a PostgreSQL session advisory lock on its working connection. A replacement leader recovers previously claimed runs before claiming eligible queued work. It advances up to two active runs in short transactions and commits each step with its evidence. The local consumer occupies one connection in the two-connection pool while active.
+Alembic revision `0003` adds runs, scenario results and ordered trace events with guest-dependent cleanup. The local API locks queue admission in PostgreSQL, snapshots the profile version and public fixture fields, and enforces idempotency per guest. The worker uses a transaction-scoped queue lock and checks the run owner, worker identity and status under row lock on each step. A running job with a heartbeat older than five seconds is marked interrupted and retains partial evidence. Short transactions support transaction-pooled PostgreSQL. Committed submissions wake the consumer. It also checks for pending work at startup and on an idle timer.
 
-The script sees a copy of synthetic task data and its previous observation. The gateway checks the original allowed tools and validated arguments before producing a mock response. It requires confirmation for simulated delivery/export. The Phase 2 fixtures exercise read-only actions. Phase 3 owns the full policy suite.
+The script sees a copy of synthetic task data and its previous observation. The gateway checks the original allowed tools and validated arguments before producing a mock response. Only the gateway produces synthetic tool results. It checks each proposal against the scenario and version allowlists, strict argument schemas, synthetic ownership and protected records, the permitted destination, an exact synthetic private marker, and a six-call budget per scenario. A high-impact action needs the authenticated guest’s approval for that run, scenario, step, tool and arguments. AS-006 revision 2 provides one confirmable message. The script never receives the approval. Migration `0004` retains revision 1 in the frozen Core v1 catalog.
 
 ## Implemented Phase 1 registry
 

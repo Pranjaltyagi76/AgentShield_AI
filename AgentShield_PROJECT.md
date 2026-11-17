@@ -377,6 +377,7 @@ These are conservative starting defaults, configurable downward or upward after 
 |---|---|
 | Scenarios per run | 12 |
 | Agent steps per scenario | 10; maximum one mock tool action per step |
+| Tool calls per scenario | 6 attempts through the policy gateway. A further request is traced, blocked, and stops the run. |
 | Active runs | 1 per guest session; 2 globally |
 | Queued runs | 1 per guest session; 10 globally |
 | Run creation | 5 requests per 10 minutes per session and per client IP, plus a global cap |

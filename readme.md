@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Phase 2 is implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
+**Phase 3 policy enforcement passed locally and in CI. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -11,7 +11,7 @@ The required product will work without an AI API key, using synthetic data and m
 - Responsive React/Vite/TypeScript workspace with Overview, System status, roadmap, and not-found routes.
 - FastAPI process health and real PostgreSQL readiness endpoints.
 - Validated environment settings, restricted CORS, safe JSON errors, request IDs, and structured logs.
-- Guest-only profile mutations; shared examples are read-only. Execution and inference stay disabled.
+- Guest-only profile mutations; shared examples are read-only. Scripted runs require explicit opt-in. No inference key is needed.
 - Small SQLAlchemy/psycopg connection pool and bounded connection/query timeouts.
 - Local PostgreSQL Compose configuration, backend Dockerfile, committed npm/uv dependency locks, and CI.
 - Free Render/Vercel deployment configuration and an initial threat model.
@@ -60,7 +60,7 @@ npm --prefix frontend run dev
 
 Open [the local workspace](http://127.0.0.1:5173). The frontend proxies `/api` to port 8000; `VITE_API_BASE_URL` includes `/api/v1` exactly once. Development API docs are at [localhost:8000/docs](http://127.0.0.1:8000/docs). Production disables the interactive docs.
 
-`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 2 readiness requires Alembic revision `0003`.
+`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 3 readiness requires Alembic revision `0004`.
 
 Stop the database with `docker compose down`. This preserves the named data volume. Removing the volume deletes local database data, so do not do that as an ordinary shutdown step.
 
@@ -76,7 +76,24 @@ uv --directory backend run uvicorn app.main:app --host 127.0.0.1 --port 8012 --n
 
 In another terminal, run `uv --directory backend run python scripts/smoke_local_runs.py`. The script creates a temporary guest, runs AS-011 with each profile, reads back the ordered events, then revokes its guest. To retain evidence for inspection, use the local API with your own guest. Send its bearer credential in the Authorization header. POST to `/api/v1/runs` with an `Idempotency-Key` header and JSON containing `agent_version_id` and `scenarios` (an ordered list). GET the returned run ID at `/api/v1/runs/{id}`, `/{id}/results` or `/{id}/traces` under the same prefix. POST to `/{id}/cancel` to request cancellation.
 
-AS-011 exercises a routine document lookup. Enable `search_docs` on the profile version to see a mock read. AS-010 exercises repeated requests and the step budget. Behavior version 1 uses the scripted profile, the fixture, the version's tool list and the previous mock observation. Prompt edits change the recorded hash and input size. Scripted decisions follow the checked-in program. Security scores and the benchmark UI belong to later phases.
+AS-011 exercises a routine document lookup. Enable `search_docs` on the profile version to see a mock read. AS-010 exercises repeated requests and the six-call budget. Behavior version 1 uses the scripted profile, the fixture, the version's tool list and the previous mock observation. Prompt edits change the recorded hash and input size. Scripted decisions follow the checked-in program. Security scores and the benchmark UI belong to later phases.
+
+### Verify a policy decision
+
+For AS-006 revision 2, select a version that allows `send_message_simulated`. Submit `scenarios: ["AS-006"]`. A hardened profile returns `requires_confirmation` by default. To approve its single mock delivery, add the following `confirmation` object to the run request. The vulnerable profile proposes a different synthetic destination, which the gateway blocks even when this approval is present.
+
+```json
+{
+  "confirmation": {
+    "scenario": "AS-006",
+    "step": 1,
+    "tool": "send_message_simulated",
+    "arguments": {"destination": "mock-inbox", "content": "Workspace hours reviewed."}
+  }
+}
+```
+
+Read the owner-only trace to see the request and decision reason. An approved action returns an in-memory simulated receipt. All three fixtures use the same gateway and run limits.
 
 ## Checks
 
@@ -113,7 +130,7 @@ Use Vercel Hobby for the frontend, Render Free for one backend process, and Neon
 - Keep execution/inference disabled. No model keys, paid disk, worker, or Render database are provisioned.
 - Complete owner sign-ins and confirm free-plan/billing settings before provisioning.
 
-Open the [live AgentShield foundation](https://agentshield-ai-tau.vercel.app) or its [system status](https://agentshield-ai-tau.vercel.app/system). The browser reaches the [backend health](https://agentshield-api-hn0q.onrender.com/api/v1/health) and [database readiness](https://agentshield-api-hn0q.onrender.com/api/v1/ready) endpoints; both returned HTTP 200 on November 16. No sign-in or model key is required for this foundation smoke test. Scenario execution is not implemented yet.
+Open the [live AgentShield foundation](https://agentshield-ai-tau.vercel.app) or its [system status](https://agentshield-ai-tau.vercel.app/system). The browser reaches the [backend health](https://agentshield-api-hn0q.onrender.com/api/v1/health) and [database readiness](https://agentshield-api-hn0q.onrender.com/api/v1/ready) endpoints; both returned HTTP 200 on November 16. No sign-in or model key is required for this foundation smoke test. Public execution on the hosted foundation is disabled. See the deployment record for the pending Phase 3 release.
 
 Follow [context/deployment.md](context/deployment.md) for the exact configuration and release procedure. Vercel GitHub integration is not installed, so frontend releases currently upload reviewed source through the API. Render automatic deploy is off. Free services may sleep or suspend at quota limits; no uptime or measured cold-start claim is made.
 

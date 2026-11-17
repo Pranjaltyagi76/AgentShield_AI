@@ -62,6 +62,12 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Phase 3 release status — November 17, 2026
+
+The implementation at `d20c30c` passed CI. Render returned `free` and automatic deploy off for the existing service. Production-mode enforcement and guest isolation passed against local PostgreSQL. Automatic approval review rejected setting `PUBLIC_RUNS_ENABLED=true` on Render without explicit owner authorization for public submissions. No Phase 3 production deployment or hosted run was observed.
+
+On authorization, release the compatible frontend and API, run the existing startup migration to `0004`, and enable the public scripted switch on the existing service. Verify the canonical frontend, database readiness, exact-origin CORS, both profiles, a denied request without a receipt, an approved synthetic receipt, and cross-guest denial. The public inference flag stays false. Setting the scripted switch to false and restarting removes the run routes and consumer. Rate limits are process-local on the single instance and reset on restart. Queue and storage limits use PostgreSQL.
+
 ## Phase 2 local configuration
 
 Local verification used a separate loopback PostgreSQL database, migration `0003` and Uvicorn on loopback port 8012 with proxy headers disabled. `LOCAL_RUNS_ENABLED` defaults to false. Production configuration rejects local execution and continues to reject enabled public execution/inference flags. Phase 2 used no new hosted resources. The hosted record below describes Phase 0. Follow the local smoke procedure in the root readme to reproduce the two-profile run.

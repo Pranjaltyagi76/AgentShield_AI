@@ -1,6 +1,6 @@
 # AgentShield AI: Requirements
 
-Status: acceptance baseline; Phase 0 complete with local checks and the public Vercel/Render/Neon smoke verified; Phase 1 guest ownership, agent/version registry and curated catalog verified locally. Phase 2 local execution, limits, queue recovery and ordered traces are verified. Full-suite evaluation and custom scenario authoring are planned. Last updated: November 16, 2026.
+Status: acceptance baseline; Phase 0 complete with local checks and the public Vercel/Render/Neon smoke verified; Phase 1 guest ownership, agent/version registry and curated catalog verified locally. Phase 2 local execution, limits, queue recovery and ordered traces are verified. Phase 3 policy enforcement and guest-owned public-mode runs passed locally. Production activation is pending. Full-suite evaluation and custom scenario authoring are planned. Last updated November 17, 2026.
 
 The full product specification is [AgentShield_PROJECT.md](AgentShield_PROJECT.md). This file is its concise acceptance checklist. Runtime decisions are in [context/system design.md](context/system%20design.md); implementation status is in [context/phasewise_roadmap.md](context/phasewise_roadmap.md). Changes to scope must update these references together.
 
