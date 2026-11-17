@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ReportDownloads } from './Reports'
 import { useMutation } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from './components/ui/button'
@@ -191,6 +192,7 @@ function SavedComparison({ scope, id }: { scope: string; id: string }) {
     <>
       <section className="surface run-panel">
         <h2>Source runs</h2>
+        <ReportDownloads runId={c.candidate.id} comparisonId={id} />
         <div className="compare-sources">
           {(['baseline', 'candidate'] as const).map((k) => (
             <div key={k}>

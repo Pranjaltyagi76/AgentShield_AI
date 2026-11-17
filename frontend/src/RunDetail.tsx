@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, ListChecks, ListTree } from 'lucide-react'
 import { api, problem } from './lib/workspace'
+import { ReportDownloads } from './Reports'
 import {
   active,
   rates,
@@ -129,6 +130,12 @@ export function RunDetail({ scope, id }: { scope: string; id: string }) {
               </button>
             )}
           </section>
+          {!active(run) && (
+            <section className="surface run-panel">
+              <h2>Export report</h2>
+              <ReportDownloads runId={run.id} />
+            </section>
+          )}
           <Evidence scope={scope} run={run} />
         </>
       )}

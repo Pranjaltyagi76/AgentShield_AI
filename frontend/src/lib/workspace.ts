@@ -24,7 +24,7 @@ export async function api<T>(
   method = 'GET',
   data?: unknown,
   auth = false,
-  options: { signal?: AbortSignal; idempotencyKey?: string } = {},
+  options: { signal?: AbortSignal; idempotencyKey?: string; blob?: boolean } = {},
 ): Promise<T> {
   const token = auth ? sessionStorage.getItem(guestKey) : null
   const timeout = AbortSignal.timeout(10_000)
@@ -49,34 +49,44 @@ export async function api<T>(
     changeGuest(null, true)
   if (!response.ok) {
     const runs = path.startsWith('/runs')
+    const report = path.startsWith('/reports') || /^\/runs\/[^/]+\/reports/.test(path)
     const comparison = path.startsWith('/benchmarks')
     const retry = response.headers.get('Retry-After')
     const delay = retry && /^\d+$/.test(retry) ? ' Retry after ' + retry + ' seconds.' : ''
     const messages: Record<number, string> = {
       401: 'Your guest session has ended.',
       403: 'Access denied for this workspace.',
-      404: runs
-        ? 'Run unavailable in this workspace or execution is disabled.'
-        : 'Record unavailable.',
-      409: comparison
-        ? 'Both source runs must finish before comparison.'
+      404: report
+        ? 'Report or source run unavailable in this workspace.'
         : runs
-          ? 'Run request conflicts with an earlier submission.'
-          : 'Workspace limit reached.',
-      422: comparison
-        ? 'Choose two distinct runs.'
-        : runs
-          ? 'Check the scenario and agent version selections.'
-          : 'Check the form values and prompt length.',
+          ? 'Run unavailable in this workspace or execution is disabled.'
+          : 'Record unavailable.',
+      409: report
+        ? 'Reports require a finished run and a supported renderer.'
+        : comparison
+          ? 'Both source runs must finish before comparison.'
+          : runs
+            ? 'Run request conflicts with an earlier submission.'
+            : 'Workspace limit reached.',
+      422: report
+        ? 'Choose HTML or JSON and an accessible comparison.'
+        : comparison
+          ? 'Choose two distinct runs.'
+          : runs
+            ? 'Check the scenario and agent version selections.'
+            : 'Check the form values and prompt length.',
       429: 'Request limit reached.' + delay,
-      503: comparison
-        ? 'Comparison storage or workspace capacity is unavailable.'
-        : runs
-          ? 'Run capacity or storage is unavailable.' + delay
-          : 'Workspace storage is unavailable.',
+      503: report
+        ? 'Report storage or workspace capacity is unavailable.'
+        : comparison
+          ? 'Comparison storage or workspace capacity is unavailable.'
+          : runs
+            ? 'Run capacity or storage is unavailable.' + delay
+            : 'Workspace storage is unavailable.',
     }
     throw new ApiError(messages[response.status] ?? 'Request failed.', response.status)
   }
+  if (options.blob) return (await response.blob()) as T
   return response.status === 204 ? (undefined as T) : response.json()
 }
 
