@@ -1,6 +1,6 @@
 # AgentShield AI: Free Deployment Runbook
 
-Status: public scripted execution was explicitly approved and enabled on November 17, 2026. The Vercel → Render → Neon feature workflow and recovery passed. Phase 9 cold-start validation is in progress. Optional inference remains disabled.
+Status: public scripted execution was explicitly approved and enabled on November 17, 2026. The Vercel → Render → Neon feature workflow and recovery passed. Phase 9 hosted workflow, recovery and real cold-start validation passed. Optional inference remains disabled.
 
 Reuse the existing resources in the observed deployment record below. Do not provision duplicate AgentShield services or projects when continuing this task.
 
@@ -91,7 +91,9 @@ The recovery case used an operator-staged fixture under a newly created verifica
 
 For repeatable ordinary HTTP validation, run `python -m scripts.verify_hosted` from the backend directory. The optional `--recovery-check` pauses for the explicitly approved fixture and service redeploy described above, and requires an interactive terminal. Expiry and fixture changes must stay scoped to that verifier’s newly created records.
 
-Cold-start timing is pending a real idle interval. Initial windows were interrupted by observed request pairs at 15:59:47, 16:11:42 and 16:14:00 UTC. The verification tab was navigated away from the app, and a process check found no old AgentShield verification Chrome processes. A later incoming pair showed that traffic was still arriving. An uninterrupted idle window remains necessary. No artificial keep-alive requests are configured.
+Initial idle windows were interrupted by request pairs at 15:59:47, 16:11:42 and 16:14:00 UTC. The verification tab was navigated away from the app. Logs then showed no incoming application requests after 16:14:00. Render recorded `application_stopped` at 16:29:00 UTC, confirming the fifteen-minute idle shutdown.
+
+The first timed wake request began at 16:30:32.949 UTC. Valid public health JSON arrived after **32.812 seconds** on the first attempt. Database readiness returned connected, and inference remained disabled. Render recorded the new application instance starting at 16:30:57 UTC. The static saved sample rendered while the API was still waking. Manual retry restored Connected/Ready in the browser. This is one observed idle/wake cycle. No artificial keep-alive requests are configured.
 
 ## Phase 8 local release preparation — November 17, 2026
 

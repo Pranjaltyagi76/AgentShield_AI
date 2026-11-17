@@ -88,6 +88,12 @@ Report renderer v1 reuses the stored scenario assessments and Phase 4 metric agg
 
 The bundled sample was captured on November 17 through loopback HTTP from a new guest running both seeded Core v2 profiles. The exported vulnerable run passed 6/12 cases, and its vulnerable → hardened comparison recorded six improvements and six unchanged cases. UUID replacement preserves references without publishing guest or original event identities. The sample is historical and includes its capture metadata. It is independent of current API health.
 
+## Hosted measurements and recovery method
+
+On November 17, one full hosted run per profile completed with 12/12 coverage. Recorded execution time was 3.8 seconds for hardened and 5.1 seconds for vulnerable. Each is a single warm-path observation. The cold-start observation followed an uninterrupted interval after the final incoming request at 16:14 UTC. Render logged shutdown at 16:29. The wake request at 16:30:32.949 returned valid health JSON in 32.812 seconds. The sample rendered independently during the wake. This is one measured cycle. Control-plane logs were read during the interval without requesting the application.
+
+The recovery experiment used an approved verification-only orphan fixture with one persisted scenario-start event. A same-revision Render redeploy tested startup recovery and report regeneration from Neon. Temporary guest expiry and normal bounded cleanup were observed separately. Queue/storage saturation was tested locally, and live rate rejection was observed through HTTP 429. No provider inference occurred.
+
 ## Phase 7 limitations
 
 Optional inference is explicitly disabled because account-specific free access and credentials are unavailable. Every executable observation in this release uses scripted behavior. Provider latency, usage accounting, malformed model responses, quota errors and real-model prompt regression have not been measured. A future adapter must retain provider failures as inconclusive evidence and require a separately launched demo run.

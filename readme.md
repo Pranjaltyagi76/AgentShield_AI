@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Phase 8 reports and the saved sample are implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
+**Phase 9 is complete. The scripted workflow is deployed on Vercel, Render Free and Neon Free.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -19,6 +19,12 @@ The required product will work without an AI API key, using synthetic data and m
 Phase 1 local verification (November 16): 35 backend tests passed with PostgreSQL and 13 frontend tests passed. The catalog and private profile creation were also checked in the browser.
 
 Historical Phase 0 verification (November 16): the backend suite contains **32 cases**; **31 passed locally and one database integration case skipped** without TEST_DATABASE_URL. [CI with PostgreSQL](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43859035364) passed all jobs, including the database integration check, frontend checks/build, and container build. The frontend suite contains **11 tests**. Live Render readiness also reached Neon successfully. These are foundation tests, not security benchmark results. See [performance review](context/performance_review.md) for environment and limitations.
+
+## Try the hosted app
+
+Open [AgentShield AI](https://agentshield-ai-tau.vercel.app/runs), start a guest workspace and launch the default hardened Core v2 suite. Select the vulnerable shared profile for a second run, then compare both results and download reports. No model key is required.
+
+[Saved sample](https://agentshield-ai-tau.vercel.app/sample) is bundled with the frontend and remains available during API outages. Guest workspaces expire after seven days and access depends on the current tab’s credential. Free hosting can sleep, restart or reach its quotas.
 
 ## Prerequisites
 
@@ -171,6 +177,14 @@ Use a dedicated migrated local test database when running these tests. This exam
 
 The CI workflow also validates Compose configuration and builds the backend container. Docker/Compose were not available on the local implementation machine; their execution must be verified in CI or an equipped environment.
 
+## Hosted verification
+
+From an interactive terminal in the backend directory, `python -m scripts.verify_hosted` checks the fixed deployed API with fresh temporary guests and revokes them afterward. It exercises CORS, ownership, shared immutability, idempotency, cancellation, report access and live rate rejection. Running it consumes the normal public quotas.
+
+The optional `--recovery-check` pauses while an explicitly approved, verification-only orphan/expiry fixture is staged and the existing service is redeployed. Credentials remain in process memory. The exact observed method and results are in [the deployment record](context/deployment.md).
+
+![Hosted report history](docs/screenshots/live-reports.jpg)
+
 ## Free deployment
 
 Use Vercel Hobby for the frontend, Render Free for one backend process, and Neon Free for PostgreSQL, subject to current eligibility. Provider subdomains provide HTTPS. Free services may sleep, restart, hit quotas, or become unavailable; this is a low-traffic portfolio deployment without guaranteed uptime.
@@ -179,16 +193,16 @@ Use Vercel Hobby for the frontend, Render Free for one backend process, and Neon
 - Render configuration: `render.yaml`; Docker context `backend`, Dockerfile `backend/Dockerfile`, locked Python build, and `sh scripts/start.sh`.
 - Set the real backend-only `DATABASE_URL`, explicit JSON `CORS_ORIGINS`, and frontend `VITE_API_BASE_URL`.
 - Render's process health path is `/api/v1/health`; separately verify database readiness.
-- Keep execution/inference disabled. No model keys, paid disk, worker, or Render database are provisioned.
+- Public scripted execution is enabled with the owner’s explicit approval. Optional inference is disabled. The service uses the existing external Neon database.
 - Complete owner sign-ins and confirm free-plan/billing settings before provisioning.
 
-Open the [live AgentShield foundation](https://agentshield-ai-tau.vercel.app) or its [system status](https://agentshield-ai-tau.vercel.app/system). The browser reaches the [backend health](https://agentshield-api-hn0q.onrender.com/api/v1/health) and [database readiness](https://agentshield-api-hn0q.onrender.com/api/v1/ready) endpoints; both returned HTTP 200 on November 16. No sign-in or model key is required for this foundation smoke test. Public execution on the hosted foundation is disabled. See the deployment record for the pending Phase 3 release.
+Open the [live AgentShield app](https://agentshield-ai-tau.vercel.app) or its [system status](https://agentshield-ai-tau.vercel.app/system). On November 17, the hosted frontend reached healthy API and database endpoints and completed both twelve-case scripted suites, comparisons and report downloads. Guest authorization is issued by the app. No durable account or model key is required.
 
-Follow [context/deployment.md](context/deployment.md) for the exact configuration and release procedure. Vercel GitHub integration is not installed, so frontend releases currently upload reviewed source through the API. Render automatic deploy is off. Free services may sleep or suspend at quota limits; no uptime or measured cold-start claim is made.
+Follow [context/deployment.md](context/deployment.md) for the exact configuration and release procedure. Vercel GitHub integration is not installed, so frontend releases currently upload reviewed source through the API. Render automatic deploy is off. Free services may sleep or suspend at quota limits. Hosted warm suites, ownership, exports and restart regeneration were verified on November 17. One real idle wake returned valid health JSON in 32.812 seconds. The saved sample remained available during wake-up and manual retry restored API connectivity. See the dated deployment record for the observation and limitations.
 
 ## Remaining work
 
-Phase 9 verifies the complete hosted workflow, migrations, cold starts and free-service limits. Phase 10 prepares the portfolio walkthrough and final evidence. Optional eligible Gemini free-tier testing stays separate from scripted results.
+Phase 9 has verified the hosted workflow, migrations, isolation, recovery and a real idle cold start. Phase 10 prepares the portfolio walkthrough and final evidence. Optional eligible Gemini free-tier testing stays separate from scripted results.
 
 This is an application-controlled simulation harness. It does not execute untrusted code or test arbitrary external systems. A passing finite benchmark does not prove complete security.
 

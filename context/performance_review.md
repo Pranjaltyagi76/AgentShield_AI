@@ -1,6 +1,26 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated November 17, 2026. Phase 8 passed local verification. Hosted execution is pending.
+Last updated November 17, 2026. Phase 9 hosted functional, recovery and real idle cold-start verification passed.
+
+## Phase 9 hosted verification — November 17, 2026
+
+The existing Vercel project deployed 40 reviewed frontend source files from commit `6478fc228b60eeb729fab4a47945f043e7a3419e`. Render deployed the same source, and the container entrypoint migrated the existing Neon database to `0007`. Public scripted execution was separately approved. Existing public aliases and exact-origin CORS were retained. Gemini inference remains explicitly disabled.
+
+A clean browser guest launched both complete Core v2 suites. The recorded server execution durations were 3.8 seconds for hardened and 5.1 seconds for vulnerable. Both evaluated 12/12 cases. Hardened passed 12/12 and vulnerable 6/12. The comparison recorded six improvements, six unchanged cases and +50 percentage points. These are two observed hosted runs, with one timing per profile. They provide a small warm-path check against the 10-second target.
+
+The AS-003 finding opened its exact redacted answer. The browser downloaded HTML and JSON comparison reports, and the downloaded files were inspected for structure and redaction. Report history displayed both records. Mobile navigation was exercised at a 390-pixel viewport override, and document width remained within the available viewport. Screenshots are in `docs/screenshots/live-reports.jpg` and `live-sample-mobile.jpg`.
+
+A separate HTTPS verifier confirmed foreign access denial for agent versions, runs, findings, metrics, traces, comparisons and report downloads. Shared metadata edits were denied. Reusing the same idempotency key returned the same run. Cancellation produced a terminal cancelled result with zero evaluable coverage. Comparing it with a completed case stayed inconclusive. Exact canonical-origin CORS was present and an untrusted origin was rejected for run creation.
+
+The owner approved one production orphan/expiry fixture in verification-only data. After the same-revision Render recovery deployment, the staged job was `failed / interrupted`, retained its one `scenario_start` event and remained inconclusive. Downloaded JSON from a completed source was byte-identical after redeployment. Startup cleanup deleted the expired verification guest. The live limiter returned 429 with `Retry-After`, and the surviving verifier guest was revoked. SQL confirmed no remaining fixture, verification profile or queued/running job. Database size was 8,478,720 bytes. An error-level Render app-log query over 15:34–15:55 UTC returned no entries.
+
+Account/resource records confirmed Vercel Hobby, Render Free and Neon Free. Vercel reported no active trial and excess data-cache billing disabled. The owner confirmed free dashboard plans and no chargeable overages. The billing-charges endpoint supplied no cost data. Initial approval-review rejections for public activation and the production data fixture were resolved through explicit owner approvals before retrying.
+
+Final local checks passed all 98 backend tests in 23.64 seconds and all 25 frontend tests. Ruff, frontend formatting, lint, type checks and production build passed. Alembic reported no schema drift. The hosted verifier’s first attempt at an interactive checkpoint encountered stdin EOF and revoked its guest records. The interactive-terminal rerun passed.
+
+Incoming request pairs interrupted initial waiting windows at 15:59:47, 16:11:42 and 16:14:00 UTC. After the verification tab was moved off the app, logs confirmed a quiet interval after 16:14:00. Render logged `application_stopped` at 16:29:00. The first wake request started at 16:30:32.949 UTC and returned valid public health JSON in **32.812 seconds**, with no failed probe attempt. Database readiness was connected by 16:31:06. The saved sample rendered while the API was waking, and manual retry restored the live browser to Connected/Ready. Render recorded startup on a new instance at 16:30:57. This is one measured cold cycle. The waking screenshot is `docs/screenshots/live-cold-sample.jpg`, and the recovered system view is `live-system.jpg`.
+
+Live storage saturation, full shared-queue saturation and abrupt process termination during an active run were not forced. The hosted recovery case used an explicitly staged orphan. Existing PostgreSQL integration tests cover the bounded queue, storage and interruption logic. Custom declarative scenario authoring remains planned.
 
 ## Phase 8 report and outage verification — November 17, 2026
 

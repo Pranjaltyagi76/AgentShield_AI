@@ -1,6 +1,6 @@
 # AgentShield AI: Architecture
 
-Status: the scripted runtime, evaluation, comparisons and retained reports are deployed on the existing free resources. Phase 9 cold-start validation is in progress. Last reviewed November 17, 2026.
+Status: the scripted runtime, evaluation, comparisons and retained reports are deployed on the existing free resources. Phase 9 hosted and idle/wake validation passed on November 17. Last reviewed November 17, 2026.
 
 ## Decisions
 
