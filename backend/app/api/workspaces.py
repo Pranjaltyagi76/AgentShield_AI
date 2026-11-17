@@ -16,6 +16,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.models import Agent, Guest, Scenario, ScenarioVersion, Version
+from app.suite import MEMBERS, SUITE
 
 router = APIRouter(prefix="/api/v1")
 MAX_GUESTS, MAX_AGENTS, MAX_VERSIONS = 128, 8, 4
@@ -202,7 +203,7 @@ def append(s, a, c):
         provider="demo",
         model_name="scripted",
         demo_profile=c.demo_profile,
-        behavior_version="1",
+        behavior_version="2",
         system_prompt=c.system_prompt,
         prompt_hash=digest(c.system_prompt),
         tool_config_json=c.allowed_tools,
@@ -326,5 +327,9 @@ def suites(s: DB):
                     .order_by(ScenarioVersion.scenario_id)
                 )
             ],
-        }
+        },
+        {
+            "id": SUITE,
+            "members": [{"scenario_id": sid, "version": v} for sid, v in MEMBERS.items()],
+        },
     ]

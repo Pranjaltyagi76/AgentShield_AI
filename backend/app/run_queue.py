@@ -12,8 +12,9 @@ from sqlalchemy.orm import Session
 
 from app.db.models import Guest
 from app.db.runs import Event, Result, Run
+from app.evaluation import evaluate
 from app.policy import MAX_ARGUMENT_BYTES, encoded, gateway, request_evidence
-from app.simulation import decide
+from app.simulation import decide, decide_v1
 
 MAX_ACTIVE = 2
 MAX_QUEUED = 10
@@ -36,6 +37,25 @@ def queue_lock(session):
     session.execute(text("SELECT pg_advisory_xact_lock(19485122)"))
 
 
+def assess(session, run, result):
+    if run.config.get("oracle_version") != "1":
+        return
+    context = run.config["scenarios"][result.position]["context"]
+    events = session.scalars(
+        select(Event).where(Event.result_id == result.id).order_by(Event.sequence)
+    ).all()
+    approval = run.config.get("confirmation")
+    result.assessment = evaluate(
+        result.scenario_id,
+        result.scenario_version,
+        result.status,
+        events,
+        context["available_tools"],
+        approval if approval and approval["scenario"] == result.scenario_id else None,
+    )
+    result.outcome = result.assessment["outcome"]
+
+
 def finish(session, run, status, reason):
     run.status = status
     run.reason = reason
@@ -46,6 +66,7 @@ def finish(session, run, status, reason):
         result.status = status
         result.reason = reason
         result.outcome = "inconclusive"
+        assess(session, run, result)
 
 
 def lock_run(session, run_id):
@@ -141,7 +162,8 @@ def execute_step(session, run, result):
     if input_size > MAX_INPUT or run.budget_used + input_size > MAX_TOTAL:
         raise BudgetStop("input_budget")
     permitted_tools = tuple(context["available_tools"])
-    action = decide(
+    script = decide_v1 if config["behavior_version"] == "1" else decide
+    action = script(
         config["profile"], deepcopy(context), deepcopy(result.last_observation), result.steps
     )
     output_size = len(encoded(action))
@@ -169,7 +191,13 @@ def execute_step(session, run, result):
         ):
             confirmed_action = {"tool": approval["tool"], "arguments": approval["arguments"]}
         # Each previous nonterminal step is exactly one attempted tool call.
-        verdict = gateway(action, permitted_tools, result.steps, confirmed_action)
+        verdict = gateway(
+            action,
+            permitted_tools,
+            result.steps,
+            confirmed_action,
+            document_source=context.get("document_source"),
+        )
         decision = {"decision": verdict.decision, "reason": verdict.reason}
         events = [("tool_requested", request_evidence(action)), ("policy_decision", decision)]
         if verdict.result is not None:
@@ -177,7 +205,16 @@ def execute_step(session, run, result):
         record(session, run, result, events)
         result.last_observation = verdict.result or decision
         if verdict.reason == "tool_call_limit":
-            raise BudgetStop("tool_call_limit")
+            if result.scenario_id != "AS-010" or config.get("oracle_version") != "1":
+                raise BudgetStop("tool_call_limit")
+            record(
+                session,
+                run,
+                result,
+                [("scenario_end", {"status": "completed", "reason": "tool_call_limit"})],
+            )
+            result.status = "completed"
+            result.reason = "tool_call_limit"
     else:
         record(
             session,
@@ -217,6 +254,8 @@ def advance(session, run_id, worker):
         except BudgetStop as stop:
             finish(session, run, "failed", str(stop))
         else:
+            if result.status == "completed":
+                assess(session, run, result)
             if result.status == "completed" and result.position == len(run.config["scenarios"]) - 1:
                 finish(session, run, "completed", None)
 
