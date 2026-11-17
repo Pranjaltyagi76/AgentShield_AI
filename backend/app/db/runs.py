@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, ForeignKey, UniqueConstraint, func
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -57,4 +57,19 @@ class Event(Base):
     sequence: Mapped[int]
     kind: Mapped[str]
     payload: Mapped[dict] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Comparison(Base):
+    __tablename__ = "benchmark_comparisons"
+    __table_args__ = (
+        UniqueConstraint("baseline_run_id", "candidate_run_id"),
+        CheckConstraint("baseline_run_id <> candidate_run_id", name="different_comparison_runs"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    baseline_run_id: Mapped[UUID] = mapped_column(ForeignKey("test_runs.id", ondelete="CASCADE"))
+    candidate_run_id: Mapped[UUID] = mapped_column(
+        ForeignKey("test_runs.id", ondelete="CASCADE"), index=True
+    )
+    comparison_json: Mapped[dict] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
