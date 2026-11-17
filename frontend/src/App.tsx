@@ -26,6 +26,8 @@ import {
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Button } from './components/ui/button'
 import { Runs } from './Runs'
+import { Reports } from './Reports'
+import { Sample } from './Sample'
 import { Agents, Scenarios } from './Registry'
 import { API_BASE } from './lib/api'
 import { cn } from './lib/utils'
@@ -99,18 +101,19 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
             <Workflow size={18} />
             Benchmark runs
           </NavLink>
+          <NavLink to="/reports" onClick={close}>
+            <BookOpen size={18} />
+            Reports
+          </NavLink>
+          <NavLink to="/sample" onClick={close}>
+            <BookOpen size={18} />
+            Saved sample
+          </NavLink>
           <NavLink to="/compare" onClick={close}>
             <ListChecks size={18} />
             Compare runs
           </NavLink>
         </nav>
-        <p className="nav-heading nav-heading-later">EVALUATION · COMING LATER</p>
-        <div className="future-nav">
-          <span>
-            <BookOpen size={18} />
-            Reports<small>08</small>
-          </span>
-        </div>
         <div className="sidebar-bottom">
           <div className="safe-mode">
             <ShieldCheck size={18} />
@@ -304,11 +307,11 @@ function Overview({ system }: { system: System }) {
           <Layers3 size={19} />
         </span>
         <div>
-          <strong>Phase 6 · Benchmark comparison</strong>
-          <p>Compare two runs and inspect the scenarios that changed.</p>
+          <strong>Phase 8 · Reports and saved sample</strong>
+          <p>Inspect a captured benchmark or export evidence from your own run.</p>
         </div>
-        <Link to="/compare">
-          Compare runs
+        <Link to="/sample">
+          Open saved sample
           <ArrowRight size={15} />
         </Link>
       </div>
@@ -441,7 +444,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="muted">Phase 7 · inference disabled</StatusLabel>
+        <StatusLabel tone="muted">Phase 8 · reports and saved sample</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -458,7 +461,7 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index <= 6 ? (
+            {index <= 6 || index === 8 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
             ) : index === 7 ? (
               <StatusLabel tone="muted">Disabled</StatusLabel>
@@ -506,7 +509,11 @@ export default function App() {
                 ? 'Benchmark comparison'
                 : location.pathname === '/runs' || location.pathname.startsWith('/runs/')
                   ? 'Benchmark runs'
-                  : 'Page not found'
+                  : location.pathname === '/reports'
+                    ? 'Reports'
+                    : location.pathname === '/sample'
+                      ? 'Saved sample'
+                      : 'Page not found'
   useEffect(() => {
     document.title = routeName + ' · AgentShield AI'
     mainRef.current?.focus({ preventScroll: true })
@@ -543,6 +550,24 @@ export default function App() {
           </div>
         </header>
         <main id="main-content" tabIndex={-1} ref={mainRef}>
+          {(system.checking ||
+            system.health.isError ||
+            system.readiness.isError ||
+            system.readiness.data?.status === 'not_ready') && (
+            <aside className="surface run-panel" aria-label="API availability">
+              <p role="status">
+                {system.checking
+                  ? 'Connecting to the API. Free hosting may need time to wake.'
+                  : 'The API or database is unavailable. You can retry or explore the saved sample.'}
+              </p>
+              <div className="run-row">
+                <button className="run-inline" disabled={system.checking} onClick={system.refresh}>
+                  Retry connection
+                </button>
+                <Link to="/sample">Open saved sample</Link>
+              </div>
+            </aside>
+          )}
           <Routes>
             <Route path="/" element={<Overview system={system} />} />
             <Route path="/system" element={<SystemPage system={system} />} />
@@ -580,6 +605,8 @@ export default function App() {
                 />
               }
             />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/sample" element={<Sample />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <footer className="workspace-footer">

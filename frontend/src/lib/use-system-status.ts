@@ -5,6 +5,11 @@ export function useSystemStatus() {
   const readiness = useQuery({
     queryKey: ['readiness'],
     queryFn: ({ signal }) => getReadiness(signal),
+    refetchIntervalInBackground: false,
+    refetchInterval: (q) =>
+      !q.state.error && q.state.data?.status === 'not_ready' && q.state.dataUpdateCount < 3
+        ? 3000
+        : false,
   })
   return {
     health,

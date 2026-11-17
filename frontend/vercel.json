@@ -6,6 +6,8 @@
   "installCommand": "npm ci",
   "rewrites": [
     { "source": "/system", "destination": "/index.html" },
+    { "source": "/reports", "destination": "/index.html" },
+    { "source": "/sample", "destination": "/index.html" },
     { "source": "/agents", "destination": "/index.html" },
     { "source": "/scenarios", "destination": "/index.html" },
     { "source": "/compare/:path*", "destination": "/index.html" },
