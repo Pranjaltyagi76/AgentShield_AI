@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { API_BASE, ApiError } from './lib/api'
+import { ApiError } from './lib/api'
+import { api, guestKey as key, changeGuest, problem, startGuest } from './lib/workspace'
 
-const key = 'agentshield.guest'
 type Profile = { id: string; name: string; description: string; is_shared: boolean }
 type Version = {
   version_number: number
@@ -18,41 +18,6 @@ type Scenario = {
   category: string
   severity: string
   version: number
-}
-
-async function api<T>(path: string, method = 'GET', data?: unknown, auth = false): Promise<T> {
-  const token = auth ? sessionStorage.getItem(key) : null
-  const r = await fetch(API_BASE + path, {
-    method,
-    credentials: 'omit',
-    signal: AbortSignal.timeout(10000),
-    headers: {
-      ...(token ? { Authorization: 'Bearer ' + token } : {}),
-      ...(data ? { 'Content-Type': 'application/json' } : {}),
-    },
-    body: data ? JSON.stringify(data) : undefined,
-  })
-  if (r.status === 401 && token && sessionStorage.getItem(key) === token)
-    sessionStorage.removeItem(key)
-  if (!r.ok)
-    throw new ApiError(
-      (
-        {
-          401: 'Your guest session has ended.',
-          403: 'Shared profiles are read-only.',
-          404: 'Record unavailable.',
-          409: 'Workspace limit reached.',
-          422: 'Check the form values and prompt length.',
-          429: 'Too many workspaces requested. Try again in ten minutes.',
-          503: 'Workspace storage is unavailable. Try again later.',
-        } as Record<number, string>
-      )[r.status] ?? 'Request failed.',
-      r.status,
-    )
-  return r.status === 204 ? (undefined as T) : r.json()
-}
-function problem(e: unknown) {
-  return e instanceof Error ? e.message : 'Unable to connect.'
 }
 
 export function Scenarios() {
@@ -93,7 +58,7 @@ export function Scenarios() {
         </select>
       </label>
       {list.isPending ? (
-        'Loading scenarios…'
+        'Loading scenariosâ€¦'
       ) : list.error ? (
         <p role="alert">
           {problem(list.error)} <button onClick={() => list.refetch()}>Retry</button>
@@ -105,7 +70,7 @@ export function Scenarios() {
           {visible.map((x) => (
             <li key={x.id}>
               <button onClick={() => select(x.id)}>
-                {x.id} · {x.name}
+                {x.id} Â· {x.name}
               </button>{' '}
               {x.category}
             </li>
@@ -121,11 +86,11 @@ export function Scenarios() {
               <h2>{detail.data.name}</h2>
               <p>{detail.data.description}</p>
               <small>
-                Version {detail.data.version} · {detail.data.severity} severity
+                Version {detail.data.version} Â· {detail.data.severity} severity
               </small>
             </>
           ) : (
-            'Loading definition…'
+            'Loading definitionâ€¦'
           )}
         </article>
       )}
@@ -164,7 +129,7 @@ export function Agents() {
   const fault = list.error || detail.error || session.error
   const expired = fault instanceof ApiError && fault.status === 401
   function reset() {
-    sessionStorage.removeItem(key)
+    changeGuest(null)
     client.removeQueries({
       predicate: (q) => ['registry', 'profile', 'session'].includes(String(q.queryKey[0])),
     })
@@ -286,8 +251,7 @@ export function Agents() {
           disabled={busy}
           onClick={() =>
             act(async () => {
-              const s = await api<{ credential: string }>('/guest-sessions', 'POST')
-              sessionStorage.setItem(key, s.credential)
+              await startGuest()
               select('')
               setActive(true)
               setEpoch((x) => x + 1)
@@ -301,13 +265,13 @@ export function Agents() {
         <>
           <h2>Profiles</h2>
           {list.isPending ? (
-            'Loading profiles…'
+            'Loading profilesâ€¦'
           ) : (
             <ul>
               {list.data?.map((x) => (
                 <li key={x.id}>
                   <button onClick={() => select(x.id)}>{x.name}</button>{' '}
-                  {x.is_shared ? 'Shared · read-only' : 'Private'}
+                  {x.is_shared ? 'Shared Â· read-only' : 'Private'}
                 </li>
               ))}
             </ul>
@@ -339,7 +303,7 @@ export function Agents() {
               {a.versions.map((v) => (
                 <details key={v.version_number}>
                   <summary>
-                    Version {v.version_number} · {v.demo_profile}
+                    Version {v.version_number} Â· {v.demo_profile}
                   </summary>
                   <p>{v.system_prompt}</p>
                   <small>Prompt SHA-256: {v.prompt_hash}</small>
