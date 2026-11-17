@@ -82,6 +82,10 @@ Full-run coverage uses each run’s own manifest. Paired coverage uses all compa
 
 For real-model tests, begin with a small repeated synthetic sample allowed by free quotas. Record repetition count and variability; avoid claiming a statistically reliable model ranking from one 12-case run. Scripted baseline/candidate tests remain deterministic harness checks.
 
+## Phase 7 limitations
+
+Optional inference is explicitly disabled because account-specific free access and credentials are unavailable. Every executable observation in this release uses scripted behavior. Provider latency, usage accounting, malformed model responses, quota errors and real-model prompt regression have not been measured. A future adapter must retain provider failures as inconclusive evidence and require a separately launched demo run.
+
 ## Performance measurement protocol
 
 1. Record source revision, dependency/runtime versions, CPU/RAM or free host, database region, run settings, and active concurrency.

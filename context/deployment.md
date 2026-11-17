@@ -62,6 +62,12 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Phase 7 optional inference decision — November 17, 2026
+
+Inference remains explicitly disabled. No configured key was found in the process environment or local backend configuration. Account billing and quota were not observable. The owner’s free-only requirement and Section 16’s disabled exit branch permit continuing mandatory work with the scripted runtime. No account resources or billing settings were changed. `PUBLIC_LLM_ENABLED=true` and `LLM_PROVIDER=gemini` fail startup validation. Public activation remains pending.
+
+Google’s [pricing](https://aistudio.google.com/docs/pricing#gemini-3.1-flash-lite) listed free input and output for Gemini 3.1 Flash-Lite when checked on November 17. Its [billing documentation](https://aistudio.google.com/docs/billing#verify-billing) places account tier verification in AI Studio. Its [rate-limit documentation](https://aistudio.google.com/docs/rate-limits) says limits apply per project and vary by model. Free-tier data may be used to improve Google products. Eligibility must be rechecked before future activation. No live inference smoke or provider-error measurement is claimed.
+
 ## Phase 6 local verification — November 17, 2026
 
 The local PostgreSQL schema advanced to `0006`. Chrome verified a comparison through the Vite proxy and FastAPI, including a direct reload at `/compare/:comparisonId`. The Vercel rewrite adds the comparison routes for a future deployment. The hosted services still run Phase 0. Production migration, public execution and hosted comparison verification remain pending.

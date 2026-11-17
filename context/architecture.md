@@ -79,6 +79,10 @@ The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreS
 
 The React routes `/runs` and `/runs/:runId` share the registry’s tab-scoped guest session. The launcher records a pending idempotency key and its request configuration for ambiguous retries. The status query polls active runs every 2.5 seconds in the foreground, stopping on a terminal response, error or 100 updates. Evidence reloads on status transitions, selection or manual refresh. Each query is scoped to the mounted guest workspace. A finding links to the run, scenario and event ID. The owned trace API filters by scenario and redacts values before the browser receives them.
 
+## Optional inference decision
+
+Phase 7 uses the specification’s explicit disabled branch. The release has no network provider adapter or provider SDK. Startup validation accepts only `LLM_PROVIDER=demo` and false `PUBLIC_LLM_ENABLED`. Guest configuration accepts no provider, endpoint or API key overrides. `GET /api/v1/demo/status` returns an explicit disabled Gemini state with reason `free_account_access_unverified`. The scripted execution flag reports configuration, and `/ready` separately probes the database. Existing schema revision `0006` and API capability phase 6 remain appropriate for this release.
+
 ## Benchmark comparisons
 
 Migration `0006` stores an immutable JSONB summary with a unique ordered baseline/candidate pair. Both foreign keys cascade on source deletion. An authenticated POST to `/api/v1/benchmarks/compare` checks both terminal runs belong to the guest. A per-guest transaction lock serializes admissions and retries. A guest can retain 64 comparisons within the configured database limit. Retrying an existing pair returns its saved summary even at capacity. GET `/api/v1/benchmarks/{id}` checks access through both runs.

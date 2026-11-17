@@ -2,6 +2,16 @@
 
 Last updated November 17, 2026. Phase 6 passed local verification. Hosted execution is pending.
 
+## Phase 7 disabled-inference verification — November 17, 2026
+
+Phase 7 uses its explicit disabled exit branch. Only the presence of environment and local-file key settings was inspected. No configured Gemini key was found and the owner’s account tier and quotas were not verified. Public Google documentation was checked, with links and the eligibility decision recorded in deployment.md.
+
+All 95 backend tests passed with local PostgreSQL in 22.61 seconds. Tests verify the availability response, secret omission, database-independent status, startup rejection of Gemini/enabled inference despite key presence, and HTTP 422 for a provider override with no run created. The existing full-suite tests still verify both scripted profiles. Ruff lint and formatting passed. Alembic reported no schema drift at `0006`.
+
+All 20 frontend tests passed, including the visible disabled Phase 7 state. Frontend formatting, lint, TypeScript and production build passed. No browser smoke was run for these text/status changes.
+
+The live adapter, provider timeouts, quota handling, structured output and token accounting are unimplemented and untested. No live Gemini smoke, provider usage or model score is claimed. The API capability phase remains 6. This optional decision adds no database migration.
+
 ## Phase 6 verification — November 17, 2026
 
 A Chrome guest launched both scripted Core v2 profiles against local FastAPI and PostgreSQL without an inference key. In the vulnerable-baseline and hardened-candidate comparison, 12/12 cases were evaluable in both runs. Six improved and six were unchanged. The pass rate rose from 6/12 to 12/12 (+50 percentage points). Reversing the pair produced six regressions. Chrome reopened the saved comparison after reload, navigated to the AS-001 source evidence and back, and showed no document overflow at 390 CSS pixels.

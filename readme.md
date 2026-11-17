@@ -76,6 +76,12 @@ uv --directory backend run uvicorn app.main:app --host 127.0.0.1 --port 8000 --n
 
 Run `npm --prefix frontend run dev` in another terminal and open [Benchmark runs](http://127.0.0.1:5173/runs). Start a guest workspace, select an agent version and launch Core v2 or selected scenarios. Open a finding’s evidence link to inspect its highlighted event. Expand a tool request to see its arguments, policy decision and recorded mock result. The same tab can reopen a run from history. Guest access expires after seven days or revocation.
 
+## Optional Gemini status
+
+Phase 7 uses the specification’s disabled-inference exit branch. This workspace has no configured Gemini credential and account-specific free access has not been verified. The API supports scripted execution through Phase 6. `GET /api/v1/demo/status` reports whether scripted execution is enabled by configuration and why Gemini is disabled. Database readiness remains available at `/ready`.
+
+`PUBLIC_LLM_ENABLED=false` and `LLM_PROVIDER=demo` are enforced. Setting a key alone cannot enable inference. A future Gemini implementation requires a verified ongoing free project, a fixed eligible model and endpoint, bounded token/call/time quotas, strict action parsing and error handling through the existing gateway. Live inference and its provider error paths have not been tested.
+
 ## Compare two runs
 
 In the same guest workspace, run Core v2 once with the vulnerable profile and once with the hardened profile. Open [Compare benchmarks](http://127.0.0.1:5173/compare), choose vulnerable as the baseline and hardened as the candidate, then select **Compare runs**. Open a scenario outcome to inspect the corresponding source trace. The comparison link can be reopened while the guest has access to both retained runs.

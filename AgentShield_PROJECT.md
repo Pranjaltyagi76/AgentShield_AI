@@ -983,6 +983,8 @@ Build incrementally. Do not ask an AI coding tool to generate the entire product
 
 **Exit criteria:** either a free real-model smoke test succeeds with all mock actions sandboxed, or the optional adapter is explicitly disabled with a documented reason. The complete no-key demo remains usable in either case. LangGraph and LLM judging remain deferred.
 
+**November 17, 2026 decision:** Phase 7 uses the explicit disabled exit branch. No Gemini key is configured and account-specific ongoing free eligibility is unverified. The runtime remains scripted-only. A live adapter and its provider error handling are unimplemented. The availability endpoint records the disabled state. This preserves the mandatory no-key workflow.
+
 ### Phase 8 — Reports and polish
 - Generate HTML and JSON reports on demand from retained records with ownership checks and safe HTML escaping.
 - Improve empty/loading/error states.

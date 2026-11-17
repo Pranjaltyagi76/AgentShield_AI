@@ -4,7 +4,7 @@ Last updated: November 17, 2026. Source: Section 16 of [AgentShield_PROJECT.md](
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is the optional free model adapter. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is explicitly disabled under its optional exit branch. Phase 8 reports and polish is next. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -17,7 +17,7 @@ Implement only the phase explicitly requested by the owner. Later-phase content 
 | 4 | Full scenario pack, oracles, metrics | Verified locally |
 | 5 | Run UI, traces, evidence | Verified locally |
 | 6 | Compatible benchmark comparisons | Verified locally on November 17 |
-| 7 | Optional free real-model adapter | Not started; optional |
+| 7 | Optional free real-model adapter | Disabled explicitly; free account access unverified, no configured key |
 | 8 | HTML/JSON reports, saved sample, UX polish | Not started |
 | 9 | Complete public deployment validation | Not started |
 | 10 | Portfolio evidence and walkthrough | Not started |
@@ -85,6 +85,8 @@ November 17 verification: a Chrome guest compared two full Core v2 runs, reopene
 Use the provider interface for a fixed approved Gemini endpoint and a currently free eligible model. Keep inference off by default. Add structured action parsing, strict budgets, timeouts, bounded retries, usage recording, quota/error handling, and an operator kill switch. No paid billing, custom provider endpoints, or paid fallback.
 
 Exit evidence: a free synthetic smoke test succeeds with the same enforced gateway, or mark the phase explicitly skipped/disabled with the reason. A failed provider run retains its own error and never becomes a scripted result. LangGraph and LLM judging remain deferred.
+
+November 17 decision and verification: use the explicit disabled exit branch. Environment and local configuration contain no Gemini key. Public documentation lists free models, but the owner’s project billing tier, eligibility and quota are unverified. The adapter, structured parsing, network retries and live provider tests are unimplemented. Runtime remains scripted-only and the API capability phase stays at 6. The new `/api/v1/demo/status` endpoint and roadmap make this decision visible. Tests verify a key cannot enable inference, an unsupported provider cannot create a run, and no database or provider probe is needed to read status. Mandatory no-key execution remains covered by the existing suite.
 
 ## Phase 8: Reports and polish
 

@@ -65,6 +65,10 @@ For a comparison, both source runs must be accessible to the caller. For a repor
 
 The health endpoint advertises local, public or disabled scripted execution. A guest selects an immutable agent version and a manifest or explicit scenario list. The API owns the run ID, policy decisions and scores. The UI reads the selected scenario’s ordered events and shows an executed action only when a mock result exists. The event ID in a finding is stable across reloads and every evidence read requires the current guest credential. An expired workspace loses access to its detail view.
 
+## Optional inference boundary
+
+Phase 7 is explicitly disabled because no Gemini key is configured and account-specific ongoing free access is unverified. The system exposes no Gemini network path. Presence of an API key cannot change the enforced demo-only settings. Capability status is public, contains no credential material and invokes neither a model nor PostgreSQL. Provider budgets, parsing, timeouts, retries, usage recording and quota failures require implementation and verification if this optional branch is reopened.
+
 ## Comparing retained runs
 
 The guest chooses a baseline and candidate independently from their history. FastAPI checks ownership and terminal status, loads the pinned manifests and saved assessments, and stores the comparison in PostgreSQL. A repeated request for the same ordered pair opens the same comparison. Reversing the pair creates a different comparison. Expiry denies access immediately. Deleting either source through retention cleanup also removes the comparison. The browser links each scenario directly to the underlying run evidence.
