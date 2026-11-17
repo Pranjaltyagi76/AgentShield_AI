@@ -31,6 +31,36 @@ def config(**kwargs):
     return Settings(_env_file=None, app_env="test", database_url=None, **kwargs)
 
 
+def test_optional_inference_status_does_not_probe_database_or_reveal_keys(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "private-provider-key")
+    probe = Probe(exception=RuntimeError("must not probe"))
+    with TestClient(create_app(config(), probe)) as client:
+        response = client.get("/api/v1/demo/status")
+        assert response.status_code == 200
+        assert response.json() == {
+            "execution_enabled": False,
+            "profiles": ["vulnerable", "hardened"],
+            "requires_api_key": False,
+            "inference": {
+                "provider": "gemini",
+                "enabled": False,
+                "reason": "free_account_access_unverified",
+                "model": None,
+            },
+        }
+        assert "private-provider-key" not in response.text
+        assert response.headers["Cache-Control"] == "no-store"
+        assert probe.calls == 0
+
+
+def test_key_presence_cannot_enable_gemini(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "private-provider-key")
+    for overrides in ({"llm_provider": "gemini"}, {"public_llm_enabled": True}):
+        with pytest.raises(ValidationError) as error:
+            config(**overrides)
+        assert "private-provider-key" not in str(error.value)
+
+
 def test_health_does_not_touch_database_and_cleans_up():
     probe = Probe(exception=RuntimeError("database must not be called"))
     with TestClient(create_app(config(), probe)) as client:

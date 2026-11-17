@@ -7,6 +7,7 @@ import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app import main, run_queue
@@ -26,6 +27,23 @@ def test_production_and_remote_database_reject_execution():
                 local_runs_enabled=True,
                 database_url=f"postgresql://user@{host}/test",
             )
+
+
+def test_inference_is_disabled_and_run_mode_cannot_be_overridden(harness):
+    client, workspace, engine, _ = harness
+    auth, version = workspace()
+    status = client.get("demo/status").json()
+    assert status["execution_enabled"] is True
+    assert status["inference"]["enabled"] is False
+    assert status["requires_api_key"] is False
+    response = client.post(
+        "runs",
+        headers={**auth, "Idempotency-Key": "provider-override"},
+        json={"agent_version_id": version, "scenarios": ["AS-011"], "provider": "gemini"},
+    )
+    assert response.status_code == 422
+    with Session(engine) as session:
+        assert session.scalar(select(Run).where(Run.request_key == "provider-override")) is None
 
 
 def test_gateway_authority_and_profile_decisions():
