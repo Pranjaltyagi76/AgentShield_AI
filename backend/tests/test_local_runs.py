@@ -428,3 +428,65 @@ def test_full_suite_repeatability_and_owned_evidence(harness):
                 )
             )
         assert summaries[0] == summaries[1]
+
+
+def test_comparisons_owned_idempotent_and_retention(harness, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+
+    from app.api import benchmarks
+    from app.db.runs import Comparison
+
+    client, workspace, engine, _ = harness
+    owner, _ = workspace()
+    other, _ = workspace()
+    agents = client.get("agents").json()
+    versions = {
+        a["name"].split()[0].lower(): client.get("agents/" + a["id"]).json()["versions"][0]["id"]
+        for a in agents
+    }
+    first = submit(client, owner, versions["vulnerable"], scenarios=["AS-001", "AS-011"]).json()[
+        "id"
+    ]
+    worker = uuid4()
+    for _ in range(5):
+        run_queue.tick(engine, worker)
+    second = submit(
+        client, owner, versions["hardened"], scenarios=["AS-001", "AS-011"], key="two"
+    ).json()["id"]
+    foreign = submit(client, other, versions["hardened"]).json()["id"]
+
+    def compare(auth, a, b):
+        return client.post(
+            "benchmarks/compare", headers=auth, json={"baseline_run_id": a, "candidate_run_id": b}
+        )
+
+    assert compare(owner, first, second).status_code == 409
+    assert compare(owner, first, first).status_code == 422
+    assert compare(owner, foreign, second).status_code == 404
+    assert compare(owner, first, foreign).status_code == 404
+    for _ in range(8):
+        run_queue.tick(engine, worker)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        requests = [pool.submit(compare, owner, first, second) for _ in range(2)]
+        responses = [request.result(timeout=10) for request in requests]
+    assert sorted(response.status_code for response in responses) == [200, 201]
+    report = responses[0].json()
+    assert responses[1].json() == report
+    assert report["counts"]["improved"] == 1 and report["counts"]["unchanged"] == 1
+    assert report["metrics"]["pass_rate"]["delta_pp"] == 50
+    path = "benchmarks/" + report["id"]
+    assert client.get(path, headers=owner).json() == report
+    assert client.get(path, headers=other).status_code == 404
+    assert client.get(path).status_code == 401
+    reverse = compare(owner, second, first).json()
+    assert reverse["counts"]["regressed"] == 1
+    monkeypatch.setattr(benchmarks, "MAX_COMPARISONS_PER_GUEST", 0)
+    retry = compare(owner, first, second)
+    assert retry.status_code == 200 and retry.json() == report
+    third = submit(client, owner, versions["hardened"], key="three").json()["id"]
+    client.post("runs/" + third + "/cancel", headers=owner)
+    assert compare(owner, first, third).status_code == 503
+    client.delete("guest-session", headers=owner)
+    with Session(engine) as session:
+        assert session.get(Comparison, UUID(report["id"])) is None
+        assert session.get(Comparison, UUID(reverse["id"])) is None

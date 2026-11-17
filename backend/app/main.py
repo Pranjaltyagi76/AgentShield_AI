@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
 from app import __version__
+from app.api.benchmarks import router as benchmark_router
 from app.api.runs import RunLimiter
 from app.api.runs import router as run_router
 from app.api.system import router
@@ -129,6 +130,7 @@ def create_app(settings: Settings | None = None, database: DatabaseProbe | None 
     if config.local_runs_enabled or config.public_runs_enabled:
         application.state.run_limiter = RunLimiter()
         application.include_router(run_router)
+        application.include_router(benchmark_router)
     application.include_router(router)
     application.add_middleware(BodyLimit)
     application.add_middleware(

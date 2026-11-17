@@ -7,8 +7,8 @@ from smoke_local_runs import request
 
 
 def main():
-    if request("GET", "health")["phase"] != 5:
-        raise RuntimeError("Expected a Phase 5 API on loopback port 8012")
+    if request("GET", "health")["phase"] != 6:
+        raise RuntimeError("Expected a Phase 6 API on loopback port 8012")
     auth = {"Authorization": "Bearer " + request("POST", "guest-sessions")["credential"]}
     try:
         profiles = request("GET", "agents")

@@ -25,8 +25,8 @@ def request(method, path, body=None, headers=None):
 
 
 def main():
-    if request("GET", "health").get("phase") != 5:
-        raise RuntimeError("Expected a Phase 5 API on port 8012")
+    if request("GET", "health").get("phase") != 6:
+        raise RuntimeError("Expected a Phase 6 API on port 8012")
     auth = {"Authorization": "Bearer " + request("POST", "guest-sessions")["credential"]}
     try:
         for profile in ("hardened", "vulnerable"):
