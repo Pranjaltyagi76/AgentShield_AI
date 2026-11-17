@@ -62,6 +62,12 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Phase 8 local release preparation — November 17, 2026
+
+Local readiness now requires revision `0007`. The startup migration mechanism remains the existing Docker entrypoint. Report files are generated from retained PostgreSQL evidence per request, so Render persistent disks and object storage are unnecessary.
+
+The Vercel rewrite adds direct `/reports` and `/sample` routes. The static build includes `saved-sample.json` and `saved-sample.html`. Their generation metadata identifies a historical capture. Guest downloads use bearer headers, local Blob URLs and attachment responses. The public Phase 0 services have not been updated. Hosted exports, no-key execution, cold starts and live cleanup remain Phase 9 gates.
+
 ## Phase 7 optional inference decision — November 17, 2026
 
 Inference remains explicitly disabled. No configured key was found in the process environment or local backend configuration. Account billing and quota were not observable. The owner’s free-only requirement and Section 16’s disabled exit branch permit continuing mandatory work with the scripted runtime. No account resources or billing settings were changed. `PUBLIC_LLM_ENABLED=true` and `LLM_PROVIDER=gemini` fail startup validation. Public activation remains pending.

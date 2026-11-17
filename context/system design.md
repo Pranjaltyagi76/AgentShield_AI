@@ -65,6 +65,12 @@ For a comparison, both source runs must be accessible to the caller. For a repor
 
 The health endpoint advertises local, public or disabled scripted execution. A guest selects an immutable agent version and a manifest or explicit scenario list. The API owns the run ID, policy decisions and scores. The UI reads the selected scenario’s ordered events and shows an executed action only when a mock result exists. The event ID in a finding is stable across reloads and every evidence read requires the current guest credential. An expired workspace loses access to its detail view.
 
+## Report lifecycle
+
+A terminal run → owned report metadata → authenticated download → renderer → escaped HTML or redacted JSON. Reports with a comparison require continued access to both comparison sources. Regeneration reads PostgreSQL on each download and survives a new API process. Source deletion and guest cleanup cascade through report metadata. A renderer version mismatch returns a conflict instead of silently changing an old export.
+
+The static saved workspace is an independently bundled historical capture. Its evidence identifiers are replaced consistently and its metadata records capture time, scripted behavior, scenario versions and renderer version. It remains browsable during API unavailability. The standard launcher reuses seeded shared profiles for a fresh live evaluation.
+
 ## Optional inference boundary
 
 Phase 7 is explicitly disabled because no Gemini key is configured and account-specific ongoing free access is unverified. The system exposes no Gemini network path. Presence of an API key cannot change the enforced demo-only settings. Capability status is public, contains no credential material and invokes neither a model nor PostgreSQL. Provider budgets, parsing, timeouts, retries, usage recording and quota failures require implementation and verification if this optional branch is reopened.

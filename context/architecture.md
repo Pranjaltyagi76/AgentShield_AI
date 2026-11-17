@@ -79,9 +79,19 @@ The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreS
 
 The React routes `/runs` and `/runs/:runId` share the registry’s tab-scoped guest session. The launcher records a pending idempotency key and its request configuration for ambiguous retries. The status query polls active runs every 2.5 seconds in the foreground, stopping on a terminal response, error or 100 updates. Evidence reloads on status transitions, selection or manual refresh. Each query is scoped to the mounted guest workspace. A finding links to the run, scenario and event ID. The owned trace API filters by scenario and redacts values before the browser receives them.
 
+## Retained reports and saved workspace
+
+Migration `0007` stores report metadata with run ID, optional comparison ID, format, renderer version and creation time. A unique ordered source/format/version tuple uses PostgreSQL NULLS NOT DISTINCT to deduplicate reports without a comparison. Guest-row locking serializes report admission. The 64-report guest ceiling and configured database limit bound storage. Both foreign keys cascade when a source is deleted.
+
+The report API checks the source run and both comparison inputs on creation, metadata reads and downloads. Only terminal runs can create reports. Renderer v1 builds HTML or JSON from retained results, configuration and ordered trace evidence. HTML text is escaped, includes no scripts, uses local evidence anchors and is sent as an attachment with a sandbox CSP. Protected synthetic values are redacted before rendering. No report path or generated file is stored on the backend.
+
+`/reports` provides paginated guest history. Export controls appear on finished runs and comparisons. The frontend fetches download bodies with an Authorization header and creates a temporary Blob URL. A guest change during a download prevents the old workspace response from being offered.
+
+`/sample` and the bundled HTML/JSON require no API or session. The saved workspace is captured through the real local runtime using newly issued guest data and shared profiles. Its UUIDs are replaced consistently, preserving finding/evidence references. It is explicitly labelled historical. Readiness polling permits at most three not-ready responses and stops on errors. A manual retry and sample link remain available.
+
 ## Optional inference decision
 
-Phase 7 uses the specification’s explicit disabled branch. The release has no network provider adapter or provider SDK. Startup validation accepts only `LLM_PROVIDER=demo` and false `PUBLIC_LLM_ENABLED`. Guest configuration accepts no provider, endpoint or API key overrides. `GET /api/v1/demo/status` returns an explicit disabled Gemini state with reason `free_account_access_unverified`. The scripted execution flag reports configuration, and `/ready` separately probes the database. Existing schema revision `0006` and API capability phase 6 remain appropriate for this release.
+Phase 7 uses the specification’s explicit disabled branch. The release has no network provider adapter or provider SDK. Startup validation accepts only `LLM_PROVIDER=demo` and false `PUBLIC_LLM_ENABLED`. Guest configuration accepts no provider, endpoint or API key overrides. `GET /api/v1/demo/status` returns an explicit disabled Gemini state with reason `free_account_access_unverified`. The scripted execution flag reports configuration, and `/ready` separately probes the database. Phase 7 introduced no schema migration or inference capability. Phase 8 later advances the schema and report capability.
 
 ## Benchmark comparisons
 

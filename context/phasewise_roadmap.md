@@ -4,7 +4,7 @@ Last updated: November 17, 2026. Source: Section 16 of [AgentShield_PROJECT.md](
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is explicitly disabled under its optional exit branch. Phase 8 reports and polish is next. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is explicitly disabled under its optional exit branch. Phase 8 reports and polish is complete locally. Phase 9 hosted validation is next. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -18,7 +18,7 @@ Implement only the phase explicitly requested by the owner. Later-phase content 
 | 5 | Run UI, traces, evidence | Verified locally |
 | 6 | Compatible benchmark comparisons | Verified locally on November 17 |
 | 7 | Optional free real-model adapter | Disabled explicitly; free account access unverified, no configured key |
-| 8 | HTML/JSON reports, saved sample, UX polish | Not started |
+| 8 | HTML/JSON reports, saved sample, UX polish | Verified locally on November 17 |
 | 9 | Complete public deployment validation | Not started |
 | 10 | Portfolio evidence and walkthrough | Not started |
 
@@ -93,6 +93,8 @@ November 17 decision and verification: use the explicit disabled exit branch. En
 Render escaped HTML and JSON on demand from retained records; add report metadata, ownership checks, and retention-dependent regeneration. Add a redacted saved sample bundled with the frontend, backend-waking/retry states, accessibility/responsive polish, and accurate setup/screenshots.
 
 Exit evidence: the complete workflow works without developer intervention while services are available; the static sample is clearly historical and remains inspectable without API access; reports survive backend restart without relying on local files.
+
+November 17 completion: terminal run and comparison exports, paginated report history, source-dependent cleanup and versioned regeneration are implemented. The saved workspace is a redacted real local capture, bundled independently of the API. The browser workflow, downloads, outage sample, mobile width and screenshots are recorded in performance_review.md. Public deployment remains a Phase 9 gate.
 
 ## Phase 9: Final deployment validation
 

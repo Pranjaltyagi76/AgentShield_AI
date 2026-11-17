@@ -82,6 +82,12 @@ Full-run coverage uses each run’s own manifest. Paired coverage uses all compa
 
 For real-model tests, begin with a small repeated synthetic sample allowed by free quotas. Record repetition count and variability; avoid claiming a statistically reliable model ranking from one 12-case run. Scripted baseline/candidate tests remain deterministic harness checks.
 
+## Report and sample methodology
+
+Report renderer v1 reuses the stored scenario assessments and Phase 4 metric aggregation. It does not reclassify missing evidence. Failed and cancelled sources retain their execution status, and inconclusive cases stay visible. Severity breakdown counts recorded findings. HTML links each finding to its retained event, with protected synthetic values redacted. An optional comparison retains its original matched-cohort denominators.
+
+The bundled sample was captured on November 17 through loopback HTTP from a new guest running both seeded Core v2 profiles. The exported vulnerable run passed 6/12 cases, and its vulnerable → hardened comparison recorded six improvements and six unchanged cases. UUID replacement preserves references without publishing guest or original event identities. The sample is historical and includes its capture metadata. It is independent of current API health.
+
 ## Phase 7 limitations
 
 Optional inference is explicitly disabled because account-specific free access and credentials are unavailable. Every executable observation in this release uses scripted behavior. Provider latency, usage accounting, malformed model responses, quota errors and real-model prompt regression have not been measured. A future adapter must retain provider failures as inconclusive evidence and require a separately launched demo run.

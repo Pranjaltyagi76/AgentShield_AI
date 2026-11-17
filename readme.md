@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Phase 6 benchmark comparisons are implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
+**Phase 8 reports and the saved sample are implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -60,7 +60,7 @@ npm --prefix frontend run dev
 
 Open [the local workspace](http://127.0.0.1:5173). The frontend proxies `/api` to port 8000; `VITE_API_BASE_URL` includes `/api/v1` exactly once. Development API docs are at [localhost:8000/docs](http://127.0.0.1:8000/docs). Production disables the interactive docs.
 
-`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 6 readiness requires Alembic revision `0006`.
+`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 8 readiness requires Alembic revision `0007`.
 
 Stop the database with `docker compose down`. This preserves the named data volume. Removing the volume deletes local database data, so do not do that as an ordinary shutdown step.
 
@@ -76,9 +76,31 @@ uv --directory backend run uvicorn app.main:app --host 127.0.0.1 --port 8000 --n
 
 Run `npm --prefix frontend run dev` in another terminal and open [Benchmark runs](http://127.0.0.1:5173/runs). Start a guest workspace, select an agent version and launch Core v2 or selected scenarios. Open a finding’s evidence link to inspect its highlighted event. Expand a tool request to see its arguments, policy decision and recorded mock result. The same tab can reopen a run from history. Guest access expires after seven days or revocation.
 
+## Export reports and explore the saved workspace
+
+Open a finished run and select **Download HTML report** or **Download JSON report**. Failed and cancelled runs retain their status and inconclusive results in the export. From a saved comparison, the same controls include that comparison with the candidate run. Open [Report history](http://127.0.0.1:5173/reports) to download retained reports again.
+
+Reports contain versioned configuration, scenario revisions, metric counts and rates, severity counts, failed cases, findings, linked redacted evidence, policy decisions, optional comparison and limitations. Metadata is stored in PostgreSQL and exports regenerate on demand. Guest expiry or deletion of a source ends access. The API uses authenticated headers for downloads.
+
+The seeded shared vulnerable and hardened profiles are ready in every migrated database. The launcher defaults to the hardened profile and Core v2. [Saved sample](http://127.0.0.1:5173/sample) opens a captured vulnerable run and hardened comparison without a guest or API connection. Its HTML and JSON downloads are bundled with the frontend. All sample IDs have been replaced and synthetic private values redacted.
+
+The availability banner offers manual retry and sample access during a backend wake or outage. A not-ready database receives at most two additional foreground checks, three seconds apart. A network error stops scheduled checks after the configured request retry.
+
+![Captured report history](docs/screenshots/report-history.png)
+
+![Saved sample during an API outage](docs/screenshots/saved-sample.png)
+
+To refresh the public sample from newly executed local suites, start the opt-in loopback API on port 8012, then run the capture command from the backend directory. It creates a temporary guest and revokes it after capturing the synthetic results.
+
+```powershell
+.venv/Scripts/python -m scripts.capture_sample
+```
+
+Review the new sample, then format the public HTML and JSON with the frontend’s Prettier command before committing. Capture timestamps describe the observed historical run.
+
 ## Optional Gemini status
 
-Phase 7 uses the specification’s disabled-inference exit branch. This workspace has no configured Gemini credential and account-specific free access has not been verified. The API supports scripted execution through Phase 6. `GET /api/v1/demo/status` reports whether scripted execution is enabled by configuration and why Gemini is disabled. Database readiness remains available at `/ready`.
+Phase 7 uses the specification’s disabled-inference exit branch. This workspace has no configured Gemini credential and account-specific free access has not been verified. The runtime uses scripted profiles. `GET /api/v1/demo/status` reports whether scripted execution is enabled by configuration and why Gemini is disabled. Database readiness remains available at `/ready`.
 
 `PUBLIC_LLM_ENABLED=false` and `LLM_PROVIDER=demo` are enforced. Setting a key alone cannot enable inference. A future Gemini implementation requires a verified ongoing free project, a fixed eligible model and endpoint, bounded token/call/time quotas, strict action parsing and error handling through the existing gateway. Live inference and its provider error paths have not been tested.
 
@@ -164,9 +186,9 @@ Open the [live AgentShield foundation](https://agentshield-ai-tau.vercel.app) or
 
 Follow [context/deployment.md](context/deployment.md) for the exact configuration and release procedure. Vercel GitHub integration is not installed, so frontend releases currently upload reviewed source through the API. Render automatic deploy is off. Free services may sleep or suspend at quota limits; no uptime or measured cold-start claim is made.
 
-## Planned product
+## Remaining work
 
-Later phases add HTML/JSON reports, a saved example, and hosted validation of the scripted workflow. Optional eligible Gemini free-tier testing stays separate from scripted results.
+Phase 9 verifies the complete hosted workflow, migrations, cold starts and free-service limits. Phase 10 prepares the portfolio walkthrough and final evidence. Optional eligible Gemini free-tier testing stays separate from scripted results.
 
 This is an application-controlled simulation harness. It does not execute untrusted code or test arbitrary external systems. A passing finite benchmark does not prove complete security.
 
