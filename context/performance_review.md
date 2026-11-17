@@ -1,6 +1,14 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated November 17, 2026. Phase 4 passed local verification. Hosted execution is pending.
+Last updated November 17, 2026. Phase 5 passed local verification. Hosted execution is pending.
+
+## Phase 5 verification — November 17, 2026
+
+- Real Chrome, Vite, FastAPI and PostgreSQL completed the full vulnerable scripted suite from the launcher. Following AS-003’s finding opened the matching redacted answer and retained the selection after reloading the URL. AS-007 showed a blocked request and AS-011 showed an executed mock read.
+- The same guest saw the run in history and cancelled a second run from its detail page. At 390 CSS pixels, document width stayed within the viewport. The test revoked its temporary guest.
+- 78 backend tests passed with PostgreSQL. The filtered trace matched the unfiltered scenario events, and a second guest received HTTP 404. The schema stayed at revision `0005` with no Alembic drift.
+- 18 frontend tests passed. The new regressions cover disabled execution, selected scenarios, exact approval, retry-key reuse, capacity guidance, event links, hidden-field omission, empty denominators, polling limits, expiry and interruption. Frontend format, lint, type checks and the production build passed. Ruff checks passed.
+- These observations cover the local browser workflow. The public deployment is still Phase 0.
 
 ## Phase 4 verification — November 17, 2026
 

@@ -2,7 +2,7 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Phase 4 scripted evaluation is implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
+**Phase 5 run and trace UI is implemented and verified locally. The public site still runs Phase 0.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
 
 The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
 
@@ -60,11 +60,23 @@ npm --prefix frontend run dev
 
 Open [the local workspace](http://127.0.0.1:5173). The frontend proxies `/api` to port 8000; `VITE_API_BASE_URL` includes `/api/v1` exactly once. Development API docs are at [localhost:8000/docs](http://127.0.0.1:8000/docs). Production disables the interactive docs.
 
-`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 4 readiness requires Alembic revision `0005`.
+`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 5 readiness requires Alembic revision `0005`.
 
 Stop the database with `docker compose down`. This preserves the named data volume. Removing the volume deletes local database data, so do not do that as an ordinary shutdown step.
 
-## Try a local scripted run
+## Launch a benchmark in the browser
+
+Start loopback PostgreSQL as described above. In a backend terminal, migrate the database, enable local runs and start the API on the port used by the Vite proxy.
+
+```powershell
+uv --directory backend run alembic upgrade head
+$env:LOCAL_RUNS_ENABLED = "true"
+uv --directory backend run uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-proxy-headers --no-access-log
+```
+
+Run `npm --prefix frontend run dev` in another terminal and open [Benchmark runs](http://127.0.0.1:5173/runs). Start a guest workspace, select an agent version and launch Core v2 or selected scenarios. Open a finding’s evidence link to inspect its highlighted event. Expand a tool request to see its arguments, policy decision and recorded mock result. The same tab can reopen a run from history. Guest access expires after seven days or revocation.
+
+## Try a local scripted run from the command line
 
 With the local PostgreSQL service running, open a PowerShell terminal at the repository root and run:
 
@@ -76,7 +88,7 @@ uv --directory backend run uvicorn app.main:app --host 127.0.0.1 --port 8012 --n
 
 In another terminal, run `uv --directory backend run python scripts/smoke_local_runs.py`. The script creates a temporary guest, runs AS-011 with each profile, reads back the ordered events, then revokes its guest. To retain evidence for inspection, use the local API with your own guest. Send its bearer credential in the Authorization header. POST to `/api/v1/runs` with an `Idempotency-Key` header and JSON containing `agent_version_id` and `scenarios` (an ordered list). GET the returned run ID at `/api/v1/runs/{id}`, `/{id}/results` or `/{id}/traces` under the same prefix. POST to `/{id}/cancel` to request cancellation.
 
-AS-011 exercises a routine document lookup. Enable `search_docs` on the profile version to see a mock read. AS-010 exercises repeated requests and the six-call budget. Behavior version 1 uses the scripted profile, the fixture, the version's tool list and the previous mock observation. Prompt edits change the recorded hash and input size. Scripted decisions follow the checked-in program. The API returns evidence-derived scores. The run and trace UI is scheduled for Phase 5.
+AS-011 exercises a routine document lookup. Enable `search_docs` on the profile version to see a mock read. AS-010 exercises repeated requests and the six-call budget. Behavior version 1 uses the scripted profile, the fixture, the version's tool list and the previous mock observation. Prompt edits change the recorded hash and input size. Scripted decisions follow the checked-in program. The API returns evidence-derived scores. The run and trace UI presents those scores at `/runs`.
 
 ### Verify a policy decision
 

@@ -4,7 +4,7 @@ Last updated: November 17, 2026. Source: Section 16 of [AgentShield_PROJECT.md](
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is the next implementation phase. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation and a hosted no-key run await owner approval. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is next. The hosted smoke deployment is still Phase 0. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -69,6 +69,8 @@ November 17 verification: PostgreSQL tests ran each profile twice and matched se
 Build launch/configuration, bounded status polling, run history/details, trace timeline/tool detail, policy decisions, findings, and evidence links. Handle cancellation, interruption, expired sessions, and capacity errors visibly.
 
 Exit evidence: a guest can launch and understand a benchmark from the UI, distinguishing attempted, blocked, and executed actions without exposing hidden chain-of-thought or protected canaries.
+
+November 17 completion evidence: a guest ran the full suite in Chrome, followed a finding to the exact redacted event, reloaded the detail link, distinguished a blocked request from a mock execution, reopened history and cancelled a second run. The browser check included a 390-pixel viewport. See performance_review.md.
 
 ## Phase 6: Benchmark comparison
 

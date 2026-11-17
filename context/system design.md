@@ -12,7 +12,7 @@ The required product works without inference credentials. A scripted vulnerable 
 
 ## Public system
 
-Only the visitor → static frontend → API → database path is implemented and verified in Phase 0. The queue, simulation runtime and gateway are implemented through Phase 3. Phase 4 adds local evaluation. Optional inference and the saved sample are planned.
+Only the visitor → static frontend → API → database path is implemented and verified in Phase 0. The queue, simulation runtime and gateway are implemented through Phase 3. Phase 4 adds local evaluation. Phase 5 connects it to the browser launcher, guest history and trace viewer. Optional inference and the saved sample are planned.
 
 ```mermaid
 flowchart LR
@@ -60,6 +60,10 @@ The browser starts a workspace explicitly and retains the opaque credential in s
 6. Losing the browser credential loses access to temporary history. Durable user accounts and credential recovery are deferred.
 
 For a comparison, both source runs must be accessible to the caller. For a report, all source evidence must remain retained and accessible. CORS is restricted to configured origins but is not an authorization mechanism.
+
+## Browser run inspection
+
+The health endpoint advertises local, public or disabled scripted execution. A guest selects an immutable agent version and a manifest or explicit scenario list. The API owns the run ID, policy decisions and scores. The UI reads the selected scenario’s ordered events and shows an executed action only when a mock result exists. The event ID in a finding is stable across reloads and every evidence read requires the current guest credential. An expired workspace loses access to its detail view.
 
 ## Local Phase 2 operation
 

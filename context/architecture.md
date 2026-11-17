@@ -75,6 +75,10 @@ AgentShield_AI/
 
 The Vercel Hobby static frontend, Render Free Docker API, and Neon Free PostgreSQL connection are live and verified together in the browser. The frontend uses the public backend API base and its CSP permits only that API origin. Render CORS explicitly lists the two production aliases, without wildcard previews. Vercel releases upload reviewed frontend source through its API because the GitHub integration is not installed; automatic GitHub frontend deployment is not configured. Vercel's default deployment protection is retained; the canonical production domain is public. The Render service was created directly with MCP, with no Blueprint attached and automatic deploy off. See deployment.md for exact evidence and resource IDs.
 
+## Run and trace frontend
+
+The React routes `/runs` and `/runs/:runId` share the registry’s tab-scoped guest session. The launcher records a pending idempotency key and its request configuration for ambiguous retries. The status query polls active runs every 2.5 seconds in the foreground, stopping on a terminal response, error or 100 updates. Evidence reloads on status transitions, selection or manual refresh. Each query is scoped to the mounted guest workspace. A finding links to the run, scenario and event ID. The owned trace API filters by scenario and redacts values before the browser receives them.
+
 ## Local evaluation
 
 Migration `0005` preserves the frozen Core v1 catalog and adds the Core v2 executable manifest, a second version of each shared profile, and a nullable JSONB assessment on each scenario result. A new run pins fixture revisions, behavior, oracle, policy, tool schema hash and budgets. Previously completed runs retain their original data. A terminal scenario and its assessment commit together. Owner-scoped endpoints aggregate stored assessments and resolve findings by event ID. Evaluation reads bounded evidence server-side before response redaction. Guest trace responses redact the synthetic marker.

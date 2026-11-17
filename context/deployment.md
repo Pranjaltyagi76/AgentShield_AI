@@ -62,6 +62,10 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Phase 5 local verification — November 17, 2026
+
+Chrome reached Vite at `127.0.0.1:5173`, FastAPI at `127.0.0.1:8000` and local PostgreSQL at revision `0005`. The checked-in Vercel rewrite supports direct `/runs` and `/runs/:runId` navigation for a future release. Production activation and hosted browser verification remain pending.
+
 ## Phase 4 local verification — November 17, 2026
 
 The local API used migration `0005`, a loopback PostgreSQL database, and the scripted provider. Both shared Core v2 profiles completed through real HTTP without keys. No Phase 4 production release or public activation was performed. The existing hosted release and the Phase 3 approval gate below remain the deployment baseline.
