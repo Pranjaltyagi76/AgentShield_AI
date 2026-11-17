@@ -73,3 +73,25 @@ class Comparison(Base):
     )
     comparison_json: Mapped[dict] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Report(Base):
+    __tablename__ = "reports"
+    __table_args__ = (
+        UniqueConstraint(
+            "run_id",
+            "comparison_id",
+            "format",
+            "renderer_version",
+            postgresql_nulls_not_distinct=True,
+        ),
+        CheckConstraint("format IN ('html', 'json')", name="report_format"),
+    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    run_id: Mapped[UUID] = mapped_column(ForeignKey("test_runs.id", ondelete="CASCADE"), index=True)
+    comparison_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("benchmark_comparisons.id", ondelete="CASCADE"), index=True
+    )
+    format: Mapped[str]
+    renderer_version: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
