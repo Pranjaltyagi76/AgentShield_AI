@@ -29,6 +29,31 @@ class ReadinessResponse(BaseModel):
     phase: Literal[6] = 6
 
 
+class InferenceStatus(BaseModel):
+    provider: Literal["gemini"] = "gemini"
+    enabled: Literal[False] = False
+    reason: Literal["free_account_access_unverified"] = "free_account_access_unverified"
+    model: None = None
+
+
+class DemoStatus(BaseModel):
+    execution_enabled: bool
+    profiles: tuple[Literal["vulnerable"], Literal["hardened"]] = ("vulnerable", "hardened")
+    requires_api_key: Literal[False] = False
+    inference: InferenceStatus = InferenceStatus()
+
+
+@router.get("/demo/status", response_model=DemoStatus)
+def demo_status(request: Request) -> DemoStatus:
+    """Report release capabilities without probing accounts or invoking inference.
+
+    execution_enabled is the operator flag. Database availability is reported by /ready.
+    Phase 7 follows the specification's explicit disabled-inference exit branch.
+    """
+    settings = request.app.state.settings
+    return DemoStatus(execution_enabled=settings.local_runs_enabled or settings.public_runs_enabled)
+
+
 @router.get("/health", response_model=HealthResponse)
 def health(request: Request) -> HealthResponse:
     settings = request.app.state.settings

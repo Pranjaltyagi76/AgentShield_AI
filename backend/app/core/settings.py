@@ -59,7 +59,8 @@ class Settings(BaseSettings):
     def parse_disabled_environment_flag(cls, value: object) -> object:
         # Environment values are strings; Literal[False] does not coerce them.
         # Only explicit false spellings are normalized. True/unknown values
-        # still fail the Literal validation and cannot enable Phase 0 execution.
+        # still fail validation. Phase 7 keeps optional inference disabled
+        # until account access and the ongoing free tier can be verified.
         if isinstance(value, str) and value.strip().lower() in {"false", "0", "off", "no"}:
             return False
         return value
