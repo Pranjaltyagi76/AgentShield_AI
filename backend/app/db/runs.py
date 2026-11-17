@@ -41,6 +41,7 @@ class Result(Base):
     scenario_version: Mapped[int]
     status: Mapped[str]
     reason: Mapped[str | None]
+    assessment: Mapped[dict | None] = mapped_column(JSONB)
     outcome: Mapped[str | None]
     steps: Mapped[int] = mapped_column(default=0)
     next_sequence: Mapped[int] = mapped_column(default=1)

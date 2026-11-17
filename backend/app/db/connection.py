@@ -40,7 +40,7 @@ class Database:
         with self.engine.connect() as connection:
             connection.execute(text("SET LOCAL statement_timeout = '3000ms'"))
             revision = connection.scalar(text("SELECT version_num FROM alembic_version"))
-            if revision != "0004":
+            if revision != "0005":
                 return "unavailable"
         return "connected"
 
