@@ -299,8 +299,11 @@ function Overview({ system }: { system: System }) {
           <Layers3 size={19} />
         </span>
         <div>
-          <strong>Phase 3 · Policy gateway</strong>
-          <p>Browse profiles and scenario definitions. Scoring arrives in a later phase.</p>
+          <strong>Phase 4 · Scenario evaluation</strong>
+          <p>
+            Browse profiles and scenario definitions. Scored runs are available through the scripted
+            API when enabled.
+          </p>
         </div>
         <Link to="/roadmap">
           View plan
@@ -435,7 +438,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="good">Phase 3 implemented</StatusLabel>
+        <StatusLabel tone="good">Phase 4 implemented</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -452,7 +455,7 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index <= 3 ? (
+            {index <= 4 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
             ) : (
               <span className="planned-label">Planned</span>

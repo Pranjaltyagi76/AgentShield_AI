@@ -75,7 +75,10 @@ export function Scenarios() {
     <section className="registry">
       <div className="eyebrow">CURATED CATALOG</div>
       <h1>Scenarios</h1>
-      <p>Browse the twelve definitions in Core v1. The scripted API supports selected fixtures.</p>
+      <p>
+        Browse the twelve definitions in Core v1. The scripted API can run all twelve scenarios in
+        Core v2.
+      </p>
       <label>
         Search by name or ID
         <input value={q} onChange={(e) => setQ(e.target.value)} />
