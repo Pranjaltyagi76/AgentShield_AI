@@ -132,7 +132,7 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
           </a>
           <div className="sidebar-version">
             <span>v0.1.0</span>
-            <span>FOUNDATION</span>
+            <span>SCRIPTED DEMO</span>
           </div>
         </div>
       </aside>
@@ -444,7 +444,7 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="muted">Phase 8 · reports and saved sample</StatusLabel>
+        <StatusLabel tone="good">Phase 9 · hosted demo</StatusLabel>
       </div>
       <p className="roadmap-note">
         Implementation and deployment gates are tracked in the repository. This roadmap describes
@@ -461,7 +461,7 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index <= 6 || index === 8 ? (
+            {index <= 6 || index === 8 || index === 9 ? (
               <StatusLabel tone="good">Complete</StatusLabel>
             ) : index === 7 ? (
               <StatusLabel tone="muted">Disabled</StatusLabel>
@@ -542,7 +542,7 @@ export default function App() {
           <div className="topbar-meta">
             <span className="foundation-pill">
               <span />
-              Foundation
+              {system.health.data?.run_mode === 'public' ? 'Public demo' : 'Scripted workspace'}
             </span>
             <span className="owner-avatar" title="Pranjal Tyagi">
               PT

@@ -40,9 +40,9 @@ it('navigates to system setup and renders typed response evidence', async () => 
 it('shows the planned roadmap without marking future phases complete', () => {
   renderApp('/roadmap')
   expect(screen.getByRole('heading', { name: /A deliberate path/ })).toBeInTheDocument()
-  expect(screen.getByText('Phase 8 · reports and saved sample')).toBeInTheDocument()
+  expect(screen.getByText('Phase 9 · hosted demo')).toBeInTheDocument()
   expect(screen.getByText('Disabled')).toBeInTheDocument()
-  expect(screen.getAllByText('Planned')).toHaveLength(2)
+  expect(screen.getAllByText('Planned')).toHaveLength(1)
 })
 it('handles an unknown deep link with a working return link', () => {
   renderApp('/missing')
