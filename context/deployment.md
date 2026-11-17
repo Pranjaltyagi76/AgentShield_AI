@@ -69,6 +69,8 @@ The owner explicitly approved `PUBLIC_RUNS_ENABLED=true` on the existing Render 
 | Item | Observed release evidence |
 |---|---|
 | Frontend | Existing `agentshield-ai` Vercel project and canonical [public site](https://agentshield-ai-tau.vercel.app) |
+| Final frontend release | `dpl_5ML77ARTauV6ofQ1bMa1YoRGpuT4`, READY at 16:38:20 UTC; source `eb42f0990b406c851e519746bbefcc552eec650b` |
+| Final source CI | [All three source jobs passed](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/44127697973) |
 | Initial feature release | `dpl_61caTPxaktqk5CZXhzUUi7yQo6JP`, READY November 17 at 15:34:47 UTC |
 | Reviewed source | `6478fc228b60eeb729fab4a47945f043e7a3419e`; 40 tracked frontend files uploaded with repository-relative paths |
 | API | Existing `srv-dbtefcmtlv9c73f4i2pg`, Render Free, one Docker instance, Singapore |
