@@ -53,9 +53,10 @@ def create_app(settings: Settings | None = None, database: DatabaseProbe | None 
 
         worker = asyncio.create_task(reap()) if getattr(probe, "engine", None) is not None else None
         stop = StopSignal()
+        wake = application.state.queue_wake = StopSignal()
         runner = (
-            asyncio.create_task(asyncio.to_thread(consume, probe.engine, stop))
-            if config.local_runs_enabled
+            asyncio.create_task(asyncio.to_thread(consume, probe.engine, stop, wake))
+            if config.local_runs_enabled or config.public_runs_enabled
             else None
         )
         logger.info("application_started")
@@ -64,6 +65,7 @@ def create_app(settings: Settings | None = None, database: DatabaseProbe | None 
         finally:
             if runner:
                 stop.set()
+                wake.set()
                 await runner
             if worker:
                 worker.cancel()
@@ -124,7 +126,7 @@ def create_app(settings: Settings | None = None, database: DatabaseProbe | None 
 
     application.state.issue_limiter = IssueLimiter()
     application.include_router(workspace_router)
-    if config.local_runs_enabled:
+    if config.local_runs_enabled or config.public_runs_enabled:
         application.state.run_limiter = RunLimiter()
         application.include_router(run_router)
     application.include_router(router)

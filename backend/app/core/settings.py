@@ -1,4 +1,4 @@
-"""Validated configuration. Phase 0 cannot enable execution or inference."""
+"""Validated configuration for opt-in scripted execution."""
 
 from pathlib import Path
 from typing import Literal
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
         default_factory=lambda: ["http://localhost:5173", "http://127.0.0.1:5173"]
     )
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
-    public_runs_enabled: Literal[False] = False
+    public_runs_enabled: bool = False
     public_llm_enabled: Literal[False] = False
     local_runs_enabled: bool = False
     max_database_bytes: int = Field(default=524288000, gt=0, le=524288000)
@@ -40,11 +40,21 @@ class Settings(BaseSettings):
             not in {"localhost", "127.0.0.1", "::1"}
         ):
             raise ValueError("Local execution requires development/test and loopback PostgreSQL")
+        if self.public_runs_enabled and (
+            self.local_runs_enabled
+            or self.app_env != "production"
+            or not self.database_url
+            or not self.cors_origins
+            or any(not origin.startswith("https://") for origin in self.cors_origins)
+        ):
+            raise ValueError(
+                "Public demo requires production, a configured database and explicit HTTPS origins"
+            )
         return self
 
     llm_provider: Literal["demo"] = "demo"
 
-    @field_validator("public_runs_enabled", "public_llm_enabled", mode="before")
+    @field_validator("public_llm_enabled", mode="before")
     @classmethod
     def parse_disabled_environment_flag(cls, value: object) -> object:
         # Environment values are strings; Literal[False] does not coerce them.

@@ -17,19 +17,20 @@ class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: str = "agentshield-api"
     version: str = __version__
-    phase: Literal[2] = 2
+    public_runs_enabled: bool
+    phase: Literal[3] = 3
 
 
 class ReadinessResponse(BaseModel):
     status: Literal["ready", "not_ready"]
     database: DatabaseStatus
     service: str = "agentshield-api"
-    phase: Literal[2] = 2
+    phase: Literal[3] = 3
 
 
 @router.get("/health", response_model=HealthResponse)
-def health() -> HealthResponse:
-    return HealthResponse()
+def health(request: Request) -> HealthResponse:
+    return HealthResponse(public_runs_enabled=request.app.state.settings.public_runs_enabled)
 
 
 @router.get(

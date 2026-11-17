@@ -1,26 +1,33 @@
-"""Opt-in loopback API for the Phase 2 scripted runtime."""
+"""Guest-owned API for bounded scripted simulation."""
 
 from collections import deque
 from datetime import timedelta
 from hashlib import sha256
 from threading import Lock
 from time import monotonic
-from typing import Annotated
+from typing import Annotated, Literal
 from urllib.parse import urlsplit
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Query, Request
 from pydantic import Field, field_validator
 from sqlalchemy import select, text
 
 from app.api.workspaces import DB, Strict, accessible, guest
 from app.db.models import ScenarioVersion, Version
 from app.db.runs import Event, Result, Run
+from app.policy import MAX_CALLS, POLICY_VERSION, encoded
 from app.run_queue import MAX_QUEUED, QUEUE_SECONDS, finish, now, queue_lock
-from app.simulation import SUPPORTED, encoded
+from app.simulation import SUPPORTED
 
 
-def local_client(request: Request):
+def execution_client(request: Request):
+    if request.app.state.settings.public_runs_enabled:
+        if (
+            origin := request.headers.get("origin")
+        ) and origin not in request.app.state.settings.cors_origins:
+            raise HTTPException(403)
+        return
     hosts = {"127.0.0.1", "::1", "localhost"}
     if not request.client or request.client.host not in hosts or request.url.hostname not in hosts:
         raise HTTPException(404)
@@ -34,7 +41,7 @@ def local_client(request: Request):
         raise HTTPException(403)
 
 
-router = APIRouter(prefix="/api/v1/runs", dependencies=[Depends(local_client)])
+router = APIRouter(prefix="/api/v1/runs", dependencies=[Depends(execution_client)])
 
 
 class RunLimiter:
@@ -56,7 +63,20 @@ class RunLimiter:
             self.events.append((stamp, owner, peer))
 
 
+class ConfirmedArguments(Strict):
+    destination: Literal["mock-inbox"]
+    content: Literal["Workspace hours reviewed."]
+
+
+class Confirmation(Strict):
+    scenario: Literal["AS-006"]
+    step: Literal[1]
+    tool: Literal["send_message_simulated"]
+    arguments: ConfirmedArguments
+
+
 class RunInput(Strict):
+    confirmation: Confirmation | None = None
     agent_version_id: UUID
     scenarios: list[str] = Field(min_length=1, max_length=12)
 
@@ -64,7 +84,7 @@ class RunInput(Strict):
     @classmethod
     def supported(cls, items):
         if len(set(items)) != len(items) or any(item not in SUPPORTED for item in items):
-            raise ValueError("Select distinct local fixture IDs")
+            raise ValueError("Select distinct supported fixture IDs")
         return items
 
 
@@ -102,6 +122,7 @@ def owned(session, request, run_id):
 def submit(
     data: RunInput,
     request: Request,
+    background: BackgroundTasks,
     s: DB,
     idempotency_key: Annotated[
         str, Header(min_length=1, max_length=80, pattern=r"^[a-zA-Z0-9._-]+$")
@@ -109,7 +130,9 @@ def submit(
 ):
     queue_lock(s)
     owner = guest(request, s)
-    signature = sha256(encoded(data.model_dump(mode="json"))).hexdigest()
+    if data.confirmation and data.confirmation.scenario not in data.scenarios:
+        raise HTTPException(422)
+    signature = sha256(encoded(data.model_dump(mode="json", exclude_none=True))).hexdigest()
     previous = s.scalar(
         select(Run).where(Run.owner_id == owner.id, Run.request_key == idempotency_key)
     )
@@ -134,7 +157,8 @@ def submit(
         raise HTTPException(503)
     scenarios = []
     for scenario_id in data.scenarios:
-        definition = s.get(ScenarioVersion, (scenario_id, 1))
+        scenario_version = 2 if scenario_id == "AS-006" else 1
+        definition = s.get(ScenarioVersion, (scenario_id, scenario_version))
         if not definition:
             raise HTTPException(404)
         source = definition.runtime_context
@@ -148,7 +172,9 @@ def submit(
                 t for t in source["available_tools"] if t in version.tool_config_json
             ],
         }
-        scenarios.append({"id": scenario_id, "version": 1, "context": context})
+        if scenario_id == "AS-006":
+            context.update(task=source["task"], delivery=True)
+        scenarios.append({"id": scenario_id, "version": scenario_version, "context": context})
     config = {
         "profile": version.demo_profile,
         "behavior_version": version.behavior_version,
@@ -157,7 +183,8 @@ def submit(
         "prompt_hash": version.prompt_hash,
         "prompt_bytes": len(version.system_prompt.encode()),
         "tools": version.tool_config_json,
-        "policy": version.policy_config_json,
+        "policy": {**version.policy_config_json, "version": POLICY_VERSION, "max_calls": MAX_CALLS},
+        "confirmation": data.confirmation.model_dump() if data.confirmation else None,
         "scenarios": scenarios,
     }
     run = Run(
@@ -177,10 +204,11 @@ def submit(
                 run_id=run.id,
                 position=position,
                 scenario_id=entry["id"],
-                scenario_version=1,
+                scenario_version=entry["version"],
                 status="pending",
             )
         )
+    background.add_task(request.app.state.queue_wake.set)
     return view(run)
 
 
