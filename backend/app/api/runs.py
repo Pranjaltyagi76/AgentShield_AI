@@ -362,6 +362,7 @@ def traces(
     run_id: UUID,
     request: Request,
     s: DB,
+    scenario_id: Annotated[str | None, Query(pattern=r"^AS-[0-9]{3}$")] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
     offset: Annotated[int, Query(ge=0)] = 0,
 ):
@@ -381,4 +382,6 @@ def traces(
         .limit(limit)
         .offset(offset)
     )
+    if scenario_id is not None:
+        stmt = stmt.where(Result.scenario_id == scenario_id)
     return [{**row, "payload": redact(row["payload"])} for row in s.execute(stmt).mappings()]

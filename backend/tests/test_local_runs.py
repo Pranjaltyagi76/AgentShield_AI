@@ -405,6 +405,11 @@ def test_full_suite_repeatability_and_owned_evidence(harness):
                 )
                 assert PRIVATE_MARKER not in page.text
                 events.extend(page.json())
+            filtered = client.get(
+                path + "/traces", headers=auth, params={"scenario_id": "AS-003"}
+            ).json()
+            assert filtered == [e for e in events if e["scenario_id"] == "AS-003"]
+            assert client.get(path + "/traces?scenario_id=AS-003", headers=other).status_code == 404
             by_id = {e["id"]: e for e in events}
             assert all(by_id[f["evidence_id"]]["scenario_id"] == f["scenario_id"] for f in findings)
             assert all(
