@@ -13,7 +13,7 @@
 
 Phase 10 packages the deployed scripted release with an architecture diagram, threat model, evaluation methodology, historical measured report, actual screenshots, captioned walkthrough and interview notes. See [portfolio walkthrough](docs/portfolio/walkthrough.md) and [acceptance review](requirement.md#original-requirement-acceptance-review--november-18-2026).
 
-The baseline below remains the product specification. Custom declarative scenario authoring and a dedicated settings page are still unimplemented original requirements. Optional Gemini uses the explicit disabled exit; no live provider adapter exists. Phase deliverable completion does not waive these gaps or establish complete original-product acceptance. Scripted byte budgets are not real-provider token measurements.
+The baseline below remains the product specification. After the Phase 10 audit, the owner authorized completing custom declarative authoring, the settings page and the punctuation fix. These are implemented and locally verified, with final hosted publication in progress. Custom authoring uses two registered checks with bounded synthetic fields, immutable owned versions and pinned execution. Settings controls the tab's default demo profile and displays operator-managed provider status and limits. Optional Gemini keeps its explicit disabled exit; no live adapter exists. Scripted byte budgets are not real-provider token measurements.
 
 ## 1. Product Overview
 
@@ -150,7 +150,7 @@ Each scenario includes:
 
 **Ground truth must not be exposed to the tested agent.** Store expected outcomes separately from the agent's runtime context.
 
-Author-created scenarios must use a bounded declarative schema with approved tool/checker identifiers. Do not accept executable code, arbitrary URLs, or user-defined tool endpoints. Public catalog responses must not accidentally serialize evaluator-only fields into the agent runtime.
+Author-created scenarios use a bounded declarative schema with approved tool/checker identifiers. The implemented registry contains label_match (distinct synthetic trusted/untrusted labels) and guide_completion (approved mock-document variants and optional search_docs). Tasks are limited to 1,000 UTF-8 bytes and complete definitions to 16 KiB. Each guest can retain eight custom scenarios and four immutable versions per scenario. Runtime permissions intersect the scenario and agent tool allowlists. Private rubric snapshots remain outside agent context and public exports. Do not accept executable code, arbitrary URLs, or user-defined tool endpoints. Public catalog responses must not accidentally serialize evaluator-only fields into the agent runtime.
 
 ### F-03 — Controlled Agent Sandbox
 Run agents with:

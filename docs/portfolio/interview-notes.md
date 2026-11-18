@@ -52,6 +52,6 @@ Optional measured detail: “In the scripted Core v2 comparison, hardened behavi
 
 ## Open scope and statements to avoid
 
-FR-03 custom declarative authoring and FR-13's dedicated settings page remain partial. Profile controls/status/operator configuration do not close the latter. Phase 7's optional disabled exit does not mean a live adapter exists. See the [acceptance review](../../requirement.md).
+The later owner-authorized extension implements FR-03 bounded custom authoring and FR-13 Settings. Explain the two registered schemas, immutable owned revisions, separate oracle snapshots and actual evidence-based execution. Settings saves a tab default and displays operator-managed provider/limit status. Hosted release evidence is tracked in the deployment/review records. Phase 7's optional disabled exit does not mean a live adapter exists. See the [acceptance review](../../requirement.md).
 
 Avoid “production-ready,” “prevents all prompt injection,” “100% secure,” “tested GPT/Gemini,” “improved real-model security by 50%,” “sub-ten-second guaranteed,” “p95,” “unlimited free hosting,” “multi-tenant enterprise authentication,” or “OS sandbox.” Do not describe proposed repetition/throughput experiments as measurements. Describe the original requirement gaps before claiming all product requirements are complete.

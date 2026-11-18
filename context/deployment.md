@@ -62,6 +62,14 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Custom authoring and settings release preparation — November 18, 2026
+
+The owner authorized implementation and publication after the audit. Reuse the existing Render Free service, Vercel project/team and Neon Free main branch. Release schema is 0008: two owned custom-scenario tables plus a private oracle-snapshot JSONB column with an empty-object default for retained runs. Runtime connections stay pooled; Alembic derives the direct Neon hostname from the configured URL without logging or changing the stored credential. No hosting environment change is required. Readiness rejects a pre-0008 database for this release.
+
+An isolated Free-project review branch `br-round-cherry-aziveynn` tested migration-generated DDL on the production-shaped PostgreSQL 17 schema and retained seven source runs with valid backfill. The endpoint `ep-shy-feather-az0hxqpw` is observed idle after suspension. The branch is retained only for review, keeps its copied 0007 Alembic stamp, and is not an application connection target. Applying the full migration again there would require reconciliation; deploy the application only to the unchanged main branch through startup Alembic. The initial custom suspend-interval request was rejected on Free; the successful branch inherited the project's existing 0.25 CU limits. No new project, paid compute plan or payment setting was introduced.
+
+All local release checks passed. Before triggering Render, verify the pushed commit and that no deploy is already running; automatic deploy remains off. Publish the 45 tracked frontend source files to the same Vercel project after backend readiness. Record actual CI/deployment IDs and public workflow observations only after success. Current original hosted release evidence below remains historical until this new release is verified.
+
 ## Phase 10 frontend publication — November 18, 2026
 
 Reuse the same Vercel project/team, Render service and Neon project. Phase 10 changes frontend status text and portfolio documentation only. Runtime code stays at the verified `6478fc228b60eeb729fab4a47945f043e7a3419e`, schema `0007`; public scripted execution remains enabled and Gemini disabled. No new resource, environment change, paid dependency, billing change or backend redeploy is required.

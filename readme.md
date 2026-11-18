@@ -9,13 +9,15 @@ AI agent security testing, controlled attack simulation, and reliability benchma
 ## What is implemented
 
 - Twelve pinned synthetic Core v2 scenarios and two versioned deterministic profiles.
+- Guest-owned custom scenarios with registered label/guide checks, validation, immutable versions and pinned execution.
+- A Settings page for the tab's default demo profile, provider status, server limits and retention.
 - Independent mock-tool gateway, ordered traces, evidence-linked findings and coverage-aware evaluation.
 - Guest-owned profiles/runs, immutable versions, bounded PostgreSQL queue, cancellation and interruption recovery.
 - Compatible-run comparisons with explicit counts, exclusions and percentage-point deltas.
 - Authenticated HTML/JSON exports from retained PostgreSQL records; redacted historical sample independent of API health.
 - React/Vite/TypeScript frontend, FastAPI backend and PostgreSQL, deployed on existing ongoing free plans.
 
-The scripts exercise the real harness. They do not establish real-model resistance to prompt injection. Custom declarative scenario authoring and a dedicated settings page remain open original requirements. Gemini is explicitly disabled and its live adapter is unimplemented.
+The scripts exercise the real harness. They do not establish real-model resistance to prompt injection. Custom declarative authoring and a dedicated Settings page are now implemented; hosted publication of this extension is in progress. Gemini is explicitly disabled and its live adapter is unimplemented.
 
 ## Reviewer starting points
 
@@ -78,7 +80,7 @@ npm --prefix frontend run dev
 
 Open [the local workspace](http://127.0.0.1:5173). The frontend proxies `/api` to port 8000; `VITE_API_BASE_URL` includes `/api/v1` exactly once. Development API docs are at [localhost:8000/docs](http://127.0.0.1:8000/docs). Production disables the interactive docs.
 
-`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. Phase 8 readiness requires Alembic revision `0007`.
+`GET /api/v1/health` reports process health independently of PostgreSQL. `GET /api/v1/ready` reports `connected`, `unavailable`, or `not_configured`, with HTTP 503 when not ready. The current API requires Alembic revision `0008`. Runtime connections stay pooled; migrations derive the direct Neon hostname from the existing URL without exposing credentials.
 
 Stop the database with `docker compose down`. This preserves the named data volume. Removing the volume deletes local database data, so do not do that as an ordinary shutdown step.
 
@@ -115,6 +117,14 @@ To refresh the public sample from newly executed local suites, start the opt-in 
 ```
 
 Review the new sample, then format the public HTML and JSON with the frontend’s Prettier command before committing. Capture timestamps describe the observed historical run.
+
+## Author custom scenarios and set demo preferences
+
+Open **Scenarios**, start a guest workspace and use **Custom scenarios**. Choose the registered label-conflict or guide-completion checker, supply synthetic fields, validate the draft, then save. Editing validated content requires validation again. Open a saved version to create a new immutable revision. Eight scenarios and four versions each are retained per guest under the normal expiry and storage limits.
+
+In **Benchmark runs**, choose **Choose curated or custom scenarios**. Select up to twelve cases, including the exact saved custom revision. Curated and custom cases can share a run. Both the agent and the scenario must allow a guide lookup. Outcomes follow recorded evidence; custom rubric snapshots never enter agent context or exports. Different custom revisions/hashes are incompatible for outcome deltas.
+
+Open **Settings** and save Hardened or Vulnerable as the tab's default. The launcher selects that shared profile on the next visit. The page also shows current provider status, server limits and workspace expiry. Free-form task text is recorded as data; deterministic scripts use the registered fields rather than interpreting arbitrary instructions.
 
 ## Optional Gemini status
 
@@ -212,9 +222,9 @@ Open the [live AgentShield app](https://agentshield-ai-tau.vercel.app) or its [s
 
 Follow [context/deployment.md](context/deployment.md) for the exact configuration and release procedure. Vercel GitHub integration is not installed, so frontend releases currently upload reviewed source through the API. Render automatic deploy is off. Free services may sleep or suspend at quota limits. Hosted warm suites, ownership, exports and restart regeneration were verified on November 17. One real idle wake returned valid health JSON in 32.812 seconds. The saved sample remained available during wake-up and manual retry restored API connectivity. See the dated deployment record for the observation and limitations.
 
-## Known limits and open requirements
+## Current scope and limitations
 
-Phase 10 completes portfolio packaging for the current scripted release. Original FR-03 custom declarative authoring and FR-13's dedicated settings page remain partial; profile controls, System status and operator configuration cover some settings. These gaps require an explicitly requested implementation scope. No product acceptance waiver is assumed.
+The owner authorized closing FR-03 and FR-13 after the audit. Both are implemented and locally verified; hosted verification is the remaining release gate. Custom scenarios use two registered checkers with bounded data fields. Settings selects a default scripted profile and displays operator-managed capability/limit information; it accepts no visitor credentials.
 
 Optional real-model inference has no adapter, eligible free account, parsing/retry/quota evidence or provider-token measurements. Scripted byte budgets are not token accounting. Exact finite oracles do not establish general security. Anonymous quotas and temporary tab credentials limit availability and persistence. One observed 32.812-second cold wake and two single warm timings are not latency guarantees or throughput measurements.
 

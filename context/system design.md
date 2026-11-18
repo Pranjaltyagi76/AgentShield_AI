@@ -6,7 +6,7 @@ Product scope and acceptance criteria come from [the project specification](../A
 
 ## Purpose and boundaries
 
-AgentShield evaluates agents inside an application-controlled simulation runtime. Inputs, customer records, documents, secrets, messages, and exports are synthetic. This runtime does not execute untrusted code and is not an operating-system sandbox. The implemented scenario catalog is curated and versioned. Custom declarative authoring remains an open requirement; it must accept only bounded data selecting registered tools and checkers if implemented later.
+AgentShield evaluates agents inside an application-controlled simulation runtime. Inputs, customer records, documents, secrets, messages, and exports are synthetic. This runtime does not execute untrusted code and is not an operating-system sandbox. The implemented scenario catalog is curated and versioned. Guest-owned declarative authoring now accepts only bounded label_match and guide_completion data. No executable checker, URL fetcher or tool endpoint can be supplied.
 
 The required product works without inference credentials. A scripted vulnerable profile and a scripted hardened profile exercise the actual runner, policy gateway, trace recorder, and evaluator. Optional real-model tests are separately labelled. Prompt edits do not change scripted behavior; profile and behavior versions must identify changes that do.
 
@@ -75,6 +75,14 @@ A real same-revision redeploy preserved report source data and regenerated ident
 A terminal run → owned report metadata → authenticated download → renderer → escaped HTML or redacted JSON. Reports with a comparison require continued access to both comparison sources. Regeneration reads PostgreSQL on each download and survives a new API process. Source deletion and guest cleanup cascade through report metadata. A renderer version mismatch returns a conflict instead of silently changing an old export.
 
 The static saved workspace is an independently bundled historical capture. Its evidence identifiers are replaced consistently and its metadata records capture time, scripted behavior, scenario versions and renderer version. It remains browsable during API unavailability. The standard launcher reuses seeded shared profiles for a fresh live evaluation.
+
+## Custom authoring and settings
+
+An authenticated guest validates a bounded draft, then creates an owned scenario or appends an immutable version. The compiler separates public synthetic task facts from private rubric values. Admission checks ownership and pins ID, revision, definition hash and runtime context, while private oracles are stored in a separate run column. The script receives only a copied runtime context. Guide permissions are the intersection of scenario and immutable agent allowlists; the existing gateway alone produces mock results. Assessment still requires ordered complete evidence and handles incomplete execution as inconclusive. Different revisions or definition hashes cannot produce misleading improvement deltas.
+
+Custom definitions are at most 16 KiB, tasks at most 1,000 UTF-8 bytes, with eight scenarios and four versions per guest. Existing run, queue, rate, step, byte, trace and expiry limits also apply. The validation endpoint does not save a record. Custom definitions are private; only the owner can list, read, append or reference them.
+
+The `/settings` page stores a non-secret hardened/vulnerable default in tab session storage. It selects the shared profile when the launcher mounts. It does not change operator switches, inference mode or policy enforcement. `/demo/status` exposes a safe current limits map without credentials, database probes or provider calls.
 
 ## Optional inference boundary
 

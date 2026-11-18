@@ -22,7 +22,7 @@ flowchart TB
     R -->|redacted JSON / escaped HTML| API
 ```
 
-API, consumer and cleanup share one backend process. PostgreSQL holds durable state; backend-local files hold no report or queue persistence. The script receives synthetic runtime context and previous observations, never evaluator-only expected labels. The browser receives redacted evidence. There is no implemented provider network adapter. [System design](system%20design.md) describes lifecycle and trust boundaries.
+API, consumer and cleanup share one backend process. PostgreSQL holds durable state; backend-local files hold no report or queue persistence. The script receives synthetic runtime context and previous observations, never evaluator-only expected labels. The browser receives redacted evidence. There is no implemented provider network adapter. The owner-authorized custom-authoring/settings extension is implemented and tested locally; hosted publication is in progress. [System design](system%20design.md) describes lifecycle and trust boundaries.
 
 ## Actual module map
 
@@ -33,6 +33,7 @@ Paths are relative to the repository root.
 | `frontend/src/App.tsx`, `main.tsx` | Routing, shell, connectivity, overview and roadmap |
 | `frontend/src/Registry.tsx` | Guest workspace, profile/version forms and public catalog |
 | `frontend/src/Runs.tsx`, `RunDetail.tsx` | Launcher, history, cancellation, metrics and evidence links |
+| `frontend/src/CustomScenarios.tsx`, `Settings.tsx`, `lib/preferences.ts` | Owned authoring/version validation, tab demo default and provider/limit visibility |
 | `frontend/src/Compare.tsx` | Compatible-pair outcomes, counts and deltas |
 | `frontend/src/Reports.tsx`, `Sample.tsx` | Authenticated downloads and historical workspace |
 | `frontend/src/lib/` | Typed API contracts, session state and bounded connection queries |
@@ -40,6 +41,7 @@ Paths are relative to the repository root.
 | `backend/app/main.py` | Application factory, middleware and consumer/cleanup lifecycle |
 | `backend/app/api/system.py` | Health, schema/database readiness and disabled-provider status |
 | `backend/app/api/workspaces.py` | Guest issuance/expiry/cleanup, registry transactions, catalog projection |
+| `backend/app/api/custom_scenarios.py`, `custom_scenarios.py` | Authenticated bounded authoring, private ownership, version quotas and registered schema compilation |
 | `backend/app/api/runs.py` | Admission, idempotency, owned evidence reads and cancellation |
 | `backend/app/api/benchmarks.py`, `reports.py` | Owned comparison/report admission and retrieval |
 | `backend/app/core/` | Validated settings, safe logging and body limits |
@@ -49,14 +51,14 @@ Paths are relative to the repository root.
 | `backend/app/policy.py` | Strict action schemas and sole mock execution gateway |
 | `backend/app/evaluation.py` | Evidence validation, scenario oracles, findings and metrics |
 | `backend/app/comparison.py`, `reporting.py` | Pure comparison and redacted/escaped rendering |
-| `backend/migrations/versions/` | Alembic revisions `0001`–`0007`; immutable seeded versions |
+| `backend/migrations/versions/` | Alembic revisions `0001`–`0008`; immutable seeded versions |
 | `backend/scripts/` | Startup, local smoke, sample capture and hosted verifier |
 | `backend/tests/`, `frontend/src/*.test.tsx` | Behavior, ownership, evaluation and component checks |
 | `.github/workflows/ci.yml` | PostgreSQL/backend checks, frontend checks/build and container build |
 | `render.yaml`, `backend/Dockerfile`, `frontend/vercel.json` | Reviewed deployment configuration |
 | `context/`, `docs/threat-model.md`, `docs/portfolio/` | Canonical design/evidence, threat review and presentation artifacts |
 
-No separate sandbox service, broker, provider SDK, findings table or backend export directory exists. Custom scenario authoring and a dedicated settings route remain unimplemented.
+No separate sandbox service, broker, provider SDK, findings table or backend export directory exists. Custom authoring and `/settings` are implemented. Authoring supports only the registered label_match and guide_completion schemas.
 
 ## Decisions and tradeoffs
 
@@ -83,6 +85,8 @@ Durable accounts, distributed workers, WebSockets, PDF, LangGraph, LLM judges an
 
 `test_runs` references its guest and exact agent version and stores pinned configuration, idempotency hash, status, deadlines, cancellation and heartbeat. `scenario_results` references its run and stores scenario revision, cursor, execution status, nullable outcome and JSONB assessment. Findings are embedded in that assessment and cite `trace_events.id`; they are not separate rows. Event sequence is unique within each result, with no global ordering assumption across results.
 
+`custom_scenarios` references a guest; `custom_scenario_versions` stores immutable name/description/definition/hash snapshots. Guest-row locking serializes admission, with eight scenarios and four versions each, plus the database ceiling. Run snapshots pin the scenario ID/revision/hash/checker and compiled runtime context. `test_runs.custom_oracles` separately stores the private rubric snapshot; explicit API/report projections omit that column. Guest cleanup cascades to all custom records.
+
 `benchmark_comparisons` stores an immutable JSONB summary and a unique ordered source pair. Both runs must remain owned and retained. `reports` stores source IDs, format, renderer version and creation time. PostgreSQL `NULLS NOT DISTINCT` deduplicates the tuple even without a comparison. Each guest can retain 64 comparisons and 64 reports within the database ceiling. Foreign keys cascade on source deletion. No shared live runs are seeded; the public historical sample is a frontend asset.
 
 ## Execution and evidence
@@ -103,8 +107,8 @@ Report creation requires a terminal run. Creation, metadata and downloads check 
 
 ## Deployment and limits
 
-The existing Render service has public scripted execution explicitly enabled, local mode disabled, exact HTTPS origins, `LLM_PROVIDER=demo` and `PUBLIC_LLM_ENABLED=false`. Schema head is `0007`; API capability phase 8 describes the deployed feature set, while later phases verify and package it. Production interactive docs are disabled.
+The existing Render service has public scripted execution explicitly enabled, local mode disabled, exact HTTPS origins, `LLM_PROVIDER=demo` and `PUBLIC_LLM_ENABLED=false`. The new release requires schema head `0008`; API capability phase 8 describes the deployed feature set, while later phases verify and package it. Production interactive docs are disabled.
 
 Vercel receives reviewed tracked frontend source by authenticated upload with root `frontend`. GitHub integration is absent; Render automatic deploy is off. Default protection remains on generated Vercel URLs; the canonical alias is public. Credentials remain backend-only. Phase 10 needs no new resource or paid capability.
 
-Bounds/residual risks are in [the threat model](../docs/threat-model.md). Original acceptance gaps remain in [requirements](../requirement.md). Actual measurements, including one observed cold wake, are in [performance review](performance_review.md).
+Bounds/residual risks are in [the threat model](../docs/threat-model.md). Updated acceptance and bounded authoring scope are in [requirements](../requirement.md). Actual measurements, including one observed cold wake, are in [performance review](performance_review.md).

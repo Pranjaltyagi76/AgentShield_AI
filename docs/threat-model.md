@@ -54,7 +54,7 @@ AS-006 revision 2 makes the vulnerable script propose a synthetic message to a p
 - Anonymous access can consume free quotas. No distributed rate store, live saturation experiment or production-scale capacity claim exists.
 - Lost browser credentials have no recovery. Same-origin script compromise can steal temporary access; durable identity/MFA is absent.
 - Exact-marker checks miss some encodings/paraphrases. Twelve curated cases cannot establish general security or model rankings.
-- Custom scenario authoring and a dedicated settings page remain open original requirements. Current controls are profile forms, status views and operator configuration.
+- Custom authoring and Settings are implemented within the authorized extension. Authoring accepts only registered data schemas, has persistent ownership/version quotas, and stores private rubric snapshots outside agent context/exports. Free-form text is inert and is not interpreted as code or a model instruction. Settings cannot alter provider credentials, public execution or mandatory enforcement.
 - Provider parsing, tokens, retries/quota handling and eligible free Gemini access are unimplemented/unverified.
 - The approved orphan fixture verified recovery with partial evidence; it did not emulate every abrupt mid-action failure. Queue/storage saturation was tested locally only.
 - Hosting/database operators remain trusted. No permanent backup, multi-region recovery, third-party audit or untrusted-code execution is claimed.
