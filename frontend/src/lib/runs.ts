@@ -22,7 +22,7 @@ export type Run = {
     profile: string
     suite_id?: string | null
     behavior_version: string
-    scenarios: { id: string; version: number }[]
+    scenarios: { id: string; version: number; name?: string }[]
   }
 }
 export type Result = {

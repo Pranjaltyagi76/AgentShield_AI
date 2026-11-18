@@ -46,6 +46,7 @@ const run = {
 const json = (data: unknown, status = 200, headers?: Record<string, string>) =>
   new Response(JSON.stringify(data), { status, headers })
 function respond(path: string) {
+  if (path === '/custom-scenarios') return json([])
   if (path === '/agents') return json([{ id: 'a', name: 'Hardened demo', is_shared: true }])
   if (path === '/agents/a')
     return json({
@@ -190,4 +191,31 @@ it('shows retained evidence on interruption and stops offering cancellation', as
   expect(await screen.findByText(/Execution was interrupted/)).toBeVisible()
   expect(screen.queryByRole('button', { name: 'Cancel run' })).toBeNull()
   expect(await screen.findByText('Policy decision')).toBeVisible()
+})
+
+it('pins the chosen older custom version without submitting an empty curated list', async () => {
+  const sid = 'CS-' + 'a'.repeat(32)
+  const posts: Record<string, unknown>[] = []
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string, init: RequestInit) => {
+      const path = url.replace('/api/v1', '')
+      if (path === '/custom-scenarios')
+        return json([{ id: sid, name: 'Synthetic experiment', version: 2, checker: 'label_match' }])
+      if (path === '/runs' && init.method === 'POST') {
+        posts.push(JSON.parse(String(init.body)))
+        return json(run, 202)
+      }
+      return respond(path)
+    }),
+  )
+  mount()
+  await userEvent.selectOptions(screen.getByLabelText('Scenarios'), 'selected')
+  await userEvent.click(
+    await screen.findByRole('checkbox', { name: 'Synthetic experiment · custom' }),
+  )
+  await userEvent.selectOptions(screen.getByLabelText('Version for Synthetic experiment'), '1')
+  await userEvent.click(screen.getByRole('button', { name: 'Launch run' }))
+  await screen.findByRole('heading', { name: 'Run details' })
+  expect(posts).toEqual([{ agent_version_id: 'v2', custom_scenarios: [{ id: sid, version: 1 }] }])
 })

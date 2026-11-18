@@ -6,6 +6,40 @@
   color: #26392d;
   min-width: 0;
 }
+.custom-author {
+  margin-top: 24px;
+  overflow-wrap: anywhere;
+}
+.custom-author pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.scenario-list strong,
+.trace-column h3 {
+  overflow-wrap: anywhere;
+}
+.custom-author input:not([type='checkbox']),
+.custom-author select,
+.custom-author textarea,
+.preference-select {
+  width: 100%;
+  min-width: 0;
+}
+.custom-author .run-check {
+  display: flex;
+}
+.preference-select {
+  display: block;
+  font: inherit;
+  padding: 10px;
+  background: white;
+  border: 1px solid #acbbae;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+.run-snapshot > div {
+  display: contents;
+}
 .run-page h1 {
   font-size: clamp(30px, 4vw, 46px);
   line-height: 1.1;

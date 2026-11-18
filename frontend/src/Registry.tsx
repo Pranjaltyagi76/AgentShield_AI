@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ApiError } from './lib/api'
 import { api, guestKey as key, changeGuest, problem, startGuest } from './lib/workspace'
+import { CustomScenarios } from './CustomScenarios'
 
 type Profile = { id: string; name: string; description: string; is_shared: boolean }
 type Version = {
@@ -58,7 +59,7 @@ export function Scenarios() {
         </select>
       </label>
       {list.isPending ? (
-        'Loading scenariosâ€¦'
+        'Loading scenarios…'
       ) : list.error ? (
         <p role="alert">
           {problem(list.error)} <button onClick={() => list.refetch()}>Retry</button>
@@ -70,7 +71,7 @@ export function Scenarios() {
           {visible.map((x) => (
             <li key={x.id}>
               <button onClick={() => select(x.id)}>
-                {x.id} Â· {x.name}
+                {x.id} · {x.name}
               </button>{' '}
               {x.category}
             </li>
@@ -86,14 +87,15 @@ export function Scenarios() {
               <h2>{detail.data.name}</h2>
               <p>{detail.data.description}</p>
               <small>
-                Version {detail.data.version} Â· {detail.data.severity} severity
+                Version {detail.data.version} · {detail.data.severity} severity
               </small>
             </>
           ) : (
-            'Loading definitionâ€¦'
+            'Loading definition…'
           )}
         </article>
       )}
+      <CustomScenarios />
     </section>
   )
 }
@@ -265,13 +267,13 @@ export function Agents() {
         <>
           <h2>Profiles</h2>
           {list.isPending ? (
-            'Loading profilesâ€¦'
+            'Loading profiles…'
           ) : (
             <ul>
               {list.data?.map((x) => (
                 <li key={x.id}>
                   <button onClick={() => select(x.id)}>{x.name}</button>{' '}
-                  {x.is_shared ? 'Shared Â· read-only' : 'Private'}
+                  {x.is_shared ? 'Shared · read-only' : 'Private'}
                 </li>
               ))}
             </ul>
@@ -303,7 +305,7 @@ export function Agents() {
               {a.versions.map((v) => (
                 <details key={v.version_number}>
                   <summary>
-                    Version {v.version_number} Â· {v.demo_profile}
+                    Version {v.version_number} · {v.demo_profile}
                   </summary>
                   <p>{v.system_prompt}</p>
                   <small>Prompt SHA-256: {v.prompt_hash}</small>

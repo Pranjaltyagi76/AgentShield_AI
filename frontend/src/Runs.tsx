@@ -9,6 +9,8 @@ import { api, guestState, subscribeGuest, startGuest, problem } from './lib/work
 import { useRunRead, type Profile, type Scenario, type Version, type Run } from './lib/runs'
 import { Compare } from './Compare'
 import { RunDetail } from './RunDetail'
+import { type CustomChoice } from './CustomScenarios'
+import { defaultDemoProfile, subscribePreferences } from './lib/preferences'
 
 export function Runs({
   health,
@@ -105,12 +107,15 @@ function Workspace({ runId }: { runId?: string }) {
 
 function Launcher({ scope }: { scope: string }) {
   const navigate = useNavigate()
+  const preferred = useSyncExternalStore(subscribePreferences, defaultDemoProfile)
   const agents = useRunRead<Profile[]>(scope, '/agents')
   const suites = useRunRead<{ id: string; members: { scenario_id: string; version: number }[] }[]>(
     scope,
     '/scenario-suites',
   )
   const catalog = useRunRead<Scenario[]>(scope, '/scenarios')
+  const authored = useRunRead<CustomChoice[]>(scope, '/custom-scenarios')
+  const [revisions, setRevisions] = useState<Record<string, number>>({})
   const [agentId, setAgent] = useState(''),
     [versionId, setVersion] = useState('')
   const [selected, setSelected] = useState<string[]>([]),
@@ -118,7 +123,7 @@ function Launcher({ scope }: { scope: string }) {
     [confirm, setConfirm] = useState(false)
   const agent =
     agentId ||
-    agents.data?.find((a) => a.is_shared && a.name.toLowerCase().includes('hardened'))?.id ||
+    agents.data?.find((a) => a.is_shared && a.name.toLowerCase().includes(preferred))?.id ||
     agents.data?.[0]?.id ||
     ''
   const detail = useRunRead<{ versions: Version[] }>(
@@ -147,19 +152,33 @@ function Launcher({ scope }: { scope: string }) {
     },
   })
   const error = agents.error || detail.error || suites.error || catalog.error
+  const selectedCurated =
+    suite?.members
+      .filter((member) => selected.includes(member.scenario_id))
+      .map((member) => member.scenario_id) ?? []
+  const selectedCustom =
+    authored.data
+      ?.filter((item) => selected.includes(item.id))
+      .map((item) => ({ id: item.id, version: revisions[item.id] ?? item.version })) ?? []
+  const selectionCount = selectedCurated.length + selectedCustom.length
   return (
     <form
       className="surface run-panel"
       onSubmit={(e) => {
         e.preventDefault()
-        if (!version || !suite || launch.isPending || (custom && !selected.length)) return
+        if (
+          !version ||
+          !suite ||
+          launch.isPending ||
+          (custom && (!selectionCount || selectionCount > 12 || !!authored.error))
+        )
+          return
         const body = {
           agent_version_id: version.id,
           ...(custom
             ? {
-                scenarios: suite.members
-                  .filter((m) => selected.includes(m.scenario_id))
-                  .map((m) => m.scenario_id),
+                ...(selectedCurated.length ? { scenarios: selectedCurated } : {}),
+                ...(selectedCustom.length ? { custom_scenarios: selectedCustom } : {}),
               }
             : { suite_id: suite.id }),
           ...(confirm && canConfirm
@@ -226,7 +245,7 @@ function Launcher({ scope }: { scope: string }) {
               }}
             >
               <option value="suite">Full suite · Core v2</option>
-              <option value="selected">Choose scenarios</option>
+              <option value="selected">Choose curated or custom scenarios</option>
             </select>
           </label>
         </div>
@@ -251,6 +270,52 @@ function Launcher({ scope }: { scope: string }) {
                 {catalog.data?.find((s) => s.id === m.scenario_id)?.name ?? 'v' + m.version}
               </label>
             ))}
+            {authored.data?.map((item) => (
+              <div key={item.id}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(item.id)}
+                    onChange={(event) =>
+                      setSelected(
+                        event.target.checked
+                          ? [...selected, item.id]
+                          : selected.filter((id) => id !== item.id),
+                      )
+                    }
+                  />
+                  {item.name} · custom
+                </label>
+                <select
+                  aria-label={'Version for ' + item.name}
+                  disabled={!selected.includes(item.id)}
+                  value={revisions[item.id] ?? item.version}
+                  onChange={(event) =>
+                    setRevisions({ ...revisions, [item.id]: Number(event.target.value) })
+                  }
+                >
+                  {Array.from({ length: item.version }, (_, index) => item.version - index).map(
+                    (revision) => (
+                      <option key={revision} value={revision}>
+                        Immutable version {revision}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </div>
+            ))}
+            <p>
+              Select up to twelve cases. <Link to="/scenarios">Author custom scenarios</Link>.
+            </p>
+            {selectionCount > 12 && <p role="alert">Choose no more than twelve scenarios.</p>}
+            {authored.error && (
+              <p role="alert">
+                {problem(authored.error)}{' '}
+                <button type="button" className="run-inline" onClick={() => authored.refetch()}>
+                  Retry custom scenarios
+                </button>
+              </p>
+            )}
           </fieldset>
         )}
         {canConfirm && (
@@ -284,7 +349,13 @@ function Launcher({ scope }: { scope: string }) {
       {launch.error && <p role="alert">{problem(launch.error)}</p>}
       <Button
         type="submit"
-        disabled={!version || !suite || !!error || launch.isPending || (custom && !selected.length)}
+        disabled={
+          !version ||
+          !suite ||
+          !!error ||
+          launch.isPending ||
+          (custom && (!selectionCount || selectionCount > 12 || !!authored.error))
+        }
       >
         <Play size={15} />
         {launch.isPending ? 'Submitting…' : 'Launch run'}

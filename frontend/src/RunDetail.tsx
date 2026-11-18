@@ -234,7 +234,7 @@ function Evidence({ scope, run }: { scope: string; run: Run }) {
           </div>
           <div className="trace-column">
             <h3>{selected?.id} timeline</h3>
-            <small>{names.data?.find((s) => s.id === selected?.id)?.name}</small>
+            <small>{selected?.name ?? names.data?.find((s) => s.id === selected?.id)?.name}</small>
             {results.data
               ?.filter((r) => r.scenario_id === selected?.id)
               .map((r) => (

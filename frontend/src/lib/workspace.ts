@@ -51,6 +51,7 @@ export async function api<T>(
     const runs = path.startsWith('/runs')
     const report = path.startsWith('/reports') || /^\/runs\/[^/]+\/reports/.test(path)
     const comparison = path.startsWith('/benchmarks')
+    const custom = path.startsWith('/custom-scenarios')
     const retry = response.headers.get('Retry-After')
     const delay = retry && /^\d+$/.test(retry) ? ' Retry after ' + retry + ' seconds.' : ''
     const messages: Record<number, string> = {
@@ -61,20 +62,24 @@ export async function api<T>(
         : runs
           ? 'Run unavailable in this workspace or execution is disabled.'
           : 'Record unavailable.',
-      409: report
-        ? 'Reports require a finished run and a supported renderer.'
-        : comparison
-          ? 'Both source runs must finish before comparison.'
-          : runs
-            ? 'Run request conflicts with an earlier submission.'
-            : 'Workspace limit reached.',
-      422: report
-        ? 'Choose HTML or JSON and an accessible comparison.'
-        : comparison
-          ? 'Choose two distinct runs.'
-          : runs
-            ? 'Check the scenario and agent version selections.'
-            : 'Check the form values and prompt length.',
+      409: custom
+        ? 'Custom scenario limit reached: eight scenarios per guest and four versions each.'
+        : report
+          ? 'Reports require a finished run and a supported renderer.'
+          : comparison
+            ? 'Both source runs must finish before comparison.'
+            : runs
+              ? 'Run request conflicts with an earlier submission.'
+              : 'Workspace limit reached.',
+      422: custom
+        ? 'Check the registered checker, distinct lowercase labels, allowed mock tools and task byte limit.'
+        : report
+          ? 'Choose HTML or JSON and an accessible comparison.'
+          : comparison
+            ? 'Choose two distinct runs.'
+            : runs
+              ? 'Check the scenario and agent version selections.'
+              : 'Check the form values and prompt length.',
       429: 'Request limit reached.' + delay,
       503: report
         ? 'Report storage or workspace capacity is unavailable.'
