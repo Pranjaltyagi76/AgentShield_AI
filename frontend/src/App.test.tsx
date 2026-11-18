@@ -37,14 +37,14 @@ it('navigates to system setup and renders typed response evidence', async () => 
   expect(await screen.findByRole('heading', { name: 'API response inspector' })).toBeInTheDocument()
   expect(await screen.findByText(/"database": "not_configured"/)).toBeInTheDocument()
 })
-it('shows portfolio completion with disabled inference and open original requirements', () => {
+it('shows portfolio completion with authoring, settings and disabled optional inference', () => {
   renderApp('/roadmap')
   expect(screen.getByRole('heading', { name: /A deliberate path/ })).toBeInTheDocument()
   expect(screen.getByText('Phase 10 · portfolio ready')).toBeInTheDocument()
   expect(screen.getByText('Disabled')).toBeInTheDocument()
   expect(screen.getAllByText('Complete')).toHaveLength(10)
   expect(
-    screen.getByText(/Custom scenario authoring and a dedicated settings page/),
+    screen.getByText(/Custom scenario authoring and demo settings are available/),
   ).toBeInTheDocument()
 })
 it('handles an unknown deep link with a working return link', () => {

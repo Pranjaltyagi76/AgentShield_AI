@@ -22,12 +22,14 @@ import {
   Terminal,
   Workflow,
   X,
+  Settings2,
 } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Button } from './components/ui/button'
 import { Runs } from './Runs'
 import { Reports } from './Reports'
 import { Sample } from './Sample'
+import { Settings } from './Settings'
 import { Agents, Scenarios } from './Registry'
 import { API_BASE } from './lib/api'
 import { cn } from './lib/utils'
@@ -112,6 +114,10 @@ function Sidebar({ open, close }: { open: boolean; close: () => void }) {
           <NavLink to="/compare" onClick={close}>
             <ListChecks size={18} />
             Compare runs
+          </NavLink>
+          <NavLink to="/settings" onClick={close}>
+            <Settings2 size={18} />
+            Settings
           </NavLink>
         </nav>
         <div className="sidebar-bottom">
@@ -448,7 +454,7 @@ function RoadmapPage() {
       </div>
       <p className="roadmap-note">
         Phase deliverables and evidence are recorded in the repository. Custom scenario authoring
-        and a dedicated settings page remain open requirements. Real-model inference is disabled.
+        and demo settings are available. Optional real-model inference remains disabled.
       </p>
       <div className="surface roadmap-list">
         {phases.map(([title, description], index) => (
@@ -511,7 +517,9 @@ export default function App() {
                     ? 'Reports'
                     : location.pathname === '/sample'
                       ? 'Saved sample'
-                      : 'Page not found'
+                      : location.pathname === '/settings'
+                        ? 'Settings'
+                        : 'Page not found'
   useEffect(() => {
     document.title = routeName + ' · AgentShield AI'
     mainRef.current?.focus({ preventScroll: true })
@@ -605,6 +613,7 @@ export default function App() {
             />
             <Route path="/reports" element={<Reports />} />
             <Route path="/sample" element={<Sample />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <footer className="workspace-footer">
