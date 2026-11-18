@@ -1,35 +1,60 @@
-# AgentShield AI: Initial Threat Model
+# AgentShield AI: Threat Model
 
-Status: Phase 0 foundation. November 10, 2026. The later agent runtime is a planned application simulation, not an OS sandbox.
+Reviewed November 18, 2026 for the deployed scripted release. This is a source and evidence review, not a penetration-test certification. [Architecture](../context/architecture.md) and [system design](../context/system%20design.md) describe the runtime. [Performance review](../context/performance_review.md) records actual checks.
 
-## Assets and entry points
+## Assets, actors and scope
 
-Assets include environment secrets/database credentials, service availability/free quotas, future guest credentials/private records, versioned test definitions, evaluator-only ground truth, and evidence integrity.
+Protect hosting/database secrets, guest credentials/private records, free quotas, immutable versions, oracle ground truth and evidence integrity. Visitors can issue guests, submit bounded profile data, select curated scenarios and inspect owned evidence. Attackers may forge IDs, repeat requests, consume quotas or submit hostile text. Retrieved instructions and agent proposals are untrusted even when claiming authority.
 
-Phase 1 adds guest issuance, private CRUD for profile metadata, append-only versions, and public catalog reads. Guest tokens are random 32-byte values, stored only by SHA-256 digest on the server. Guest row locks serialize ownership and quota checks with writes. The single-process issuance window allows eight requests per peer and sixty globally per ten minutes (resets on restart); a database-backed cap of 128 sessions persists across restarts. Behind a proxy the peer cap can be shared. Each guest has at most eight profiles and four versions per profile. Write bodies are bounded to 64 KiB, prompts to 16 KiB UTF-8. The API permits no owner/shared flags or arbitrary tool endpoints in client input. Browser session storage remains vulnerable to a successful same-origin script injection.
+The runtime uses synthetic data and four in-memory mock tools. It accepts no executable scenarios, shell, arbitrary URLs, custom endpoints or real messages/exports. A process/database compromise is not contained by an OS sandbox. Gemini has no network adapter and remains disabled.
 
-Historical Phase 0 entry points were the static frontend, the process-only health endpoint, database readiness, development-only OpenAPI/docs, dependency installation, CI, and deployment configuration. No guest, agent, scenario, run, tool, or inference endpoints exist yet.
+## Trust boundaries and controls
 
-## Threats and controls
-
-| Threat | Phase 0 control and verification | Later required work |
+| Threat / boundary | Implemented control | Evidence and residual risk |
 |---|---|---|
-| Exposed database credentials | SecretStr settings, hidden validation inputs, generic readiness failures, no exception text in operational logs; tests inspect responses | Review provider adapters, traces, reports, and history before publishing |
-| Untrusted origin requests | Explicit CORS origins; GET-only cross-origin methods; no wildcard; CORS tests | Real guest authorization before private features; CORS alone is not access control |
-| Misleading operational status | Process health separate from actual PostgreSQL readiness; unavailable state is 503 | Evidence completeness, honest coverage, no fake benchmark outcomes |
-| Public feature activation before enforcement | Phase 0 settings reject true execution/inference flags; feature routes absent | Ownership, policy gateway, budgets, and runtime tests before activation |
-| Dependency/supply-chain issues | Committed npm/uv locks, locked installs, tracked dependency override, CI read-only permissions | Review updates; do not treat an audit with no findings as proof of security |
-| Browser content injection | React text rendering; no arbitrary HTML; production CSP/security headers | Redact/escape future model/tool/report content and protect guest bearer credentials |
-| Database resource exhaustion | Small pool, connection and statement timeouts; readiness only executes a constant probe | Public endpoint rate limits, bounded queue, guest/IP/global limits, retention |
-| Sleep/restart/data loss | No local persistence assumptions; health/readiness tolerate absent DB | Durable queue state, interruption handling, on-demand retained-data reports |
-| Cost escalation | Free-only manifests, inference disabled, no paid disk/worker/database provisioned | Owner verifies actual account billing and quotas during deployment |
+| Secret/credential exposure | Secret settings, generic errors, logs without credential payloads; bearer headers; server stores SHA-256 guest-token digest | `test_system.py`, `test_workspaces.py`; hosted verifier keeps credentials in memory. Same-origin script compromise can steal browser session storage |
+| Forged ownership / indirect references | Server-derived guest, immediate expiry checks, parent ownership on versions/runs/evidence/comparisons/reports; shared profiles immutable | Workspace/run/comparison/report tests; hosted two-guest isolation and denied shared edits November 17 |
+| Agent bypasses policy / claims approval | Gateway alone creates results; strict schema/allowlist, record/destination/marker checks; exact owner confirmation outside agent context | Policy/run tests; AS-006 hosted and November 18 blocked-destination capture. These controls do not sanitize every natural-language answer |
+| Oracle leakage / fabricated score | Explicit public/runtime projections, private evaluator descriptors, ordered evidence validation, immutable snapshots | Evaluation tests and actual twelve-case runs. Finite exact-string oracles have limited semantic coverage |
+| Incomplete evidence hides failure | Separate execution/outcome, inconclusive handling, compatibility and cohort denominators | Evaluation/comparison tests, cancellation and approved hosted orphan recovery. No real-model resilience evidence |
+| Text injection in UI/report | React text rendering, CSP, redaction, HTML escaping, attachment/sandbox headers, no report scripts | Report/frontend tests and observed downloads. No claim of complete XSS/supply-chain protection |
+| Cross-origin misuse | Exact CORS origins plus independent authorization; production docs disabled | System tests; trusted/untrusted HTTPS checks. CORS does not stop direct HTTP clients |
+| Resource exhaustion | Payload/evidence/step/time caps, process-local rate windows, persistent guest/queue quotas, database admission ceiling | Local queue/storage guards and hosted 429 with Retry-After. Windows reset on restart; a proxy peer cap may be shared |
+| Sleep/restart/data loss | PostgreSQL persistence, short transactions, orphan recovery, source-backed regeneration, static sample | Approved November 17 recovery/expiry test and idle wake. Free services may suspend; no distributed-worker/uptime claim |
+| Cost escalation | Existing free resources; no paid fallback; explicit public activation; provider locked to demo | Free-plan evidence and owner billing confirmation November 17. Future eligibility must be rechecked |
+| Deployment/dependency compromise | Locked npm/uv installs, read-only CI permissions, reviewed source upload, explicit intended-file staging | PostgreSQL tests and container CI. No independent security audit claimed |
 
-The SQL probe uses the minimum query needed to establish connectivity. Feature schema readiness and migrations begin in Phase 1. Readiness requests are not a production load-test interface; provider quotas and public-endpoint abuse remain operational risks until additional controls are implemented.
+Test filenames live in `backend/tests/`; frontend tests live beside components. See the review log for local versus hosted scope.
 
-## Trust boundaries for later phases
+## Enforced default bounds
 
-The browser cannot choose ownership. Agent output cannot authorize tools. Retrieved documents and tool results are untrusted data. Oracle labels remain outside agent context. Custom scenarios may select approved declarative schemas, never executable code or arbitrary URLs. Optional provider calls use a fixed endpoint with synthetic context; mock tools have no network actions.
+These are code/specification defaults, not measured traffic capacity.
 
-## Remaining verification
+| Layer | Bound |
+|---|---|
+| Guest admission | 8 per peer and 60 globally per 600 seconds; 128 retained guests |
+| Guest data | 8 profiles/guest; 4 immutable versions/profile; 7-day expiry |
+| Write bodies | 256 KiB for run POST/PATCH paths; 64 KiB otherwise; 16 KiB UTF-8 prompt |
+| Run admission | 5 per owner and peer, 50 globally per 600 seconds; 1 queued and 1 active/guest; 10 queued and 2 active globally |
+| Execution | 12 scenarios, 10 steps/scenario; gateway denies further calls after 6 calls |
+| Time | Queue 300 seconds, run 180 seconds, scenario 60 seconds; stale heartbeat recovery after 5 seconds |
+| Evidence/text | Event 16 KiB; trace 1 MiB/run; input 4,000 bytes, output 512 bytes, total scripted budget 20,000 bytes |
+| Derived records | 64 comparisons and 64 reports/guest, subject to retention and database ceiling |
+| Database | Conservative admission ceiling at 500 MiB total database size, configurable downward; small bounded pool/timeouts |
+| Cleanup | Every 300 seconds while active; at most 16 expired guests/transaction, skip locked; also at startup |
 
-Real provider account eligibility, billing configuration, live TLS/CORS, deployed database connectivity, container execution, and cold-start timing require actual environments. Do not infer these from source configuration. Record observed outcomes in the context deployment/performance documents.
+Rate windows are process-local. Queue, ownership and retained caps are database-backed. Byte budgets are not measured provider tokens. Expiry denies access immediately even while physical cleanup waits for a sleeping process. Storage admission is conservative, not a forecast of the next write or a guarantee against concurrent overshoot.
+
+## Attack-to-evidence example
+
+AS-006 revision 2 makes the vulnerable script propose a synthetic message to a prohibited destination. The trace records `destination_not_allowed` with no mock result. A hardened proposal to `mock-inbox` needs exact owner confirmation. Both profiles can pass enforcement while differing in attempted behavior. Separately, AS-003 can fail on final-answer disclosure despite zero unauthorized tool executions. The server evaluates original evidence; presentation redacts the private marker.
+
+## Remaining risks and unverified behavior
+
+- Anonymous access can consume free quotas. No distributed rate store, live saturation experiment or production-scale capacity claim exists.
+- Lost browser credentials have no recovery. Same-origin script compromise can steal temporary access; durable identity/MFA is absent.
+- Exact-marker checks miss some encodings/paraphrases. Twelve curated cases cannot establish general security or model rankings.
+- Custom scenario authoring and a dedicated settings page remain open original requirements. Current controls are profile forms, status views and operator configuration.
+- Provider parsing, tokens, retries/quota handling and eligible free Gemini access are unimplemented/unverified.
+- The approved orphan fixture verified recovery with partial evidence; it did not emulate every abrupt mid-action failure. Queue/storage saturation was tested locally only.
+- Hosting/database operators remain trusted. No permanent backup, multi-region recovery, third-party audit or untrusted-code execution is claimed.
