@@ -1,6 +1,6 @@
 # AgentShield AI: Requirements
 
-Status: acceptance baseline; Phase 0 complete with local checks and the public Vercel/Render/Neon smoke verified; Phase 1 guest ownership, agent/version registry and curated catalog verified locally. Phase 2 local execution, limits, queue recovery and ordered traces are verified. Phase 3 policy enforcement and guest-owned public-mode runs passed locally. Production scripted activation was verified on November 17. Phase 4 full-suite execution, deterministic outcomes, findings and metrics are verified locally. Phase 5 guest launch, history, cancellation, findings and event-linked traces are verified locally. Phase 6 guest-owned comparisons, compatibility checks, coverage and metric deltas are verified locally. Phase 7 is explicitly disabled under its optional exit branch because free account access is unverified and no Gemini key is configured. Phase 8 owned HTML/JSON reports, source-dependent retention, saved sample and outage UX are verified locally. Public scripted execution was explicitly approved and the hosted suites, comparisons, exports, isolation, cancellation, expiry and recovery checks passed. Phase 9 completed hosted verification, including a 32.812-second observed cold wake and saved-sample access during wake-up. Custom scenario authoring remains planned. Last updated November 17, 2026.
+Status: deployed scripted release with Phase 10 portfolio packaging reviewed November 18, 2026. Phases 0–6, 8 and 9 have dated local/hosted evidence; optional Phase 7 uses its explicit disabled exit. The original specification is not fully accepted: FR-03 custom authoring and FR-13's dedicated settings page remain partial. See the acceptance review below and the roadmap for phase evidence.
 
 The full product specification is [AgentShield_PROJECT.md](AgentShield_PROJECT.md). This file is its concise acceptance checklist. Runtime decisions are in [context/system design.md](context/system%20design.md); implementation status is in [context/phasewise_roadmap.md](context/phasewise_roadmap.md). Changes to scope must update these references together.
 
@@ -57,7 +57,7 @@ Build a publicly deployed, low-traffic portfolio platform that runs synthetic ag
 | NFR-09 | Use a pooled TLS database connection, bounded pagination/polling, migrations, and short transactions |
 | NFR-10 | Relevant tests, lint, type checks, and builds pass before declaring phase completion; unrun checks are stated explicitly |
 
-The warm scripted-suite target is at most 10 seconds after readiness, to be measured before publication. It is not an achieved performance figure or an uptime promise.
+The warm scripted-suite target is at most 10 seconds after readiness. November 17 hosted observations were 3.8 seconds hardened and 5.1 seconds vulnerable, one run each. They meet the target in those observations, without establishing a latency guarantee or distribution.
 
 ## Evaluation requirements
 
@@ -71,7 +71,24 @@ Use Vercel Hobby, Render Free, and Neon Free subject to current eligibility and 
 
 Completion requires all mandatory feature/security gates, both scripted profiles and all 12 scenarios, correct evidence/metrics/comparison, HTML/JSON exports, verified guest isolation and bounds, tests/builds, documented public deployment, saved-sample outage UX, architecture/threat model, and portfolio walkthrough. Optional inference may remain disabled with a documented reason.
 
-## Deferred work
+## Original requirement acceptance review — November 18, 2026
+
+Phase 10 packages the implemented scripted release. Its portfolio completion does not close every mandatory requirement in the original specification. No owner waiver is assumed.
+
+| Requirement | Current status / evidence |
+|---|---|
+| FR-01, FR-02 | Implemented; ownership, expiry, shared immutability and version tests; hosted isolation |
+| FR-03 | Partial: curated twelve-case catalog/filter/detail implemented; custom declarative scenario creation/validation UI and API unimplemented |
+| FR-04–FR-12 | Implemented scripted scope; meaningful local tests, CI and dated hosted suites, evidence, comparison/export, cancellation and recovery in performance review |
+| FR-13 | Partial: listed workflow pages implemented except dedicated settings page; profile controls, System status and operator configuration cover some settings |
+| FR-14 | Implemented; historical redacted sample works without API and retains November 17 capture date |
+| FR-15 | Optional disabled exit accepted by specification; live adapter and provider error paths unimplemented, free account access unverified |
+| NFR-04 | Scripted byte/call/step/time/storage/rate limits implemented; real-provider token limits/accounting cannot be claimed without an adapter |
+| Phase 10 portfolio | Architecture, threat model, methodology, measured sample, screenshots, captioned video and evidence-linked interview notes in repository |
+
+Custom authoring and the dedicated settings page require a new owner-authorized implementation scope. Keep these open rather than declaring complete original-product acceptance. Current finite scripted results establish harness behavior only.
+
+## Deferred extensions
 
 Durable accounts and email flows, PDF reports, LangGraph, LLM judging, distributed workers, unrestricted external agent endpoints, commercial uptime, hosted local models, and paid infrastructure are outside the first release.
 

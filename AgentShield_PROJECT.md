@@ -9,6 +9,12 @@
 
 ---
 
+### Implementation status — November 18, 2026
+
+Phase 10 packages the deployed scripted release with an architecture diagram, threat model, evaluation methodology, historical measured report, actual screenshots, captioned walkthrough and interview notes. See [portfolio walkthrough](docs/portfolio/walkthrough.md) and [acceptance review](requirement.md#original-requirement-acceptance-review--november-18-2026).
+
+The baseline below remains the product specification. Custom declarative scenario authoring and a dedicated settings page are still unimplemented original requirements. Optional Gemini uses the explicit disabled exit; no live provider adapter exists. Phase deliverable completion does not waive these gaps or establish complete original-product acceptance. Scripted byte budgets are not real-provider token measurements.
+
 ## 1. Product Overview
 
 AgentShield AI is a developer-oriented platform for systematically testing AI agents against controlled security scenarios. It allows users to configure an agent, run repeatable adversarial tests, inspect execution traces, measure security outcomes, and compare agent/model/prompt versions over time.
@@ -1108,11 +1114,13 @@ AgentShield AI is complete when:
 
 **AgentShield AI — AI Agent Security Testing & Benchmarking Platform**
 
-**Suggested description (revise after implementation to match actual results):**
+**Evidence-backed description for the implemented scripted release:**
 
-Built a sandboxed AI-agent security testing platform featuring adversarial scenario simulation, deterministic tool-policy enforcement, evidence-linked execution traces, and repeatable security benchmarks. Developed a FastAPI backend and React/TypeScript dashboard with scenario-level evaluation, regression comparisons, and API-independent demo mode.
+Built and deployed a synthetic agent-security evaluation harness with twelve versioned scenarios, independent mock-tool policy enforcement, evidence-linked traces, compatible-run comparisons and retained HTML/JSON reports. Developed the React/TypeScript frontend, FastAPI backend and PostgreSQL persistence with temporary guest ownership and a historical sample usable without the API. All executable agent results use deterministic scripted profiles; real-model inference remains disabled.
 
 Only include metrics such as scenario count, test coverage, latency, or benchmark improvements after measuring them in the implemented system.
+
+Use the [interview and resume notes](docs/portfolio/interview-notes.md) for claim-to-evidence links, measured examples and known limitations. No external resume is edited by this repository change.
 
 ---
 
