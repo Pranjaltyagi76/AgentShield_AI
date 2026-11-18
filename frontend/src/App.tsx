@@ -307,7 +307,7 @@ function Overview({ system }: { system: System }) {
           <Layers3 size={19} />
         </span>
         <div>
-          <strong>Phase 8 · Reports and saved sample</strong>
+          <strong>Phase 10 · Portfolio evidence ready</strong>
           <p>Inspect a captured benchmark or export evidence from your own run.</p>
         </div>
         <Link to="/sample">
@@ -342,7 +342,7 @@ function Overview({ system }: { system: System }) {
           </div>
         </section>
         <section className="surface next-panel">
-          <span className="small-eyebrow">AVAILABLE · PHASE 1</span>
+          <span className="small-eyebrow">AVAILABLE · SCRIPTED DEMO</span>
           <h2>
             Give every test
             <br />a place to belong.
@@ -444,15 +444,15 @@ function RoadmapPage() {
           <h1>A deliberate path to deployment.</h1>
           <p>Eleven phases. Explicit gates. Free services throughout.</p>
         </div>
-        <StatusLabel tone="good">Phase 9 · hosted demo</StatusLabel>
+        <StatusLabel tone="good">Phase 10 · portfolio ready</StatusLabel>
       </div>
       <p className="roadmap-note">
-        Implementation and deployment gates are tracked in the repository. This roadmap describes
-        scope; it does not mark unverified work complete.
+        Phase deliverables and evidence are recorded in the repository. Custom scenario authoring
+        and a dedicated settings page remain open requirements. Real-model inference is disabled.
       </p>
       <div className="surface roadmap-list">
         {phases.map(([title, description], index) => (
-          <article key={title} className={cn('roadmap-item', index === 0 && 'roadmap-current')}>
+          <article key={title} className={cn('roadmap-item', index === 10 && 'roadmap-current')}>
             <span className="phase-number">{String(index).padStart(2, '0')}</span>
             <div>
               <h2>
@@ -461,12 +461,10 @@ function RoadmapPage() {
               </h2>
               <p>{description}</p>
             </div>
-            {index <= 6 || index === 8 || index === 9 ? (
-              <StatusLabel tone="good">Complete</StatusLabel>
-            ) : index === 7 ? (
+            {index === 7 ? (
               <StatusLabel tone="muted">Disabled</StatusLabel>
             ) : (
-              <span className="planned-label">Planned</span>
+              <StatusLabel tone="good">Complete</StatusLabel>
             )}
           </article>
         ))}
