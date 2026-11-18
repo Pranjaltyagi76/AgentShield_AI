@@ -1,6 +1,6 @@
 # AgentShield AI: Requirements
 
-Status: deployed scripted release with Phase 10 portfolio packaging reviewed November 18, 2026. Phases 0–6, 8 and 9 have dated local/hosted evidence; optional Phase 7 uses its explicit disabled exit. The owner subsequently authorized closing FR-03 and FR-13. Bounded custom authoring and the dedicated settings page are implemented and verified locally; their hosted publication gate is in progress. See the acceptance review below and the roadmap for phase evidence.
+Status: deployed scripted release with Phase 10 portfolio packaging reviewed November 18, 2026. Phases 0–6, 8 and 9 have dated local/hosted evidence; optional Phase 7 uses its explicit disabled exit. The owner subsequently authorized closing FR-03 and FR-13. Bounded custom authoring, the dedicated settings page and the punctuation correction are implemented, publicly deployed and verified through CI and the hosted workflow. See the acceptance review below and the roadmap for phase evidence.
 
 The full product specification is [AgentShield_PROJECT.md](AgentShield_PROJECT.md). This file is its concise acceptance checklist. Runtime decisions are in [context/system design.md](context/system%20design.md); implementation status is in [context/phasewise_roadmap.md](context/phasewise_roadmap.md). Changes to scope must update these references together.
 
@@ -73,7 +73,7 @@ Completion requires all mandatory feature/security gates, both scripted profiles
 
 ## Original requirement acceptance review — November 18, 2026
 
-The Phase 10 review identified two original requirement gaps. The owner explicitly authorized implementing both on November 18. The table now records the updated implementation; public release verification is tracked separately in the roadmap and deployment record.
+The Phase 10 review identified two original requirement gaps. The owner explicitly authorized implementing both on November 18. The table records the completed scripted MVP implementation; dated public release verification is in the roadmap, performance review and deployment record.
 
 | Requirement | Current status / evidence |
 |---|---|
@@ -86,7 +86,7 @@ The Phase 10 review identified two original requirement gaps. The owner explicit
 | NFR-04 | Scripted byte/call/step/time/storage/rate limits implemented; real-provider token limits/accounting cannot be claimed without an adapter |
 | Phase 10 portfolio | Architecture, threat model, methodology, measured sample, screenshots, captioned video and evidence-linked interview notes in repository |
 
-The owner-authorized gap closure is implemented, including the audit's punctuation correction. No acceptance requirement was waived. Custom authoring accepts only the two registered bounded checkers and their approved synthetic data fields; arbitrary tasks are not interpreted by an LLM. Hosted verification remains the final release gate. Current finite scripted results establish harness behavior only.
+The owner-authorized gap closure is implemented and live, including the audit's punctuation correction. No acceptance requirement was waived. Custom authoring accepts only the two registered bounded checkers and their approved synthetic data fields; arbitrary tasks are not interpreted by an LLM. Local checks passed 119 backend tests and 30 frontend tests; all three CI jobs, startup migration 0008, hosted API checks and public browser authoring/settings/custom execution passed. No mandatory release gate remains for this bounded scripted scope. Current finite scripted results establish harness behavior only.
 
 ## Deferred extensions
 

@@ -22,7 +22,7 @@ flowchart TB
     R -->|redacted JSON / escaped HTML| API
 ```
 
-API, consumer and cleanup share one backend process. PostgreSQL holds durable state; backend-local files hold no report or queue persistence. The script receives synthetic runtime context and previous observations, never evaluator-only expected labels. The browser receives redacted evidence. There is no implemented provider network adapter. The owner-authorized custom-authoring/settings extension is implemented and tested locally; hosted publication is in progress. [System design](system%20design.md) describes lifecycle and trust boundaries.
+API, consumer and cleanup share one backend process. PostgreSQL holds durable state; backend-local files hold no report or queue persistence. The script receives synthetic runtime context and previous observations, never evaluator-only expected labels. The browser receives redacted evidence. There is no implemented provider network adapter. The owner-authorized custom-authoring/settings extension is implemented, publicly deployed and verified, with main database schema 0008. [System design](system%20design.md) describes lifecycle and trust boundaries.
 
 ## Actual module map
 

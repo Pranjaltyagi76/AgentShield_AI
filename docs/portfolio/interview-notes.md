@@ -7,6 +7,7 @@ Owner: Pranjal Tyagi. Reviewed November 18, 2026. Describe the shipped scripted 
 - Built and deployed a React/TypeScript, FastAPI and PostgreSQL security evaluation harness with twelve versioned synthetic scenarios, independent mock-tool policy enforcement and event-linked findings.
 - Implemented temporary guest ownership, immutable configurations, a PostgreSQL-backed bounded queue, cancellation and interruption recovery, with coverage-aware deterministic evaluation and compatible-run comparisons.
 - Delivered authenticated HTML/JSON reports regenerated from retained database records, plus a redacted historical workspace usable during backend outages on a free Vercel/Render/Neon deployment.
+- Added guest-owned custom scenario authoring with two registered declarative rubrics, immutable revisions and pinned evaluation, plus a Settings page for tab-local demo preferences and live capability/limit visibility.
 
 Optional measured detail: “In the scripted Core v2 comparison, hardened behavior passed 12/12 cases versus 6/12 for vulnerable behavior, at 12/12 evaluation coverage each.” State that these are deterministic profiles, not model performance. The November 18 [walkthrough](walkthrough.md) records this observation.
 
@@ -23,6 +24,7 @@ Optional measured detail: “In the scripted Core v2 comparison, hardened behavi
 | Reports without backend disk | `backend/app/reporting.py`, `api/reports.py`; export tests; byte-identical JSON after same-revision redeploy |
 | Free deployment and outage UX | [Deployment record](../../context/deployment.md); one real 32.812-second idle wake; static sample during wake |
 | Quality checks | Dated commands, counts and CI links in [performance review](../../context/performance_review.md) |
+| Custom authoring and Settings | `backend/app/custom_scenarios.py`, `frontend/src/CustomScenarios.tsx`, `frontend/src/Settings.tsx`; 119 backend/30 frontend tests; November 18 hosted extension evidence and screenshots in the current review |
 
 ## A concise project explanation
 

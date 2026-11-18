@@ -1,6 +1,6 @@
 # AgentShield AI: Free Deployment Runbook
 
-Status: public scripted execution was explicitly approved and enabled on November 17, 2026. The Vercel → Render → Neon feature workflow and recovery passed. Phase 9 hosted workflow, recovery and real cold-start validation passed. Optional inference remains disabled.
+Status: public scripted execution was explicitly approved and enabled on November 17, 2026. Phase 9 hosted workflow, recovery and real cold-start validation passed. The owner-authorized custom authoring/Settings extension is live and verified on November 18 with schema 0008. Optional inference remains disabled.
 
 Reuse the existing resources in the observed deployment record below. Do not provision duplicate AgentShield services or projects when continuing this task.
 
@@ -62,13 +62,21 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
-## Custom authoring and settings release preparation — November 18, 2026
+## Custom authoring and settings release — November 18, 2026
 
 The owner authorized implementation and publication after the audit. Reuse the existing Render Free service, Vercel project/team and Neon Free main branch. Release schema is 0008: two owned custom-scenario tables plus a private oracle-snapshot JSONB column with an empty-object default for retained runs. Runtime connections stay pooled; Alembic derives the direct Neon hostname from the configured URL without logging or changing the stored credential. No hosting environment change is required. Readiness rejects a pre-0008 database for this release.
 
 An isolated Free-project review branch `br-round-cherry-aziveynn` tested migration-generated DDL on the production-shaped PostgreSQL 17 schema and retained seven source runs with valid backfill. The endpoint `ep-shy-feather-az0hxqpw` is observed idle after suspension. The branch is retained only for review, keeps its copied 0007 Alembic stamp, and is not an application connection target. Applying the full migration again there would require reconciliation; deploy the application only to the unchanged main branch through startup Alembic. The initial custom suspend-interval request was rejected on Free; the successful branch inherited the project's existing 0.25 CU limits. No new project, paid compute plan or payment setting was introduced.
 
-All local release checks passed. Before triggering Render, verify the pushed commit and that no deploy is already running; automatic deploy remains off. Publish the 45 tracked frontend source files to the same Vercel project after backend readiness. Record actual CI/deployment IDs and public workflow observations only after success. Current original hosted release evidence below remains historical until this new release is verified.
+Release source `2d8b0a8ce18e7a70a35e6a9c47dd702ba8e5728e` passed [all three CI jobs](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/44241232149): backend/PostgreSQL 17, backend container build, and frontend checks/build. After verifying the pushed source and no pending deploy, the existing Render service deployed it as `dep-dbuj37u7bikc73a3vcp0`, live at **05:04:09.204 UTC**. Startup Alembic advanced main to 0008; readiness and writes through the new custom endpoints passed. Render remains Free, one instance, automatic deploy off; no disk, worker or environment change was added.
+
+After backend verification, 45 reviewed tracked frontend files from the same source were uploaded to the existing Vercel project/team, excluding credentials, dependencies and build output. Deployment `dpl_EomvNY9gfUVQffmE5cmJHLddAkkD` reached **READY at 05:08:59.205 UTC**, serving the canonical [public app](https://agentshield-ai-tau.vercel.app), direct `/settings` and `/scenarios` routes. Existing deployment protection, public aliases and exact-origin CORS remain configured. No paid capability or new hosting project was introduced.
+
+Hosted API verification passed synthetic custom validation, ownership denial, immutable revision retention, mixed curated/custom execution, idempotency, compatible comparison, redacted HTML/JSON export, foreign report denial and cancellation. Across two twelve-case mixed manifests every curated ID was exercised; their common ten-case cohort had five improvements, five unchanged and four unmatched cases. This is not a fresh canonical Core v2 profile-pair benchmark. The verifier revoked only its own two new temporary guests. No direct production SQL fixture, forced expiry or recovery redeploy was used.
+
+The public browser created label scenario `CS-cdf5f603ef1945ec8a9daa78c5350125` with revisions 1 and 2 and guide scenario `CS-e52669acca124de899159cc8670c261e` revision 1. Run `b5c82aec-d36c-4d6e-8efd-2ce872be67b0` selected the older label revision 1 plus guide revision 1, completed with 2/2 coverage and passes, showed the original `teal` answer and prepared JSON export. The Settings default drove launcher selection and survived reload, while live status/limits/expiry rendered correctly. Settings, authoring and custom run detail fit the 390×844 mobile override without horizontal document overflow; the override was reset. Proof: [authoring](../docs/screenshots/custom-authoring-live.jpg), [custom run](../docs/screenshots/custom-run-live.jpg), [Settings](../docs/screenshots/settings-live.jpg). Browser synthetic records retain ordinary seven-day expiry; no credential was exported.
+
+The authorized release gates are complete. Local checks passed 119 backend tests and 30 frontend tests. Public scripted execution stays enabled under the existing approval, `LLM_PROVIDER=demo` and `PUBLIC_LLM_ENABLED=false` remain enforced, and API capability phase remains 8. No new cold-cycle, saturation, crash/recovery, live-provider or payment-dashboard test was claimed for this release; earlier dated evidence remains historical below.
 
 ## Phase 10 frontend publication — November 18, 2026
 

@@ -17,7 +17,7 @@ AI agent security testing, controlled attack simulation, and reliability benchma
 - Authenticated HTML/JSON exports from retained PostgreSQL records; redacted historical sample independent of API health.
 - React/Vite/TypeScript frontend, FastAPI backend and PostgreSQL, deployed on existing ongoing free plans.
 
-The scripts exercise the real harness. They do not establish real-model resistance to prompt injection. Custom declarative authoring and a dedicated Settings page are now implemented; hosted publication of this extension is in progress. Gemini is explicitly disabled and its live adapter is unimplemented.
+The scripts exercise the real harness. They do not establish real-model resistance to prompt injection. Custom declarative authoring and a dedicated Settings page are implemented and publicly verified. Gemini is explicitly disabled and its live adapter is unimplemented.
 
 ## Reviewer starting points
 
@@ -218,13 +218,15 @@ Use Vercel Hobby for the frontend, Render Free for one backend process, and Neon
 - Public scripted execution is enabled with the owner’s explicit approval. Optional inference is disabled. The service uses the existing external Neon database.
 - Complete owner sign-ins and confirm free-plan/billing settings before provisioning.
 
-Open the [live AgentShield app](https://agentshield-ai-tau.vercel.app) or its [system status](https://agentshield-ai-tau.vercel.app/system). On November 17, the hosted frontend reached healthy API and database endpoints and completed both twelve-case scripted suites, comparisons and report downloads. Guest authorization is issued by the app. No durable account or model key is required.
+Open the [live AgentShield app](https://agentshield-ai-tau.vercel.app), [custom authoring](https://agentshield-ai-tau.vercel.app/scenarios), [Settings](https://agentshield-ai-tau.vercel.app/settings) or [system status](https://agentshield-ai-tau.vercel.app/system). On November 17, the hosted frontend reached healthy API and database endpoints and completed both twelve-case scripted suites, comparisons and report downloads. The November 18 extension passed CI, migration 0008, mixed curated/custom API runs, comparison/export ownership and public browser authoring, older-version execution, settings reload and mobile checks. Guest authorization is issued by the app. No durable account or model key is required.
+
+Release proof: [custom authoring](docs/screenshots/custom-authoring-live.jpg), [selected revision and completed custom run](docs/screenshots/custom-run-live.jpg), [Settings](docs/screenshots/settings-live.jpg), and [all three CI jobs](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/44241232149). Full settings and limitations are recorded in the dated context documents.
 
 Follow [context/deployment.md](context/deployment.md) for the exact configuration and release procedure. Vercel GitHub integration is not installed, so frontend releases currently upload reviewed source through the API. Render automatic deploy is off. Free services may sleep or suspend at quota limits. Hosted warm suites, ownership, exports and restart regeneration were verified on November 17. One real idle wake returned valid health JSON in 32.812 seconds. The saved sample remained available during wake-up and manual retry restored API connectivity. See the dated deployment record for the observation and limitations.
 
 ## Current scope and limitations
 
-The owner authorized closing FR-03 and FR-13 after the audit. Both are implemented and locally verified; hosted verification is the remaining release gate. Custom scenarios use two registered checkers with bounded data fields. Settings selects a default scripted profile and displays operator-managed capability/limit information; it accepts no visitor credentials.
+The owner authorized closing FR-03 and FR-13 after the audit. Both are implemented, deployed and verified locally, in CI and through the public application. Custom scenarios use two registered checkers with bounded data fields. Settings selects a default scripted profile and displays operator-managed capability/limit information; it accepts no visitor credentials. The listed audit fixes and mandatory release gates for the bounded scripted MVP are complete.
 
 Optional real-model inference has no adapter, eligible free account, parsing/retry/quota evidence or provider-token measurements. Scripted byte budgets are not token accounting. Exact finite oracles do not establish general security. Anonymous quotas and temporary tab credentials limit availability and persistence. One observed 32.812-second cold wake and two single warm timings are not latency guarantees or throughput measurements.
 
