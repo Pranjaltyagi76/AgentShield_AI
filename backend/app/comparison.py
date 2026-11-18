@@ -99,6 +99,12 @@ def pair_issues(configs, entries, results, global_issues):
     reasons = list(global_issues)
     if entries[0]["version"] != entries[1]["version"]:
         reasons.append("scenario_version")
+    if any(entry.get("definition_hash") is not None for entry in entries) and (
+        not all(entry.get("definition_hash") for entry in entries)
+        or entries[0]["definition_hash"] != entries[1]["definition_hash"]
+        or entries[0].get("checker") != entries[1].get("checker")
+    ):
+        reasons.append("custom_definition")
     if any(
         result and result.scenario_version != entry["version"]
         for entry, result in zip(entries, results, strict=True)

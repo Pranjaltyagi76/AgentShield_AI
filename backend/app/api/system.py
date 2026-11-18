@@ -7,7 +7,10 @@ from fastapi import APIRouter, Request, Response
 from pydantic import BaseModel
 
 from app import __version__
+from app.custom_scenarios import MAX_CUSTOM_SCENARIOS, MAX_CUSTOM_VERSIONS
 from app.db.connection import DatabaseStatus
+from app.policy import MAX_CALLS
+from app.run_queue import MAX_ACTIVE, MAX_QUEUED, MAX_STEPS, MAX_TOTAL, MAX_TRACE
 
 router = APIRouter(prefix="/api/v1", tags=["system"])
 logger = logging.getLogger("agentshield")
@@ -41,6 +44,8 @@ class DemoStatus(BaseModel):
     profiles: tuple[Literal["vulnerable"], Literal["hardened"]] = ("vulnerable", "hardened")
     requires_api_key: Literal[False] = False
     inference: InferenceStatus = InferenceStatus()
+    custom_scenarios_enabled: Literal[True] = True
+    limits: dict[str, int]
 
 
 @router.get("/demo/status", response_model=DemoStatus)
@@ -51,7 +56,22 @@ def demo_status(request: Request) -> DemoStatus:
     Phase 7 follows the specification's explicit disabled-inference exit branch.
     """
     settings = request.app.state.settings
-    return DemoStatus(execution_enabled=settings.local_runs_enabled or settings.public_runs_enabled)
+    return DemoStatus(
+        execution_enabled=settings.local_runs_enabled or settings.public_runs_enabled,
+        limits={
+            "scenarios_per_run": 12,
+            "active_runs_global": MAX_ACTIVE,
+            "queued_runs_global": MAX_QUEUED,
+            "steps_per_scenario": MAX_STEPS,
+            "calls_per_scenario": MAX_CALLS,
+            "trace_bytes_per_run": MAX_TRACE,
+            "scripted_bytes_per_run": MAX_TOTAL,
+            "guest_retention_days": 7,
+            "custom_scenarios_per_guest": MAX_CUSTOM_SCENARIOS,
+            "versions_per_custom_scenario": MAX_CUSTOM_VERSIONS,
+            "database_admission_bytes": settings.max_database_bytes,
+        },
+    )
 
 
 @router.get("/health", response_model=HealthResponse)

@@ -2,12 +2,26 @@
 
 from typing import Literal, Protocol
 
+from pydantic import SecretStr
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 
 from app.core.settings import Settings
 
 DatabaseStatus = Literal["connected", "unavailable", "not_configured"]
+
+
+def migration_settings(settings: Settings) -> Settings:
+    """Use Neon's direct endpoint for DDL; keep the application's pooled URL unchanged."""
+    if not settings.database_url:
+        return settings
+    url = make_url(settings.database_url.get_secret_value())
+    if url.host and url.host.endswith(".neon.tech") and "-pooler." in url.host:
+        direct = url.set(host=url.host.replace("-pooler.", ".", 1))
+        return settings.model_copy(
+            update={"database_url": SecretStr(direct.render_as_string(hide_password=False))}
+        )
+    return settings
 
 
 class DatabaseProbe(Protocol):
@@ -40,7 +54,7 @@ class Database:
         with self.engine.connect() as connection:
             connection.execute(text("SET LOCAL statement_timeout = '3000ms'"))
             revision = connection.scalar(text("SELECT version_num FROM alembic_version"))
-            if revision != "0007":
+            if revision != "0008":
                 return "unavailable"
         return "connected"
 

@@ -19,6 +19,7 @@ class Run(Base):
     request_key: Mapped[str]
     request_hash: Mapped[str]
     config: Mapped[dict] = mapped_column(JSONB)
+    custom_oracles: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
     status: Mapped[str] = mapped_column(index=True)
     queued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     queue_expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

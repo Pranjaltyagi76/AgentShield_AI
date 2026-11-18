@@ -68,3 +68,25 @@ class ScenarioVersion(Base):
     description: Mapped[str]
     runtime_context: Mapped[dict] = mapped_column(JSONB)
     evaluator_rule: Mapped[str]
+
+
+class CustomScenario(Base):
+    __tablename__ = "custom_scenarios"
+    id: Mapped[str] = mapped_column(primary_key=True)
+    owner_id: Mapped[UUID] = mapped_column(
+        ForeignKey("guest_sessions.id", ondelete="CASCADE"), index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class CustomScenarioVersion(Base):
+    __tablename__ = "custom_scenario_versions"
+    scenario_id: Mapped[str] = mapped_column(
+        ForeignKey("custom_scenarios.id", ondelete="CASCADE"), primary_key=True
+    )
+    version: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    description: Mapped[str]
+    definition: Mapped[dict] = mapped_column(JSONB)
+    definition_hash: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

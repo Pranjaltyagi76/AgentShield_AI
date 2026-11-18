@@ -15,8 +15,10 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, 
 from pydantic import Field, field_validator, model_validator
 from sqlalchemy import select, text
 
+from app.api.custom_scenarios import owned as owned_custom
 from app.api.workspaces import DB, Strict, accessible, guest
-from app.db.models import ScenarioVersion, Version
+from app.custom_scenarios import CustomDraft, CustomSelection, compile_definition
+from app.db.models import CustomScenarioVersion, ScenarioVersion, Version
 from app.db.runs import Event, Result, Run
 from app.evaluation import metrics
 from app.policy import MAX_CALLS, POLICY_VERSION, SCHEMAS, encoded
@@ -98,11 +100,16 @@ class RunInput(Strict):
     agent_version_id: UUID
     scenarios: list[str] = Field(default_factory=list, min_length=1, max_length=12)
     suite_id: Literal["core-v2"] | None = None
+    custom_scenarios: list[CustomSelection] = Field(default_factory=list, max_length=12)
 
     @model_validator(mode="after")
     def selection(self):
-        if bool(self.scenarios) == bool(self.suite_id):
-            raise ValueError("Select either scenarios or a suite")
+        explicit = bool(self.scenarios or self.custom_scenarios)
+        if explicit == bool(self.suite_id):
+            raise ValueError("Select either explicit scenarios or a suite")
+        custom_ids = [item.id for item in self.custom_scenarios]
+        if len(custom_ids) != len(set(custom_ids)) or len(self.scenarios) + len(custom_ids) > 12:
+            raise ValueError("Select up to twelve distinct scenarios")
         return self
 
     @field_validator("scenarios")
@@ -158,7 +165,11 @@ def submit(
     selected = list(MEMBERS) if data.suite_id else data.scenarios
     if data.confirmation and data.confirmation.scenario not in selected:
         raise HTTPException(422)
-    signature = sha256(encoded(data.model_dump(mode="json", exclude_none=True))).hexdigest()
+    signature_body = data.model_dump(mode="json", exclude_none=True)
+    if not data.custom_scenarios:
+        # Preserve retry hashes created before custom authoring was introduced.
+        signature_body.pop("custom_scenarios")
+    signature = sha256(encoded(signature_body)).hexdigest()
     previous = s.scalar(
         select(Run).where(Run.owner_id == owner.id, Run.request_key == idempotency_key)
     )
@@ -204,6 +215,30 @@ def submit(
         if scenario_id == "AS-006":
             context.update(task=source["task"], delivery=True)
         scenarios.append({"id": scenario_id, "version": scenario_version, "context": context})
+    custom_oracles = {}
+    for choice in data.custom_scenarios:
+        owned_custom(s, owner, choice.id)
+        versioned = s.get(CustomScenarioVersion, (choice.id, choice.version))
+        if versioned is None:
+            raise HTTPException(404)
+        draft = CustomDraft(
+            name=versioned.name, description=versioned.description, definition=versioned.definition
+        )
+        context, oracle = compile_definition(draft.definition)
+        context["available_tools"] = [
+            tool for tool in context["available_tools"] if tool in version.tool_config_json
+        ]
+        scenarios.append(
+            {
+                "id": choice.id,
+                "version": choice.version,
+                "name": versioned.name,
+                "definition_hash": versioned.definition_hash,
+                "checker": draft.definition.checker,
+                "context": context,
+            }
+        )
+        custom_oracles[choice.id] = oracle
     revision = os.getenv("SOURCE_REVISION") or os.getenv("RENDER_GIT_COMMIT", "")
     config = {
         "source_revision": revision if re.fullmatch(r"[0-9a-f]{40}", revision) else None,
@@ -243,6 +278,7 @@ def submit(
         request_hash=signature,
         status="queued",
         config=config,
+        custom_oracles=custom_oracles,
         queue_expires_at=now() + timedelta(seconds=QUEUE_SECONDS),
     )
     s.add(run)
@@ -362,7 +398,7 @@ def traces(
     run_id: UUID,
     request: Request,
     s: DB,
-    scenario_id: Annotated[str | None, Query(pattern=r"^AS-[0-9]{3}$")] = None,
+    scenario_id: Annotated[str | None, Query(pattern=r"^(AS-[0-9]{3}|CS-[0-9a-f]{32})$")] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
     offset: Annotated[int, Query(ge=0)] = 0,
 ):

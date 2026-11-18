@@ -52,6 +52,7 @@ def assess(session, run, result):
         events,
         context["available_tools"],
         approval if approval and approval["scenario"] == result.scenario_id else None,
+        custom=(run.custom_oracles or {}).get(result.scenario_id),
     )
     result.outcome = result.assessment["outcome"]
 

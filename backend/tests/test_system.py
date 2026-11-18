@@ -37,7 +37,14 @@ def test_optional_inference_status_does_not_probe_database_or_reveal_keys(monkey
     with TestClient(create_app(config(), probe)) as client:
         response = client.get("/api/v1/demo/status")
         assert response.status_code == 200
-        assert response.json() == {
+        body = response.json()
+        assert body.pop("custom_scenarios_enabled") is True
+        limits = body.pop("limits")
+        assert limits["custom_scenarios_per_guest"] == 8
+        assert limits["versions_per_custom_scenario"] == 4
+        assert limits["scenarios_per_run"] == 12
+        assert limits["database_admission_bytes"] == 524288000
+        assert body == {
             "execution_enabled": False,
             "profiles": ["vulnerable", "hardened"],
             "requires_api_key": False,

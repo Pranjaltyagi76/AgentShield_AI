@@ -16,6 +16,7 @@ from starlette.exceptions import HTTPException
 
 from app import __version__
 from app.api.benchmarks import router as benchmark_router
+from app.api.custom_scenarios import router as custom_router
 from app.api.reports import router as report_router
 from app.api.runs import RunLimiter
 from app.api.runs import router as run_router
@@ -128,6 +129,7 @@ def create_app(settings: Settings | None = None, database: DatabaseProbe | None 
 
     application.state.issue_limiter = IssueLimiter()
     application.include_router(workspace_router)
+    application.include_router(custom_router)
     if config.local_runs_enabled or config.public_runs_enabled:
         application.state.run_limiter = RunLimiter()
         application.include_router(run_router)
