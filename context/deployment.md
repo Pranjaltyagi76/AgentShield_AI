@@ -62,11 +62,15 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
-## Phase 10 publication preparation — November 18, 2026
+## Phase 10 frontend publication — November 18, 2026
 
 Reuse the same Vercel project/team, Render service and Neon project. Phase 10 changes frontend status text and portfolio documentation only. Runtime code stays at the verified `6478fc228b60eeb729fab4a47945f043e7a3419e`, schema `0007`; public scripted execution remains enabled and Gemini disabled. No new resource, environment change, paid dependency, billing change or backend redeploy is required.
 
-The existing Vercel project ID/team and canonical production alias were re-read before release. Forty tracked frontend files are the intended source upload; the video/capture assets live under `docs/portfolio/` and are not part of the frontend runtime bundle. Fresh hosted suites, comparison and both report downloads were observed on November 18 before the status update. Source publication, CI and frontend release results will be added after verification.
+The existing Vercel project ID/team and canonical production alias were re-read before release. Forty reviewed tracked frontend files were uploaded from source `fff55c404b79930823d21830113c8ac6439ff80a`; video/capture assets live under `docs/portfolio/` and are not part of the frontend runtime bundle. Fresh hosted suites, comparison and both report downloads were observed on November 18 before the status update.
+
+Vercel deployment `dpl_C42Xhih6hnos7rC3AGF8B4uCDLRY` reached READY at **03:59:47.959 UTC**, with both existing production aliases assigned. [All three CI jobs passed](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/44233718830) for the uploaded source. The canonical public `/roadmap` showed Phase 10 complete, Phase 7 disabled and both original requirement gaps explicitly open. Overview displayed the new portfolio label. `/sample` loaded the unchanged November 17 capture; System status showed Connected, Ready and public execution Enabled with Gemini disabled. No login or private developer credential was needed to inspect these pages. Proof is `docs/screenshots/phase10-roadmap.jpg`.
+
+No backend redeploy, new production fixture or configuration change occurred. This release reuses the previously verified free resources; November 17 billing confirmation retains its original date. The final documentation/media-compatibility commit records this release without changing the uploaded frontend.
 
 ## Phase 9 hosted release — November 17, 2026
 

@@ -86,7 +86,8 @@ def main():
         font_option = "fontfile=header.ttf:"
     # Relative subtitle filename avoids Windows drive-colon filter escaping.
     filters = (
-        "scale=1000:800:force_original_aspect_ratio=decrease,"
+        "scale=1000:800:force_original_aspect_ratio=decrease:in_range=pc:out_range=tv,"
+        "format=yuv420p,setparams=range=limited,"
         "pad=1024:960:(ow-iw)/2:40:color=0x10221b,"
         "drawtext="
         + font_option

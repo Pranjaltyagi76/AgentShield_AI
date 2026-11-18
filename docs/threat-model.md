@@ -34,7 +34,7 @@ These are code/specification defaults, not measured traffic capacity.
 |---|---|
 | Guest admission | 8 per peer and 60 globally per 600 seconds; 128 retained guests |
 | Guest data | 8 profiles/guest; 4 immutable versions/profile; 7-day expiry |
-| Write bodies | 256 KiB for run POST/PATCH paths; 64 KiB otherwise; 16 KiB UTF-8 prompt |
+| Write bodies | POST/PATCH at exactly `/api/v1/runs`: 256 KiB; other POST/PATCH bodies: 64 KiB; prompt: 16 KiB UTF-8 |
 | Run admission | 5 per owner and peer, 50 globally per 600 seconds; 1 queued and 1 active/guest; 10 queued and 2 active globally |
 | Execution | 12 scenarios, 10 steps/scenario; gateway denies further calls after 6 calls |
 | Time | Queue 300 seconds, run 180 seconds, scenario 60 seconds; stale heartbeat recovery after 5 seconds |

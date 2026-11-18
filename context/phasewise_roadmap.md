@@ -4,7 +4,7 @@ Last updated: November 18, 2026. Source: Section 16 of [AgentShield_PROJECT.md](
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation was explicitly approved on November 17 and both hosted no-key suites passed. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is explicitly disabled under its optional exit branch. Phase 8 reports and polish is complete locally. Phase 9 hosted validation is complete. Phase 10 portfolio preparation is in final verification. Original custom-authoring/settings requirements remain open; phase completion does not waive them. The hosted application now serves the scripted feature set, and its real idle/wake cycle has been verified. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation was explicitly approved on November 17 and both hosted no-key suites passed. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is explicitly disabled under its optional exit branch. Phase 8 reports and polish is complete locally. Phase 9 hosted validation is complete. Phase 10 portfolio preparation completed November 18, with actual artifacts, checks, CI and public frontend verification. Original custom-authoring/settings requirements remain open; phase completion does not waive them. The hosted application serves the scripted feature set, and its real idle/wake cycle has been verified. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -20,7 +20,7 @@ Implement only the phase explicitly requested by the owner. Later-phase content 
 | 7 | Optional free real-model adapter | Disabled explicitly; free account access unverified, no configured key |
 | 8 | HTML/JSON reports, saved sample, UX polish | Verified locally on November 17 |
 | 9 | Complete public deployment validation | Complete November 17; live workflow, recovery and cold wake verified |
-| 10 | Portfolio evidence and walkthrough | Implemented; final verification/publication in progress |
+| 10 | Portfolio evidence and walkthrough | Complete November 18; artifacts, fresh hosted captures, local checks, CI and public frontend verified |
 
 ## Phase 0: Foundation
 
@@ -110,7 +110,11 @@ Finalize architecture/threat model/methodology, measured sample report, actual s
 
 Exit evidence: a reviewer can understand the repository, reproduce setup, inspect evidence, and try the deployed app without needing private credentials.
 
-November 18 scope: actual architecture/module map and tradeoffs, implemented threat controls, precise metric cohorts, requirement traceability, real hosted screenshots, a 120-second captioned edited-capture MP4 with source frames/transcript/rebuild script, and evidence-linked interview/resume notes. Fresh hosted suites and report downloads were observed. Final checks and release evidence will be recorded before completion. No new runtime feature, provider adapter or infrastructure resource is introduced.
+Started and completed November 18. Deliverables include actual architecture/module map and tradeoffs, implemented threat controls, precise metric cohorts, requirement traceability, real hosted screenshots, a 120-second captioned edited-capture MP4 with source frames/transcript/rebuild script, and evidence-linked interview/resume notes. Fresh hosted suites, comparison, evidence links and both report downloads were observed. The saved historical sample retains its November 17 provenance.
+
+Relevant commits: `29774d6` design/threat review, `7b32073` methodology/acceptance/claims, `b64e457` walkthrough and capture sources, `f935d61` frontend status and `fff55c4` reviewer guide/verification. All use Pranjal Tyagi for author and committer. The final release-evidence commit also normalizes video color format for playback compatibility. Frontend source `fff55c4` passed all three CI jobs and Vercel deployment `dpl_C42Xhih6hnos7rC3AGF8B4uCDLRY` reached READY at 03:59:47.959 UTC. The public overview, roadmap, static sample and Connected/Ready system view were verified. Local frontend checks, 25 tests, media lint/decode and documentation/report checks passed; exact evidence is in performance_review.md.
+
+No Phase 10 portfolio gate remains. No new runtime feature, provider adapter, backend deployment or infrastructure resource was introduced. FR-03 custom authoring and FR-13's dedicated settings page remain open original requirements, not silently deferred acceptance. The optional Phase 7 remains disabled. Further implementation requires the owner's explicit request.
 
 ## Completion record for every phase
 
