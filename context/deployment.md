@@ -62,6 +62,12 @@ Environment-variable updates may schedule a Render deploy themselves; inspect `l
 
 Vercel scope `pranjal-tyagi-ai` (`team_mRdCuSvoFHIrkEm4K3UAPs7P`) is now authorized. Reuse it; no further scope or token request is needed. Do not commit short-lived consent links. An attempted project-wide protection removal was rejected by automatic approval review and was not applied. The public production alias works with default protection retained.
 
+## Phase 10 publication preparation — November 18, 2026
+
+Reuse the same Vercel project/team, Render service and Neon project. Phase 10 changes frontend status text and portfolio documentation only. Runtime code stays at the verified `6478fc228b60eeb729fab4a47945f043e7a3419e`, schema `0007`; public scripted execution remains enabled and Gemini disabled. No new resource, environment change, paid dependency, billing change or backend redeploy is required.
+
+The existing Vercel project ID/team and canonical production alias were re-read before release. Forty tracked frontend files are the intended source upload; the video/capture assets live under `docs/portfolio/` and are not part of the frontend runtime bundle. Fresh hosted suites, comparison and both report downloads were observed on November 18 before the status update. Source publication, CI and frontend release results will be added after verification.
+
 ## Phase 9 hosted release — November 17, 2026
 
 The owner explicitly approved `PUBLIC_RUNS_ENABLED=true` on the existing Render Free service. Initial automatic approval review rejected activation until that exact approval was received. The owner separately approved the temporary orphaned-run fixture, verification-guest expiry and dependent recovery redeploy. Account settings were confirmed by the owner as free with no chargeable overages.
@@ -181,11 +187,11 @@ If costs or limits become uncertain, disable inference first and stop accepting 
 
 After restart, fail orphaned active runs as interrupted and preserve their partial evidence. Generate reports from database state, never local stored files. Keep a manual export procedure for synthetic data/configuration, with credentials excluded. Backups on existing local storage are optional and do not imply permanent guest retention. Roll back an application revision only if database migrations remain compatible; record any migration repair as a new change.
 
-## Observed deployment record
+## Phase 0 observed deployment record (historical)
 
 Verified November 16, 2026. No credentials or connection strings are recorded here.
 
-| Item | Current evidence |
+| Item | Evidence at the Phase 0 review |
 |---|---|
 | Repository | [Pranjaltyagi76/AgentShield_AI](https://github.com/Pranjaltyagi76/AgentShield_AI) |
 | Vercel project | agentshield-ai; prj_SQE3tk0g66cjq1qDqQ6NlJTET0Lb; scope pranjal-tyagi-ai; Hobby badge verified |

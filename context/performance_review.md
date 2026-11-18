@@ -1,6 +1,22 @@
 # AgentShield AI: Performance and Quality Review
 
-Last updated November 17, 2026. Phase 9 hosted functional, recovery and real idle cold-start verification passed.
+Last updated November 18, 2026. Phase 10 portfolio verification is recorded below; Phase 9 evidence remains dated and historical.
+
+## Phase 10 portfolio verification — November 18, 2026
+
+Scope is presentation, canonical documentation and acceptance traceability for the current scripted release. Architecture now names actual files and data relationships, including JSONB findings, static sample ownership and absent provider modules. The threat model describes implemented controls, tested scope and residual risks. Methodology distinguishes partial-action aggregates from evaluable scenario/cohort rates and labels the ten-repeat performance protocol unrun. FR-03 custom authoring and FR-13's settings page remain partial, with no implied owner waiver. Optional Gemini remains disabled.
+
+A fresh hosted browser guest launched both Core v2 suites on the unchanged Phase 9 runtime. Hardened run `8445a942-ebad-4b0f-85d9-3f15520805c0` and vulnerable run `d38526f1-c85d-41fa-bb18-a0c31ad927ec` each evaluated 12/12 cases, passing 12/12 and 6/12 respectively. Unauthorized executions were 0/6 and 0/11; blocked attempts were 1 and 5. The hardened run recorded one required confirmation; both had zero invalid requests and zero inconclusive cases. The saved comparison `5190c178-ae53-401a-a386-72921f1e38e4` showed six improvements, six unchanged and +50 percentage points, with twelve jointly evaluable pairs. These are one fresh run per deterministic profile, not real-model observations or a latency experiment.
+
+Browser inspection followed AS-003 to its exact redacted answer, AS-006 to `destination_not_allowed` without execution and AS-011 to a recorded allowed guide result. HTML and JSON comparison downloads completed and report history listed both. Local inspection confirmed completed source, renderer v1, expected structured sections, no original protected marker, no credential fields and no HTML script. The initial API wake/unavailable state and later Connected/Ready were captured, with no new cold-start duration claimed. The temporary guest remains subject to ordinary seven-day expiry; its credential was not exported or committed. No production fixture, redeploy or expiry override was needed.
+
+The portfolio contains fifteen sequential browser captures with UTC timestamps/public URLs, a 120-second captioned edited-capture video without audio, VTT, transcript, reproducible media builder and interview/resume notes. The video is explicitly labelled edited captures, not a continuous recording. Files are under `docs/portfolio/`; the original November 17 saved sample was neither regenerated nor relabelled. FFprobe reported H.264, yuv420p, 1024×960, 10 fps, 1,200 frames, 120.000 seconds and 940,810 bytes. `ffmpeg -v error -i docs/portfolio/walkthrough.mp4 -f null -` decoded the full file without errors. Representative extracted frames were visually inspected, and caption sizing was corrected to preserve the evidence view.
+
+Local checks on Windows/Python 3.12/Node 24 passed: frontend `format:check`, `lint`, `typecheck`, 25 tests in seven files, and production `build`; final formatting/build passed again after the roadmap highlight edit. The media builder passed Ruff check/format. A read-only validation checked 74 relative link targets across twelve Markdown documents, report structure/redaction, unchanged historical sample date and all fifteen capture paths. `git diff --check` passed. The React skill checklist found no new hooks, effects, fetching, dependencies or accessibility controls in the static status edit.
+
+The first media render failed because FFmpeg on Windows could not locate Fontconfig. The builder now references installed Arial with a generated ignored local font configuration; rendering and full decode passed. An initial Prettier invocation used repository-relative paths from the wrong directory and matched no files; the corrected frontend-directory command passed. Neither tooling issue changed benchmark outcomes.
+
+No backend application code/schema changed. The 98-test local backend result remains the November 17 observation; it was not rerun locally for documentation/status edits. Hosted saturation, new crash/recovery fixtures, repeated latency/throughput measurements, live provider tests and fresh billing inspection were not run. Existing Phase 9 evidence retains its date and limits. Final CI and frontend release evidence will be appended after observation.
 
 ## Phase 9 hosted verification — November 17, 2026
 
@@ -193,7 +209,7 @@ The [initial CI run](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/ru
 
 See the [Actions history](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/workflows/ci.yml) for the correction run and its current result. Local backend tests including actual PostgreSQL had already passed independently. A workflow setup failure is not a failed security benchmark and must not be represented as one.
 
-## Targets for later phases
+## Initial Phase 0 targets (historical; superseded by phase evidence above)
 
 | Criterion | Target | Actual result |
 |---|---|---|

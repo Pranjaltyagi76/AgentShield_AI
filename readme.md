@@ -2,23 +2,35 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
-**Phase 9 is complete. The scripted workflow is deployed on Vercel, Render Free and Neon Free.** Open `/agents` locally to start a seven-day workspace, create profiles, edit metadata, and save immutable versions. Open `/scenarios` to search twelve curated definitions without a session.
+**Phase 10 portfolio materials are ready for the deployed scripted release.** Use the app without an AI API key, inspect a real historical report, and follow a finding to its recorded event.
 
-The required product will work without an AI API key, using synthetic data and mock actions. Scripted demo results will demonstrate the actual harness; they will not establish real-model resistance to prompt injection.
+[Live demo](https://agentshield-ai-tau.vercel.app/runs) · [Saved sample](https://agentshield-ai-tau.vercel.app/sample) · [Two-minute captioned video](docs/portfolio/walkthrough.mp4) · [Walkthrough and transcript](docs/portfolio/walkthrough.md)
 
-## Available now
+## What is implemented
 
-- Responsive React/Vite/TypeScript workspace with Overview, System status, roadmap, and not-found routes.
-- FastAPI process health and real PostgreSQL readiness endpoints.
-- Validated environment settings, restricted CORS, safe JSON errors, request IDs, and structured logs.
-- Guest-only profile mutations; shared examples are read-only. Scripted runs require explicit opt-in. No inference key is needed.
-- Small SQLAlchemy/psycopg connection pool and bounded connection/query timeouts.
-- Local PostgreSQL Compose configuration, backend Dockerfile, committed npm/uv dependency locks, and CI.
-- Free Render/Vercel deployment configuration and an initial threat model.
+- Twelve pinned synthetic Core v2 scenarios and two versioned deterministic profiles.
+- Independent mock-tool gateway, ordered traces, evidence-linked findings and coverage-aware evaluation.
+- Guest-owned profiles/runs, immutable versions, bounded PostgreSQL queue, cancellation and interruption recovery.
+- Compatible-run comparisons with explicit counts, exclusions and percentage-point deltas.
+- Authenticated HTML/JSON exports from retained PostgreSQL records; redacted historical sample independent of API health.
+- React/Vite/TypeScript frontend, FastAPI backend and PostgreSQL, deployed on existing ongoing free plans.
 
-Phase 1 local verification (November 16): 35 backend tests passed with PostgreSQL and 13 frontend tests passed. The catalog and private profile creation were also checked in the browser.
+The scripts exercise the real harness. They do not establish real-model resistance to prompt injection. Custom declarative scenario authoring and a dedicated settings page remain open original requirements. Gemini is explicitly disabled and its live adapter is unimplemented.
 
-Historical Phase 0 verification (November 16): the backend suite contains **32 cases**; **31 passed locally and one database integration case skipped** without TEST_DATABASE_URL. [CI with PostgreSQL](https://github.com/Pranjaltyagi76/AgentShield_AI/actions/runs/43859035364) passed all jobs, including the database integration check, frontend checks/build, and container build. The frontend suite contains **11 tests**. Live Render readiness also reached Neon successfully. These are foundation tests, not security benchmark results. See [performance review](context/performance_review.md) for environment and limitations.
+## Reviewer starting points
+
+| Inspect | Evidence |
+|---|---|
+| Runtime and decisions | [Architecture diagram and actual module map](context/architecture.md), [system design](context/system%20design.md) |
+| Security boundaries | [Threat model, controls and residual risks](docs/threat-model.md) |
+| Scoring and reproducibility | [Methodology and denominators](context/benchmark.md), [sample JSON](frontend/public/saved-sample.json), [sample HTML](frontend/public/saved-sample.html) |
+| Actual observations | [Dated performance/quality review](context/performance_review.md), [deployment evidence](context/deployment.md) |
+| Portfolio discussion | [Video, transcript and capture provenance](docs/portfolio/walkthrough.md), [resume/interview notes](docs/portfolio/interview-notes.md) |
+| Remaining acceptance gaps | [Requirement review](requirement.md#original-requirement-acceptance-review--november-18-2026) |
+
+On November 18, fresh hosted Core v2 runs evaluated 12/12 cases each. Hardened passed 12/12 and vulnerable passed 6/12; their comparison showed six improvements and six unchanged cases. These are scripted observations. The bundled sample retains its separate November 17 capture date. Historical quality evidence on November 17 includes 98 backend tests, 25 frontend tests and all three CI jobs passing; Phase 10 verification is recorded separately in the review log.
+
+![Actual hosted comparison from the walkthrough](docs/portfolio/captures/12.jpg)
 
 ## Try the hosted app
 
@@ -200,11 +212,13 @@ Open the [live AgentShield app](https://agentshield-ai-tau.vercel.app) or its [s
 
 Follow [context/deployment.md](context/deployment.md) for the exact configuration and release procedure. Vercel GitHub integration is not installed, so frontend releases currently upload reviewed source through the API. Render automatic deploy is off. Free services may sleep or suspend at quota limits. Hosted warm suites, ownership, exports and restart regeneration were verified on November 17. One real idle wake returned valid health JSON in 32.812 seconds. The saved sample remained available during wake-up and manual retry restored API connectivity. See the dated deployment record for the observation and limitations.
 
-## Remaining work
+## Known limits and open requirements
 
-Phase 9 has verified the hosted workflow, migrations, isolation, recovery and a real idle cold start. Phase 10 prepares the portfolio walkthrough and final evidence. Optional eligible Gemini free-tier testing stays separate from scripted results.
+Phase 10 completes portfolio packaging for the current scripted release. Original FR-03 custom declarative authoring and FR-13's dedicated settings page remain partial; profile controls, System status and operator configuration cover some settings. These gaps require an explicitly requested implementation scope. No product acceptance waiver is assumed.
 
-This is an application-controlled simulation harness. It does not execute untrusted code or test arbitrary external systems. A passing finite benchmark does not prove complete security.
+Optional real-model inference has no adapter, eligible free account, parsing/retry/quota evidence or provider-token measurements. Scripted byte budgets are not token accounting. Exact finite oracles do not establish general security. Anonymous quotas and temporary tab credentials limit availability and persistence. One observed 32.812-second cold wake and two single warm timings are not latency guarantees or throughput measurements.
+
+This application-controlled simulation uses synthetic data and mock actions. It does not execute untrusted code or test arbitrary external systems. Free services may sleep, restart or suspend at quotas. No paid fallback is configured.
 
 ## Documentation map
 
@@ -217,8 +231,8 @@ This is an application-controlled simulation harness. It does not execute untrus
 | [context/phasewise_roadmap.md](context/phasewise_roadmap.md) | Phase scope, status, and gates |
 | [context/deployment.md](context/deployment.md) | Hosting runbook and observed results |
 | [context/performance_review.md](context/performance_review.md) | Actual verification evidence |
-| [context/benchmark.md](context/benchmark.md) | Future benchmark methodology |
-| [docs/threat-model.md](docs/threat-model.md) | Initial threats, controls, and remaining risks |
+| [context/benchmark.md](context/benchmark.md) | Evaluation and performance methodology |
+| [docs/threat-model.md](docs/threat-model.md) | Implemented controls, verification and residual risks |
 | [AGENTS.md](AGENTS.md) | Development and publication instructions |
 
 Owner: **Pranjal Tyagi**. Repository: [Pranjaltyagi76/AgentShield_AI](https://github.com/Pranjaltyagi76/AgentShield_AI). New commits use the owner's author/committer identity without bot co-author attribution. Prefer four to six meaningful commits per substantial push; never manufacture history.

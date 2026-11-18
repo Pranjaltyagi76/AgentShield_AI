@@ -1,10 +1,10 @@
 # AgentShield AI: Phasewise Roadmap
 
-Last updated: November 17, 2026. Source: Section 16 of [AgentShield_PROJECT.md](../AgentShield_PROJECT.md).
+Last updated: November 18, 2026. Source: Section 16 of [AgentShield_PROJECT.md](../AgentShield_PROJECT.md).
 
 ## Current position
 
-Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation was explicitly approved on November 17 and both hosted no-key suites passed. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is explicitly disabled under its optional exit branch. Phase 8 reports and polish is complete locally. Phase 9 hosted validation is complete. Phase 10 portfolio preparation is next. The hosted application now serves the scripted feature set, and its real idle/wake cycle has been verified. See performance_review.md and deployment.md for dated evidence and limitations.
+Phase 0 is complete as of November 16, 2026. Local foundation checks and hosted frontend → FastAPI → Neon connectivity passed. The public Vercel Hobby shell, Render Free API, Neon Free database, direct page links, exact-origin CORS, and mobile navigation were verified without an inference key. Phases 1 and 2 are complete locally (November 16). Phase 3 policy enforcement passed locally and in CI on November 17. Public activation was explicitly approved on November 17 and both hosted no-key suites passed. Phase 4 is complete locally. Both scripted profiles ran all twelve cases. Phase 5 is complete locally. Phase 6 benchmark comparison is complete locally. Phase 7 is explicitly disabled under its optional exit branch. Phase 8 reports and polish is complete locally. Phase 9 hosted validation is complete. Phase 10 portfolio preparation is in final verification. Original custom-authoring/settings requirements remain open; phase completion does not waive them. The hosted application now serves the scripted feature set, and its real idle/wake cycle has been verified. See performance_review.md and deployment.md for dated evidence and limitations.
 
 Implement only the phase explicitly requested by the owner. Later-phase content in this document is a plan, not permission to build every feature now. The optional Phase 7 may be explicitly skipped with a recorded reason while preserving core completion criteria.
 
@@ -20,7 +20,7 @@ Implement only the phase explicitly requested by the owner. Later-phase content 
 | 7 | Optional free real-model adapter | Disabled explicitly; free account access unverified, no configured key |
 | 8 | HTML/JSON reports, saved sample, UX polish | Verified locally on November 17 |
 | 9 | Complete public deployment validation | Complete November 17; live workflow, recovery and cold wake verified |
-| 10 | Portfolio evidence and walkthrough | Not started |
+| 10 | Portfolio evidence and walkthrough | Implemented; final verification/publication in progress |
 
 ## Phase 0: Foundation
 
@@ -109,6 +109,8 @@ November 17 completion: the existing free resources serve the frontend, API, mig
 Finalize architecture/threat model/methodology, measured sample report, actual screenshots, walkthrough video, decision records, limitations, and interview notes. Update resume claims only to match implemented, measured behavior.
 
 Exit evidence: a reviewer can understand the repository, reproduce setup, inspect evidence, and try the deployed app without needing private credentials.
+
+November 18 scope: actual architecture/module map and tradeoffs, implemented threat controls, precise metric cohorts, requirement traceability, real hosted screenshots, a 120-second captioned edited-capture MP4 with source frames/transcript/rebuild script, and evidence-linked interview/resume notes. Fresh hosted suites and report downloads were observed. Final checks and release evidence will be recorded before completion. No new runtime feature, provider adapter or infrastructure resource is introduced.
 
 ## Completion record for every phase
 
