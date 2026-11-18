@@ -1,0 +1,92 @@
+[
+  {
+    "file": "01.jpg",
+    "title": "Historical saved sample, available from the static frontend",
+    "captured_at": "2026-11-18T03:30:58.374Z",
+    "url": "https://agentshield-ai-tau.vercel.app/sample"
+  },
+  {
+    "file": "02.jpg",
+    "title": "During an API wake, retry is explicit and the saved sample stays accessible",
+    "captured_at": "2026-11-18T03:31:10.089Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs"
+  },
+  {
+    "file": "03.jpg",
+    "title": "Start a temporary guest workspace without a model key",
+    "captured_at": "2026-11-18T03:31:10.587Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs"
+  },
+  {
+    "file": "04.jpg",
+    "title": "Select the shared hardened behavior version and the twelve-case Core v2 suite",
+    "captured_at": "2026-11-18T03:31:21.544Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs"
+  },
+  {
+    "file": "05.jpg",
+    "title": "The persisted queue executes the requested suite and records evidence",
+    "captured_at": "2026-11-18T03:31:22.171Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs/8445a942-ebad-4b0f-85d9-3f15520805c0"
+  },
+  {
+    "file": "06.jpg",
+    "title": "The observed hardened run evaluated all twelve scenarios",
+    "captured_at": "2026-11-18T03:31:43.326Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs/8445a942-ebad-4b0f-85d9-3f15520805c0"
+  },
+  {
+    "file": "07.jpg",
+    "title": "Compare scripted behavior profiles while holding the suite and limits fixed",
+    "captured_at": "2026-11-18T03:31:55.248Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs"
+  },
+  {
+    "file": "08.jpg",
+    "title": "The observed vulnerable run passed six of twelve evaluated cases",
+    "captured_at": "2026-11-18T03:32:33.766Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs/d38526f1-c85d-41fa-bb18-a0c31ad927ec"
+  },
+  {
+    "file": "09.jpg",
+    "title": "A finding opens its exact recorded answer, with the private marker redacted",
+    "captured_at": "2026-11-18T03:33:02.216Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs/d38526f1-c85d-41fa-bb18-a0c31ad927ec?scenario=AS-003&event=432c2b7f-d3e6-40fc-843a-309edd8c0ac8"
+  },
+  {
+    "file": "10.jpg",
+    "title": "The independent gateway blocked the proposed mock destination",
+    "captured_at": "2026-11-18T03:33:15.467Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs/d38526f1-c85d-41fa-bb18-a0c31ad927ec?scenario=AS-006"
+  },
+  {
+    "file": "11.jpg",
+    "title": "An allowed mock read has a recorded tool result and a benign completion check",
+    "captured_at": "2026-11-18T03:33:16.110Z",
+    "url": "https://agentshield-ai-tau.vercel.app/runs/d38526f1-c85d-41fa-bb18-a0c31ad927ec?scenario=AS-011"
+  },
+  {
+    "file": "12.jpg",
+    "title": "Paired comparison shows six improvements and six unchanged cases",
+    "captured_at": "2026-11-18T03:35:48.511Z",
+    "url": "https://agentshield-ai-tau.vercel.app/compare/5190c178-ae53-401a-a386-72921f1e38e4"
+  },
+  {
+    "file": "13.jpg",
+    "title": "Authenticated HTML and JSON reports are generated on demand",
+    "captured_at": "2026-11-18T03:36:09.469Z",
+    "url": "https://agentshield-ai-tau.vercel.app/compare/5190c178-ae53-401a-a386-72921f1e38e4"
+  },
+  {
+    "file": "14.jpg",
+    "title": "Report history retains metadata and regenerates downloads while sources remain",
+    "captured_at": "2026-11-18T03:36:25.450Z",
+    "url": "https://agentshield-ai-tau.vercel.app/reports"
+  },
+  {
+    "file": "15.jpg",
+    "title": "Connected API and database; scripted execution enabled and Gemini disabled",
+    "captured_at": "2026-11-18T03:36:25.793Z",
+    "url": "https://agentshield-ai-tau.vercel.app/system"
+  }
+]

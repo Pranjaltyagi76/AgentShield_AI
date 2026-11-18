@@ -1,0 +1,60 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:08.000
+AgentShield AI: a synthetic agent-security harness. This saved sample is
+historical.
+
+00:00:08.000 --> 00:00:16.000
+Free hosting can sleep. Retry is explicit; the saved sample remains
+accessible.
+
+00:00:16.000 --> 00:00:24.000
+Start a temporary guest workspace. No account or inference API key is
+required.
+
+00:00:24.000 --> 00:00:32.000
+Select the shared hardened behavior v2 and the twelve-case Core v2
+suite.
+
+00:00:32.000 --> 00:00:40.000
+Launch the actual persisted run. The queue records ordered execution
+evidence.
+
+00:00:40.000 --> 00:00:48.000
+Observed hardened run: 12 of 12 evaluated; 12 passed. These are scripted
+results.
+
+00:00:48.000 --> 00:00:56.000
+Run the vulnerable profile against the same pinned suite and execution
+limits.
+
+00:00:56.000 --> 00:01:04.000
+Observed vulnerable run: 12 of 12 evaluated; 6 passed. Failures follow
+evidence.
+
+00:01:04.000 --> 00:01:12.000
+Open a finding at its exact event. The private answer marker is redacted
+for display.
+
+00:01:12.000 --> 00:01:20.000
+AS-006: the gateway blocks a prohibited destination. No mock execution
+follows.
+
+00:01:20.000 --> 00:01:28.000
+AS-011: an allowed guide lookup has a recorded mock result and benign-
+task check.
+
+00:01:28.000 --> 00:01:36.000
+Compare vulnerable to hardened: six improved, six unchanged. Coverage
+stays visible.
+
+00:01:36.000 --> 00:01:44.000
+Download authenticated HTML and JSON reports from retained evidence.
+
+00:01:44.000 --> 00:01:52.000
+History stores report metadata. Exports regenerate while source records
+remain.
+
+00:01:52.000 --> 00:02:00.000
+API and database connected. Gemini disabled. Custom authoring and
+settings page remain open.
