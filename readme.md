@@ -2,6 +2,8 @@
 
 AI agent security testing, controlled attack simulation, and reliability benchmarking.
 
+**Deployment URL:** [https://agentshield-ai-tau.vercel.app](https://agentshield-ai-tau.vercel.app)
+
 **Phase 10 portfolio materials are ready for the deployed scripted release.** Use the app without an AI API key, inspect a real historical report, and follow a finding to its recorded event.
 
 [Live demo](https://agentshield-ai-tau.vercel.app/runs) · [Saved sample](https://agentshield-ai-tau.vercel.app/sample) · [Two-minute captioned video](docs/portfolio/walkthrough.mp4) · [Walkthrough and transcript](docs/portfolio/walkthrough.md)
